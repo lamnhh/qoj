@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"qoj/server"
 	"qoj/server/config"
 )
@@ -8,5 +9,11 @@ import (
 func main() {
 	config.InitialiseDatabaseConnection()
 	app := server.InitialiseApp()
-	_ = app.Run(":3000")
+
+	port := os.Getenv("PORT")
+	// If env.PORT does not exist, run on port 3000
+	if port == "" {
+		port = "3000"
+	}
+	_ = app.Run(":" + port)
 }
