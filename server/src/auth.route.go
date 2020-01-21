@@ -119,7 +119,7 @@ func getSecret(ctx *gin.Context) {
 	})
 }
 
-func InitialiseAuthRoute(app *gin.Engine) {
+func InitialiseAuthRoutes(app *gin.Engine) {
 	app.POST("/api/register", postRegister)
 	app.POST("/api/login", postLogin)
 	app.GET("/api/refresh", getRefresh)
