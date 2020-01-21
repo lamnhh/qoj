@@ -3,7 +3,10 @@ package src
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -22,7 +25,7 @@ func createToken(username string, jwtKey []byte, expirationTime time.Duration) s
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 	tokenString, _ := token.SignedString(jwtKey)
-return tokenString
+	return tokenString
 }
 
 func CreateAccessToken(username string) string {
@@ -55,4 +58,35 @@ func DecodeRefreshToken(tokenString string) (string, error) {
 		return "", errors.New("invalid token")
 	}
 	return claim.Username, nil
+}
+
+func AuthRequired() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Extract header
+		authHeader := ctx.GetHeader("Authorization")
+		if authHeader == "" {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Access token required"})
+			return
+		}
+
+		// Split authHeader into 2 parts: "Bearer" and the actual token
+		authHeaderToken := strings.Split(authHeader, " ")
+		if len(authHeaderToken) != 2 {
+			// If there aren't exactly 2 parts, return a 401
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			return
+		}
+
+		// Extract access token as the 2nd element from authHeaderToken
+		accessToken := authHeaderToken[1]
+		username, err := DecodeAccessToken(accessToken)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Save `username` into context for later use
+		ctx.Set("username", username)
+		ctx.Next()
+	}
 }

@@ -113,8 +113,18 @@ func getRefresh(ctx *gin.Context) {
 	})
 }
 
+func getSecret(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"secret": "Hello there",
+	})
+}
+
 func InitialiseAuthRoute(app *gin.Engine) {
 	app.POST("/api/register", postRegister)
 	app.POST("/api/login", postLogin)
 	app.GET("/api/refresh", getRefresh)
+
+	// Protected route for token testing
+	app.GET("/api/secret", AuthRequired(), getSecret)
 }
+
