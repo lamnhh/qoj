@@ -10,25 +10,23 @@ type Problem struct {
 	Id        int    `json:"id"`
 	Code      string `json:"code" binding:"required"`
 	Name      string `json:"name" binding:"required"`
-	TestCount int    `json:"test_count"`
 }
 
-func CreateProblem(problem Problem) (Problem, error) {
+func CreateProblem(problem Problem) (int, error) {
 	rows, err := config.DB.Query(
-		"INSERT INTO problems(code, name, test_count) VALUES ($1, $2, $3) RETURNING *",
+		"INSERT INTO problems(code, name) VALUES ($1, $2) RETURNING id",
 		problem.Code,
 		problem.Name,
-		problem.TestCount,
 	)
 	if err != nil {
-		return Problem{}, err
+		return 0, err
 	}
 
-	var created Problem
+	var id int
 	for rows.Next() {
-		_ = rows.Scan(&created.Id, &created.Code, &created.Name, &created.TestCount)
+		_ = rows.Scan(&id)
 	}
-	return created, nil
+	return id, nil
 }
 
 func DeleteProblem(problemId int) error {
@@ -52,7 +50,7 @@ func FetchAllProblems() ([]Problem, error) {
 	var problemList []Problem
 	for rows.Next() {
 		var problem Problem
-		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TestCount); err != nil {
+		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {
 			return []Problem{}, err
 		}
 		problemList = append(problemList, problem)
@@ -69,7 +67,7 @@ func FetchProblemById(problemId int) (Problem, error) {
 
 	var problem Problem
 	for rows.Next() {
-		_ = rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TestCount)
+		_ = rows.Scan(&problem.Id, &problem.Code, &problem.Name)
 	}
 	return problem, nil
 }
@@ -83,7 +81,7 @@ func FetchProblemsByCode(code string) ([]Problem, error) {
 	var problemList []Problem
 	for rows.Next() {
 		var problem Problem
-		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TestCount); err != nil {
+		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {
 			return []Problem{}, err
 		}
 		problemList = append(problemList, problem)

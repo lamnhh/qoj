@@ -9,6 +9,5 @@ CREATE TABLE problems (
 	id	SERIAL,
 	code CHAR(10),
 	name CHAR(10),
-	test_count INTEGER,
 	primary key (id)
 );
