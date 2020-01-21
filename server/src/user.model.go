@@ -2,17 +2,21 @@ package src
 
 import "qoj/server/config"
 
-type User struct {
+type UserLogin struct {
 	Username string `json:"username" binding:"required"`
 	Fullname string `json:"fullname" binding:"required"`
+}
+
+type User struct {
+	UserLogin
 	Password string `json:"password" binding:"required"`
 }
 
 func FindUserByUsername(username string) (User, error){
 	var user User
 	err := config.DB.
-		QueryRow("SELECT username, fullname FROM users WHERE username = $1", username).
-		Scan(&user.Username, &user.Fullname)
+		QueryRow("SELECT RTRIM(username), password, RTRIM(fullname) FROM users WHERE username = $1", username).
+		Scan(&user.Username, &user.Password, &user.Fullname)
 	if err != nil {
 		return User{}, err
 	}
