@@ -1,9 +1,11 @@
 package src
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"qoj/server/config"
+	"strings"
 )
 
 type Problem struct {
@@ -41,6 +43,11 @@ func DeleteProblem(problemId int) error {
 	return nil
 }
 
+func normaliseProblem(problem *Problem) {
+	problem.Code = strings.TrimSpace(problem.Code)
+	problem.Name = strings.TrimSpace(problem.Name)
+}
+
 func FetchAllProblems() ([]Problem, error) {
 	rows, err := config.DB.Query("SELECT * FROM problems")
 	if err != nil {
@@ -53,6 +60,7 @@ func FetchAllProblems() ([]Problem, error) {
 		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {
 			return []Problem{}, err
 		}
+		normaliseProblem(&problem)
 		problemList = append(problemList, problem)
 	}
 
@@ -60,15 +68,19 @@ func FetchAllProblems() ([]Problem, error) {
 }
 
 func FetchProblemById(problemId int) (Problem, error) {
-	rows, err := config.DB.Query("SELECT * FROM problems WHERE id = $1", problemId)
+	var problem Problem
+	err := config.DB.QueryRow("SELECT * FROM problems WHERE id = $1", problemId).
+		Scan(&problem.Id, &problem.Code, &problem.Name)
 	if err != nil {
-		return Problem{}, err
+		if err == sql.ErrNoRows {
+			// rows.Next() means no rows was returned. In other words, no problem with such ID exists
+			return Problem{}, errors.New(fmt.Sprintf("No problem with ID %d exists", problemId))
+		} else {
+			return Problem{}, err
+		}
 	}
 
-	var problem Problem
-	for rows.Next() {
-		_ = rows.Scan(&problem.Id, &problem.Code, &problem.Name)
-	}
+	normaliseProblem(&problem)
 	return problem, nil
 }
 
@@ -84,6 +96,7 @@ func FetchProblemsByCode(code string) ([]Problem, error) {
 		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {
 			return []Problem{}, err
 		}
+		normaliseProblem(&problem)
 		problemList = append(problemList, problem)
 	}
 

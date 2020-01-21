@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 func getProblem(ctx *gin.Context) {
@@ -104,7 +105,54 @@ func postProblem(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, problem)
 }
 
+func getProblemId(ctx *gin.Context) {
+	problemId, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
+		return
+	}
+
+	problem, err := FetchProblemById(int(problemId))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, problem)
+}
+
+func getProblemCode(ctx *gin.Context) {
+	code := ctx.Param("code")
+	if code == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem code"})
+		return
+	}
+
+	problemList, err := FetchProblemsByCode(code)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, problemList)
+}
+
+func deleteProblemId(ctx *gin.Context) {
+	problemId, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
+		return
+	}
+
+	if err := DeleteProblem(int(problemId)); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{})
+	}
+}
+
 func InitialiseProblemRoutes(app *gin.Engine) {
 	app.GET("/api/problem", getProblem)
+	app.GET("/api/problem/:id", getProblemId)
+	app.GET("/api/problem-code/:code", getProblemCode)
 	app.POST("/api/problem", postProblem)
+	app.DELETE("/api/problem/:id", deleteProblemId)
 }
