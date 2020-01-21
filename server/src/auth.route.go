@@ -2,6 +2,7 @@ package src
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"net/http"
@@ -30,10 +31,17 @@ func postRegister(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: create access token and refresh token
-	// Access token is sent in response
-	// Refresh token is stored in cookie
-	ctx.Writer.WriteHeader(200)
+	// Set refresh token in cookie
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "rftoken",
+		Value:    CreateRefreshToken(user.Username),
+		HttpOnly: true,
+	})
+
+	// Send access token back to user
+	ctx.JSON(http.StatusOK, gin.H{
+		"accessToken": CreateAccessToken(user.Username),
+	})
 }
 
 func postLogin(ctx *gin.Context) {
@@ -58,15 +66,51 @@ func postLogin(ctx *gin.Context) {
 		return
 	}
 
+	// Set refresh token in cookie
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "rftoken",
+		Value:    CreateRefreshToken(user.Username),
+		HttpOnly: true,
+	})
+
 	// Return (username, fullname)
 	ctx.JSON(http.StatusOK, gin.H{
-		"username": user.Username,
-		"fullname": user.Fullname,
+		"username":    user.Username,
+		"fullname":    user.Fullname,
+		"accessToken": CreateAccessToken(user.Username),
 	})
 }
 
 func getRefresh(ctx *gin.Context) {
+	// Get cookie `rftoken`
+	cookie, err := ctx.Cookie("rftoken")
+	if err != nil {
+		// No cookie `rftoken`, return a 401
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token required"})
+		return
+	}
 
+	fmt.Println(cookie)
+
+	// Decode the cookie above for `username`
+	username, err := DecodeRefreshToken(cookie)
+	if err != nil {
+		// Cannot decode JWT, or JWT is expired, return 401
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Set new refresh token in cookie
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "rftoken",
+		Value:    CreateRefreshToken(username),
+		HttpOnly: true,
+	})
+
+	// Send access token back to user
+	ctx.JSON(http.StatusOK, gin.H{
+		"accessToken": CreateAccessToken(username),
+	})
 }
 
 func InitialiseAuthRoute(app *gin.Engine) {
