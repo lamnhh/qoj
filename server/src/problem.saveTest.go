@@ -54,6 +54,7 @@ func saveTestData(uuid string, problemId int, problemCode string) {
 
 	// Path to save test data: ./server/tasks/id/*.inp | *.out
 	testPath := filepath.Join(".", "server", "tasks", fmt.Sprintf("%d", problemId))
+	_ = os.RemoveAll(testPath)
 	_ = os.Mkdir(testPath, os.ModePerm)
 
 	// Read all test subdirectories, each of which contains a test file

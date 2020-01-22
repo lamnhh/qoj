@@ -127,10 +127,51 @@ func patchProblemId(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, problem)
 }
 
+func putProblemIdTest(ctx *gin.Context) {
+	problemId, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
+		return
+	}
+
+	problem, err := FetchProblemById(int(problemId))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Parse test ZIP file
+	// `file` is required
+	file, _ := ctx.FormFile("file")
+	if file == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ZIP file required"})
+		return
+	}
+
+	// Save uploaded file to ./server/tasks/<uuid>.zip
+	uuid := uuid2.New().String()
+	zipPath := filepath.Join(".", "server", "tasks", uuid + ".zip")
+	if err := ctx.SaveUploadedFile(file, zipPath); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate ZIP file
+	code, err := validateTestZip(uuid, problem.Code)
+	if err != nil {
+		ctx.JSON(code, gin.H{"error": err.Error()})
+	} else {
+		saveTestData(uuid, problem.Id, problem.Code)
+		ctx.JSON(http.StatusOK, problem)
+	}
+	clearTemporaryData(uuid)
+}
+
 func InitialiseProblemRoutes(app *gin.Engine) {
 	app.GET("/api/problem", getProblem)
 	app.GET("/api/problem/:id", getProblemId)
 	app.POST("/api/problem", postProblem)
 	app.DELETE("/api/problem/:id", deleteProblemId)
 	app.PATCH("/api/problem/:id", patchProblemId)
+	app.PUT("/api/problem/:id/test", putProblemIdTest)
 }
