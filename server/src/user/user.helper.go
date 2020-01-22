@@ -1,10 +1,10 @@
-package src
+package user
 
 import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashPassword(password string) string {
+func hashPassword(password string) string {
 	hashedBytes, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 	return string(hashedBytes)
 }

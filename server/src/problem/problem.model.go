@@ -1,11 +1,10 @@
-package src
+package problem
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
 	"qoj/server/config"
-	"strings"
 )
 
 type Problem struct {
@@ -41,11 +40,6 @@ func DeleteProblem(problemId int) error {
 		return errors.New(fmt.Sprintf("No problem with ID %d exists", problemId))
 	}
 	return nil
-}
-
-func normaliseProblem(problem *Problem) {
-	problem.Code = strings.TrimSpace(problem.Code)
-	problem.Name = strings.TrimSpace(problem.Name)
 }
 
 func FetchAllProblems() ([]Problem, error) {
@@ -103,7 +97,7 @@ func FetchProblemsByCode(code string) ([]Problem, error) {
 	return problemList, nil
 }
 
-func updateProblemMetadata(problemId int, patch map[string]string) (Problem, error) {
+func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, error) {
 	// Fetch old problem metadata
 	problem, err := FetchProblemById(problemId)
 	if err != nil {

@@ -1,4 +1,4 @@
-package src
+package problem
 
 import (
 	"github.com/gin-gonic/gin"
@@ -119,7 +119,7 @@ func patchProblemId(ctx *gin.Context) {
 		return
 	}
 
-	problem, err := updateProblemMetadata(int(problemId), patch)
+	problem, err := UpdateProblemMetadata(int(problemId), patch)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
