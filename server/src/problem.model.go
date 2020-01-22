@@ -102,3 +102,30 @@ func FetchProblemsByCode(code string) ([]Problem, error) {
 
 	return problemList, nil
 }
+
+func updateProblemMetadata(problemId int, patch map[string]string) (Problem, error) {
+	// Fetch old problem metadata
+	problem, err := FetchProblemById(problemId)
+	if err != nil {
+		return problem, err
+	}
+
+	// Update according to `patch`
+	if val, ok := patch["code"]; ok {
+		problem.Code = val
+	}
+	if val, ok := patch["name"]; ok {
+		problem.Name = val
+	}
+
+	// Update corresponding row in database
+	err = config.DB.
+		QueryRow("UPDATE problems SET code = $1, name = $2 WHERE id = $3 RETURNING *", problem.Code, problem.Name, problem.Id).
+		Scan(&problem.Id, &problem.Code, &problem.Name)
+	if err != nil {
+		return Problem{}, err
+	}
+
+	normaliseProblem(&problem)
+	return problem, nil
+}

@@ -9,7 +9,16 @@ import (
 )
 
 func getProblem(ctx *gin.Context) {
-	problemList, err := FetchAllProblems()
+	code := ctx.Query("code")
+
+	var problemList []Problem
+	var err error
+	if code == "" {
+		problemList, err = FetchAllProblems()
+	} else {
+		problemList, err = FetchProblemsByCode(code)
+	}
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -83,21 +92,6 @@ func getProblemId(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, problem)
 }
 
-func getProblemCode(ctx *gin.Context) {
-	code := ctx.Param("code")
-	if code == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem code"})
-		return
-	}
-
-	problemList, err := FetchProblemsByCode(code)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	ctx.JSON(http.StatusOK, problemList)
-}
-
 func deleteProblemId(ctx *gin.Context) {
 	problemId, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
 	if err != nil {
@@ -112,10 +106,31 @@ func deleteProblemId(ctx *gin.Context) {
 	}
 }
 
+func patchProblemId(ctx *gin.Context) {
+	problemId, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
+		return
+	}
+
+	var patch map[string]string
+	if err := ctx.ShouldBindJSON(&patch); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	problem, err := updateProblemMetadata(int(problemId), patch)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, problem)
+}
+
 func InitialiseProblemRoutes(app *gin.Engine) {
 	app.GET("/api/problem", getProblem)
 	app.GET("/api/problem/:id", getProblemId)
-	app.GET("/api/problem-code/:code", getProblemCode)
 	app.POST("/api/problem", postProblem)
 	app.DELETE("/api/problem/:id", deleteProblemId)
+	app.PATCH("/api/problem/:id", patchProblemId)
 }
