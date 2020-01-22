@@ -35,18 +35,18 @@ func postRegister(ctx *gin.Context) {
 	// Set refresh token in cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:     "rftoken",
-		Value:    CreateRefreshToken(user.Username),
+		Value:    createRefreshToken(user.Username),
 		HttpOnly: true,
 	})
 
 	// Send access token back to user
 	ctx.JSON(http.StatusOK, gin.H{
-		"accessToken": CreateAccessToken(user.Username),
+		"accessToken": createAccessToken(user.Username),
 	})
 }
 
 func postLogin(ctx *gin.Context) {
-	var userLogin user2.UserLogin
+	var userLogin user2.LoginAuth
 
 	// If request body is not a JSON, return a 400.
 	if err := ctx.ShouldBindJSON(&userLogin); err != nil {
@@ -70,7 +70,7 @@ func postLogin(ctx *gin.Context) {
 	// Set refresh token in cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:     "rftoken",
-		Value:    CreateRefreshToken(user.Username),
+		Value:    createRefreshToken(user.Username),
 		HttpOnly: true,
 	})
 
@@ -78,7 +78,7 @@ func postLogin(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"username":    user.Username,
 		"fullname":    user.Fullname,
-		"accessToken": CreateAccessToken(user.Username),
+		"accessToken": createAccessToken(user.Username),
 	})
 }
 
@@ -94,7 +94,7 @@ func getRefresh(ctx *gin.Context) {
 	fmt.Println(cookie)
 
 	// Decode the cookie above for `username`
-	username, err := DecodeRefreshToken(cookie)
+	username, err := decodeRefreshToken(cookie)
 	if err != nil {
 		// Cannot decode JWT, or JWT is expired, return 401
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
@@ -104,13 +104,13 @@ func getRefresh(ctx *gin.Context) {
 	// Set new refresh token in cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:     "rftoken",
-		Value:    CreateRefreshToken(username),
+		Value:    createRefreshToken(username),
 		HttpOnly: true,
 	})
 
 	// Send access token back to user
 	ctx.JSON(http.StatusOK, gin.H{
-		"accessToken": CreateAccessToken(username),
+		"accessToken": createAccessToken(username),
 	})
 }
 
@@ -126,6 +126,6 @@ func InitialiseAuthRoutes(app *gin.Engine) {
 	app.GET("/api/refresh", getRefresh)
 
 	// Protected route for token testing
-	app.GET("/api/secret", AuthRequired(), getSecret)
+	app.GET("/api/secret", RequireAuth(), getSecret)
 }
 

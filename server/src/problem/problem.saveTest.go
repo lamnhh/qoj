@@ -17,13 +17,13 @@ func validateTestZip(uuid string, problemCode string) (int, error) {
 	// Extract the zip file, verify filename
 	zipPath := filepath.Join(".", "server", "tasks", uuid + ".zip")
 	extractedPath := filepath.Join(".", "server", "tasks", uuid)
-	_, err := Unzip(zipPath, extractedPath)
+	_, err := unzip(zipPath, extractedPath)
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
 
 	// Read all test subdirectories, each of which contains a test file
-	testList, err := ReadDir(filepath.Join(extractedPath, problemCode))
+	testList, err := readDir(filepath.Join(extractedPath, problemCode))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -34,13 +34,13 @@ func validateTestZip(uuid string, problemCode string) (int, error) {
 		fileName := filepath.Join(extractedPath, problemCode, "Test" + testId, problemCode)
 
 		// Check if "Code.INP" or "Code.inp" exists
-		if !DoesFileExists(fileName + ".INP") && !DoesFileExists(fileName + ".inp") {
+		if !doesFileExists(fileName + ".INP") && !doesFileExists(fileName + ".inp") {
 			message := fmt.Sprintf("Test%s does not contain input file", problemCode)
 			return http.StatusBadRequest, errors.New(message)
 		}
 
 		// Check if "Code.OUT" or "Code.out" exists
-		if !DoesFileExists(fileName + ".OUT") && !DoesFileExists(fileName + ".out") {
+		if !doesFileExists(fileName + ".OUT") && !doesFileExists(fileName + ".out") {
 			message := fmt.Sprintf("Test%s does not contain output file", problemCode)
 			return http.StatusBadRequest, errors.New(message)
 		}
@@ -58,7 +58,7 @@ func saveTestData(uuid string, problemId int, problemCode string) {
 	_ = os.Mkdir(testPath, os.ModePerm)
 
 	// Read all test subdirectories, each of which contains a test file
-	testList, _ := ReadDir(filepath.Join(extractedPath, problemCode))
+	testList, _ := readDir(filepath.Join(extractedPath, problemCode))
 
 	// Iterate over all test directories, check if every directory contains <code>.INP and <code.OUT
 	for _, testId := range testList {
@@ -67,7 +67,7 @@ func saveTestData(uuid string, problemId int, problemCode string) {
 
 		// Fetch inputFile path. This file should be in the form "fileName.INP" or "fileName.inp"
 		var inputFile string
-		if DoesFileExists(fileName + ".INP") {
+		if doesFileExists(fileName + ".INP") {
 			inputFile = fileName + ".INP"
 		} else {
 			inputFile = fileName + ".inp"
@@ -75,7 +75,7 @@ func saveTestData(uuid string, problemId int, problemCode string) {
 
 		// Fetch outputFile path. This file should be in the form "fileName.OUT" or "fileName.out"
 		var outputFile string
-		if DoesFileExists(fileName + ".OUT") {
+		if doesFileExists(fileName + ".OUT") {
 			outputFile = fileName + ".OUT"
 		} else {
 			outputFile = fileName + ".out"

@@ -2,13 +2,13 @@ package user
 
 import "qoj/server/config"
 
-type UserLogin struct {
+type LoginAuth struct {
 	Username string `json:"username" binding:"required"`
 	Fullname string `json:"fullname" binding:"required"`
 }
 
 type User struct {
-	UserLogin
+	LoginAuth
 	Password string `json:"password" binding:"required"`
 }
 
@@ -24,7 +24,7 @@ func FindUserByUsername(username string) (User, error){
 }
 
 func CreateNewUser(user User) error {
-	hashedPassword := HashPassword(user.Password)
+	hashedPassword := hashPassword(user.Password)
 	_, err := config.DB.Query("SELECT create_user($1, $2, $3)", user.Username, hashedPassword, user.Fullname)
 	return err
 }

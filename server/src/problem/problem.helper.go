@@ -11,16 +11,16 @@ import (
 	"strings"
 )
 
-func DoesFileExists(path string) bool {
+func doesFileExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
 	return true
 }
 
-// ReadDir reads the directory named by dirname and returns
+// readDir reads the directory named by dirname and returns
 // a list of directory entries sorted by filename.
-func ReadDir(dirname string) ([]string, error) {
+func readDir(dirname string) ([]string, error) {
 	f, err := os.Open(dirname)
 	if err != nil {
 		return nil, err
@@ -52,9 +52,9 @@ func ReadDir(dirname string) ([]string, error) {
 	return ans, nil
 }
 
-// Unzip will decompress a zip archive, moving all files and folders
+// unzip will decompress a zip archive, moving all files and folders
 // within the zip file (parameter 1) to an output directory (parameter 2).
-func Unzip(src string, dest string) ([]string, error) {
+func unzip(src string, dest string) ([]string, error) {
 	var filenames []string
 
 	r, err := zip.OpenReader(src)
@@ -106,4 +106,9 @@ func Unzip(src string, dest string) ([]string, error) {
 		}
 	}
 	return filenames, nil
+}
+
+func normaliseProblem(problem *Problem) {
+	problem.Code = strings.TrimSpace(problem.Code)
+	problem.Name = strings.TrimSpace(problem.Name)
 }
