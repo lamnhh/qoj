@@ -54,7 +54,7 @@ func FetchAllProblems() ([]Problem, error) {
 		return []Problem{}, err
 	}
 
-	var problemList []Problem
+	problemList := make([]Problem, 0)
 	for rows.Next() {
 		var problem Problem
 		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {
@@ -90,7 +90,7 @@ func FetchProblemsByCode(code string) ([]Problem, error) {
 		return []Problem{}, err
 	}
 
-	var problemList []Problem
+	problemList := make([]Problem, 0)
 	for rows.Next() {
 		var problem Problem
 		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {

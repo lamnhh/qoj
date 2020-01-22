@@ -1,11 +1,9 @@
 package src
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	uuid2 "github.com/google/uuid"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -53,56 +51,21 @@ func postProblem(ctx *gin.Context) {
 		return
 	}
 
-	// Extract the zip file, verify filename
-	extractedPath := filepath.Join(".", "server", "tasks", uuid)
-	_, err := Unzip(zipPath, extractedPath)
+	// Validate ZIP file
+	code, err := validateTestZip(uuid, problem.Code)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H {"error": err.Error()})
-		return
-	}
-
-	// Read all test subdirectories, each of which contains a test file
-	fmt.Println(filepath.Join(extractedPath, problem.Code))
-	testList, err := ReadDir(filepath.Join(extractedPath, problem.Code))
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Iterate over all test directories, check if every directory contains <code>.INP and <code.OUT
-	for _, testId := range testList {
-		testPath := filepath.Join(extractedPath, problem.Code, "Test" + testId)
-		if !DoesFileExists(filepath.Join(testPath, problem.Code + ".inp")) && !DoesFileExists(filepath.Join(testPath, problem.Code + ".INP")) {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintf("Test%s does not contain input file", problem.Code),
-			})
-			return
-		}
-		if !DoesFileExists(filepath.Join(testPath, problem.Code + ".out")) && !DoesFileExists(filepath.Join(testPath, problem.Code + ".OUT")) {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintf("Test%s does not contain output file", problem.Code),
-			})
-			return
+		ctx.JSON(code, gin.H{"error": err.Error()})
+	} else {
+		// Add problem to database to get problem ID
+		problem.Id, err = CreateProblem(problem)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		} else {
+			saveTestData(uuid, problem.Id, problem.Code)
+			ctx.JSON(http.StatusOK, problem)
 		}
 	}
-
-	// Add problem to database to get problem ID
-	problem.Id, err = CreateProblem(problem)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// All validation is completed
-	// Rename uuid to problemId
-	oldPath := filepath.Join(".", "server", "tasks", uuid)
-	newPath := filepath.Join(".", "server", "tasks", fmt.Sprintf("%d", problem.Id))
-	if err := os.Rename(oldPath, newPath); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, problem)
+	clearTemporaryData(uuid)
 }
 
 func getProblemId(ctx *gin.Context) {

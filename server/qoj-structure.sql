@@ -8,6 +8,6 @@ CREATE TABLE users (
 CREATE TABLE problems (
 	id	SERIAL,
 	code CHAR(10),
-	name CHAR(10),
+	name CHAR(100),
 	primary key (id)
 );
