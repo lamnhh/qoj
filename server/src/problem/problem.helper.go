@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func doesFileExists(path string) bool {
+func DoesFileExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
