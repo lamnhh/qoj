@@ -1,4 +1,4 @@
-package src
+package user
 
 import "qoj/server/config"
 

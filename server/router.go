@@ -2,15 +2,16 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"qoj/server/src"
+	"qoj/server/src/auth"
+	"qoj/server/src/problem"
 )
 
 func InitialiseApp() *gin.Engine {
 	app := gin.Default()
 
 	// Routing
-	src.InitialiseAuthRoutes(app)
-	src.InitialiseProblemRoutes(app)
+	auth.InitialiseAuthRoutes(app)
+	problem.InitialiseProblemRoutes(app)
 
 	return app
 }

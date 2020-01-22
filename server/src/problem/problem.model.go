@@ -1,4 +1,4 @@
-package src
+package problem
 
 import (
 	"database/sql"

@@ -1,4 +1,4 @@
-package src
+package auth
 
 import (
 	"database/sql"
@@ -6,10 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"net/http"
+	user2 "qoj/server/src/user"
 )
 
 func postRegister(ctx *gin.Context) {
-	var user User
+	var user user2.User
 
 	// If request body is not a JSON, return a 400.
 	if err := ctx.ShouldBindJSON(&user); err != nil {
@@ -18,7 +19,7 @@ func postRegister(ctx *gin.Context) {
 	}
 
 	// If some error occurs during user creation, return it back to user with a 500.
-	if err := CreateNewUser(user); err != nil {
+	if err := user2.CreateNewUser(user); err != nil {
 		pqErr, ok := err.(*pq.Error)
 		if ok {
 			// If err is an instance of pq.Error, it means the RAISE line in function create_user() has been called
@@ -45,7 +46,7 @@ func postRegister(ctx *gin.Context) {
 }
 
 func postLogin(ctx *gin.Context) {
-	var userLogin UserLogin
+	var userLogin user2.UserLogin
 
 	// If request body is not a JSON, return a 400.
 	if err := ctx.ShouldBindJSON(&userLogin); err != nil {
@@ -54,7 +55,7 @@ func postLogin(ctx *gin.Context) {
 	}
 
 	// Find user with username `userLogin.Username`
-	user, err := FindUserByUsername(userLogin.Username)
+	user, err := user2.FindUserByUsername(userLogin.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// If `username` does not exist, return a 404
