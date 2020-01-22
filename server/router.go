@@ -9,7 +9,8 @@ func InitialiseApp() *gin.Engine {
 	app := gin.Default()
 
 	// Routing
-	src.InitialiseAuthRoute(app)
+	src.InitialiseAuthRoutes(app)
+	src.InitialiseProblemRoutes(app)
 
 	return app
 }

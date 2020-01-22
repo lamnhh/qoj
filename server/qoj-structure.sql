@@ -4,3 +4,10 @@ CREATE TABLE users (
 	fullname CHARACTER(100),
 	primary key (username)
 );
+
+CREATE TABLE problems (
+	id	SERIAL,
+	code CHAR(10),
+	name CHAR(100),
+	primary key (id)
+);
