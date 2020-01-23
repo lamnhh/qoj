@@ -44,3 +44,10 @@ function handleSubmit(form) {
         }));
     }).catch(console.log);
 }
+
+function subscribe() {
+    socket.send(JSON.stringify({
+        "type": "subscribe",
+        "message": "1"
+    }));
+}

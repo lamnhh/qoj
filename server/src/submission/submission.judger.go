@@ -107,7 +107,7 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	if err != nil {
 		// Compile error
 		done <- map[string]interface{}{
-			"type":    "compile",
+			"type":    "compile-error",
 			"error":   err,
 			"message": string(compileOutput),
 		}
@@ -144,9 +144,6 @@ func judge(submissionId int, problemId int, fileHeader *multipart.FileHeader) er
 	if _, err := io.Copy(cppFile, file); err != nil {
 		return err
 	}
-
-	// Initialise judge channel for this particular submission
-	judges[submissionId] = make(chan interface{})
 
 	compileTask := queue.Task{
 		Run:           compileFunc,

@@ -8,24 +8,25 @@ import (
 	"strconv"
 )
 
-var upgrader websocket.Upgrader
-
 type Message struct {
 	Type    string `json:"type"`
 	Message string `json:"message"`
 }
 
-func distributeResult(judge chan interface{}, conn *websocket.Conn) {
-	for {
-		select {
-		case res := <-judge:
-			_ = conn.WriteJSON(res.(map[string]interface{}))
-		}
-	}
-}
+var upgrader websocket.Upgrader
+var listenerList map[int]*ListenerList
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
+	subscriptionList := make(map[int]int)
 	conn, err := upgrader.Upgrade(w, r, nil)
+
+	defer func() {
+		// After connection closes, remove all subscriptions
+		for id := range subscriptionList {
+			listenerList[id].Unsubscribe(conn)
+		}
+	}()
+
 	if err != nil {
 		log.Fatalln(err)
 		return
@@ -40,8 +41,15 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		switch message.Type {
 		case "subscribe":
 			submissionId, _ := strconv.ParseInt(message.Message, 10, 16)
-			judge := judges[int(submissionId)]
-			go distributeResult(judge, conn)
+			if _, ok := subscriptionList[int(submissionId)]; ok {
+				// Already subscribed
+			} else {
+				// Subscribe
+				subscriptionList[int(submissionId)] = 1
+
+				// Add listener
+				listenerList[int(submissionId)].Subscribe(conn)
+			}
 		}
 	}
 }
@@ -52,6 +60,8 @@ func InitialiseSubmissionSocket(app *gin.Engine) {
 	}
 
 	judges = make(map[int]chan interface{})
+	listenerList = make(map[int]*ListenerList)
+
 	app.GET("/ws", func(ctx *gin.Context) {
 		socketHandler(ctx.Writer, ctx.Request)
 	})

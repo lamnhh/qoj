@@ -26,6 +26,8 @@
         <button type="submit">Submit</button>
     </form>
 
+    <button type="button" onclick="subscribe();">Subscribe</button>
+
     <script src="/static/index.js"></script>
 </body>
 </html>

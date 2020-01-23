@@ -9,9 +9,31 @@ import (
 
 var submissionCount int
 
+func submissionHandler(submissionId int) {
+	for {
+		select {
+			case _res := <- judges[submissionId]:
+				res := _res.(map[string]interface{})
+
+				connList := listenerList[submissionId].GetSubscriptionList()
+				for _, conn := range connList {
+					_ = conn.WriteJSON(res)
+				}
+				if res["type"] == "compile-error" || res["type"] == "finish" {
+					return
+				}
+		}
+	}
+}
+
 func postSubmission(ctx *gin.Context) {
 	submissionCount++
 	submissionId := submissionCount
+
+	// Initialise judge channel for this particular submission
+	judges[submissionId] = make(chan interface{})
+	listenerList[submissionId] = &ListenerList{}
+	go submissionHandler(submissionId)
 
 	problemId, err := strconv.ParseInt(ctx.PostForm("problemId"), 10, 16)
 	if err != nil {
