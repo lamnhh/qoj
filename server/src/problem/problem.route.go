@@ -44,6 +44,22 @@ func postProblem(ctx *gin.Context) {
 		problem.Name = problem.Code
 	}
 
+	// Parse problem's time limit
+	tl, err := strconv.ParseFloat(ctx.PostForm("timeLimit"), 32)
+	if err != nil || tl < 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid time limit"})
+		return
+	}
+	problem.TimeLimit = float32(tl)
+
+	// Parse problem's memory limit
+	ml, err := strconv.ParseInt(ctx.PostForm("memoryLimit"), 10, 16)
+	if err != nil || ml < 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid memory limit"})
+		return
+	}
+	problem.MemoryLimit = int(ml)
+
 	// Parse test ZIP file
 	// `file` is required
 	file, _ := ctx.FormFile("file")

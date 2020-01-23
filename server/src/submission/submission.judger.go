@@ -64,7 +64,7 @@ func judge(submissionId int, problemId int, fileHeader *multipart.FileHeader) er
 				break
 			}
 
-			fmt.Printf("Judging test %d\n", testId)
+			log.Printf("Judging test %d\n", testId)
 
 			cmd := fmt.Sprintf("%s < %s > %s", exePath, inpPath, tmpOutPath)
 

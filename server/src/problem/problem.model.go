@@ -5,19 +5,24 @@ import (
 	"errors"
 	"fmt"
 	"qoj/server/config"
+	"strconv"
 )
 
 type Problem struct {
-	Id        int    `json:"id"`
-	Code      string `json:"code" binding:"required"`
-	Name      string `json:"name" binding:"required"`
+	Id          int     `json:"id"`
+	Code        string  `json:"code" binding:"required"`
+	Name        string  `json:"name" binding:"required"`
+	TimeLimit   float32 `json:"timeLimit" binding:"required"`
+	MemoryLimit int     `json:"memoryLimit" binding:"required"`
 }
 
 func CreateProblem(problem Problem) (int, error) {
 	rows, err := config.DB.Query(
-		"INSERT INTO problems(code, name) VALUES ($1, $2) RETURNING id",
+		"INSERT INTO problems(code, name, tl, ml) VALUES ($1, $2, $3, $4) RETURNING id",
 		problem.Code,
 		problem.Name,
+		problem.TimeLimit,
+		problem.MemoryLimit,
 	)
 	if err != nil {
 		return 0, err
@@ -51,7 +56,7 @@ func FetchAllProblems() ([]Problem, error) {
 	problemList := make([]Problem, 0)
 	for rows.Next() {
 		var problem Problem
-		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {
+		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit); err != nil {
 			return []Problem{}, err
 		}
 		normaliseProblem(&problem)
@@ -64,7 +69,7 @@ func FetchAllProblems() ([]Problem, error) {
 func FetchProblemById(problemId int) (Problem, error) {
 	var problem Problem
 	err := config.DB.QueryRow("SELECT * FROM problems WHERE id = $1", problemId).
-		Scan(&problem.Id, &problem.Code, &problem.Name)
+		Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// rows.Next() means no rows was returned. In other words, no problem with such ID exists
@@ -87,7 +92,7 @@ func FetchProblemsByCode(code string) ([]Problem, error) {
 	problemList := make([]Problem, 0)
 	for rows.Next() {
 		var problem Problem
-		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name); err != nil {
+		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit); err != nil {
 			return []Problem{}, err
 		}
 		normaliseProblem(&problem)
@@ -111,10 +116,24 @@ func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, err
 	if val, ok := patch["name"]; ok {
 		problem.Name = val
 	}
+	if val, ok := patch["timeLimit"]; ok {
+		tl, _ := strconv.ParseFloat(val, 32)
+		problem.TimeLimit = float32(tl)
+	}
+	if val, ok := patch["memoryLimit"]; ok {
+		ml, _ := strconv.ParseInt(val, 10, 16)
+		problem.MemoryLimit = int(ml)
+	}
 
 	// Update corresponding row in database
 	err = config.DB.
-		QueryRow("UPDATE problems SET code = $1, name = $2 WHERE id = $3 RETURNING *", problem.Code, problem.Name, problem.Id).
+		QueryRow("UPDATE problems SET code = $1, name = $2, tl = $3, ml = $4 WHERE id = $3 RETURNING *",
+			problem.Code,
+			problem.Name,
+			problem.TimeLimit,
+			problem.MemoryLimit,
+			problem.Id,
+		).
 		Scan(&problem.Id, &problem.Code, &problem.Name)
 	if err != nil {
 		return Problem{}, err
