@@ -1,12 +1,5 @@
 function handleSocketData(json) {
-    switch (json.type) {
-        case "result":
-            console.log(json.message);
-            break;
-        default:
-            console.log("invalid type");
-            break;
-    }
+    console.log(json);
 }
 
 function createSocket() {

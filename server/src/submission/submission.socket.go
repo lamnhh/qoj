@@ -1,7 +1,6 @@
 package submission
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"log"
@@ -16,17 +15,11 @@ type Message struct {
 	Message string `json:"message"`
 }
 
-func distributeResult(judge chan TestResult, conn *websocket.Conn) {
+func distributeResult(judge chan interface{}, conn *websocket.Conn) {
 	for {
 		select {
 		case res := <-judge:
-			if res.Id == -1 {
-				return
-			}
-			_ = conn.WriteJSON(gin.H{
-				"type": "result",
-				"message": fmt.Sprintf("Test %d: %s", res.Id, res.Result),
-			})
+			_ = conn.WriteJSON(res.(map[string]interface{}))
 		}
 	}
 }
@@ -58,7 +51,7 @@ func InitialiseSubmissionSocket(app *gin.Engine) {
 		return true
 	}
 
-	judges = make(map[int]chan TestResult)
+	judges = make(map[int]chan interface{})
 	app.GET("/ws", func(ctx *gin.Context) {
 		socketHandler(ctx.Writer, ctx.Request)
 	})
