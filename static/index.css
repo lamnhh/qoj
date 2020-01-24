@@ -1,0 +1,28 @@
+html {
+    font-size: 62.5%;
+}
+
+body {
+    padding: 4rem;
+}
+
+.submission-form__section {
+    display: flex;
+}
+
+.submission-form__section + .submission-form__section {
+    margin-top: 2rem;
+}
+
+.submission-form__section h3 {
+    font-size: 1.6rem;
+    line-height: 1.5;
+    margin: 0;
+    width: 15rem;
+}
+
+.submission-form__section select {
+    background: #fff;
+    font-size: 1.6rem;
+    padding: 0.4rem 0.8rem;
+}

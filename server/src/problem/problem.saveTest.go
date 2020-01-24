@@ -34,13 +34,13 @@ func validateTestZip(uuid string, problemCode string) (int, error) {
 		fileName := filepath.Join(extractedPath, problemCode, "Test" + testId, problemCode)
 
 		// Check if "Code.INP" or "Code.inp" exists
-		if !doesFileExists(fileName + ".INP") && !doesFileExists(fileName + ".inp") {
+		if !DoesFileExists(fileName + ".INP") && !DoesFileExists(fileName + ".inp") {
 			message := fmt.Sprintf("Test%s does not contain input file", problemCode)
 			return http.StatusBadRequest, errors.New(message)
 		}
 
 		// Check if "Code.OUT" or "Code.out" exists
-		if !doesFileExists(fileName + ".OUT") && !doesFileExists(fileName + ".out") {
+		if !DoesFileExists(fileName + ".OUT") && !DoesFileExists(fileName + ".out") {
 			message := fmt.Sprintf("Test%s does not contain output file", problemCode)
 			return http.StatusBadRequest, errors.New(message)
 		}
@@ -61,13 +61,14 @@ func saveTestData(uuid string, problemId int, problemCode string) {
 	testList, _ := readDir(filepath.Join(extractedPath, problemCode))
 
 	// Iterate over all test directories, check if every directory contains <code>.INP and <code.OUT
+	id := 0
 	for _, testId := range testList {
 		// fileName = ".../Code/Test00/Code.(INP|inp|OUT|out)
 		fileName := filepath.Join(extractedPath, problemCode, "Test" + testId, problemCode)
 
 		// Fetch inputFile path. This file should be in the form "fileName.INP" or "fileName.inp"
 		var inputFile string
-		if doesFileExists(fileName + ".INP") {
+		if DoesFileExists(fileName + ".INP") {
 			inputFile = fileName + ".INP"
 		} else {
 			inputFile = fileName + ".inp"
@@ -75,15 +76,16 @@ func saveTestData(uuid string, problemId int, problemCode string) {
 
 		// Fetch outputFile path. This file should be in the form "fileName.OUT" or "fileName.out"
 		var outputFile string
-		if doesFileExists(fileName + ".OUT") {
+		if DoesFileExists(fileName + ".OUT") {
 			outputFile = fileName + ".OUT"
 		} else {
 			outputFile = fileName + ".out"
 		}
 
 		// Save both files to "testId.inp", "testId.out"
-		_ = os.Rename(inputFile, filepath.Join(testPath, testId + ".inp"))
-		_ = os.Rename(outputFile, filepath.Join(testPath, testId + ".out"))
+		id++
+		_ = os.Rename(inputFile, filepath.Join(testPath, fmt.Sprintf("%d.inp", id)))
+		_ = os.Rename(outputFile, filepath.Join(testPath, fmt.Sprintf("%d.out", id)))
 	}
 }
 
