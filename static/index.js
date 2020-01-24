@@ -22,6 +22,26 @@ function createSocket() {
 
 let socket = createSocket();
 
+let accessToken = "";
+
+fetch("/api/login", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        username: "lamnhh",
+        password: "123456"
+    })
+}).then(function(res) {
+    if (res.ok) {
+        return res.json();
+    }
+    throw res.json();
+}).then(function(res) {
+    accessToken = res.accessToken;
+});
+
 function handleSubmit(form) {
     let problemId = form.problemId.value;
     let file = form.file.files[0];
@@ -31,6 +51,9 @@ function handleSubmit(form) {
     body.append("file", file);
     fetch("/api/submission", {
         method: "POST",
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        },
         body
     }).then(function (res) {
         if (res.ok) {
@@ -46,8 +69,17 @@ function handleSubmit(form) {
 }
 
 function subscribe() {
+    let submissionId = parseInt(document.getElementById("submissionId").value);
     socket.send(JSON.stringify({
         "type": "subscribe",
-        "message": "1"
+        "message": String(submissionId)
+    }));
+}
+
+function unsubscribe() {
+    let submissionId = parseInt(document.getElementById("submissionId").value);
+    socket.send(JSON.stringify({
+        "type": "unsubscribe",
+        "message": String(submissionId)
     }));
 }

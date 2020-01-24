@@ -4,12 +4,12 @@ import "qoj/server/config"
 
 type LoginAuth struct {
 	Username string `json:"username" binding:"required"`
-	Fullname string `json:"fullname" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type User struct {
 	LoginAuth
-	Password string `json:"password" binding:"required"`
+	Fullname string `json:"fullname" binding:"required"`
 }
 
 func FindUserByUsername(username string) (User, error){

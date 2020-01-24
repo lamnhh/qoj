@@ -26,7 +26,9 @@
         <button type="submit">Submit</button>
     </form>
 
+    <input type="text" id="submissionId">
     <button type="button" onclick="subscribe();">Subscribe</button>
+    <button type="button" onclick="unsubscribe();">Unsubscribe</button>
 
     <script src="/static/index.js"></script>
 </body>

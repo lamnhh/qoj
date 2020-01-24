@@ -67,6 +67,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 				equal, _ := cmp.CompareFile(outPath, tmpOutPath)
 				if equal {
 					resultMsg = "Correct"
+					_ = updateScore(submissionId, 1)
 				} else {
 					resultMsg = "Wrong Answer"
 				}

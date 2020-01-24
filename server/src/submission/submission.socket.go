@@ -50,6 +50,17 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 				// Add listener
 				listenerList[int(submissionId)].Subscribe(conn)
 			}
+		case "unsubscribe":
+			submissionId, _ := strconv.ParseInt(message.Message, 10, 16)
+			if _, ok := subscriptionList[int(submissionId)]; ok {
+				// Unsubscribe
+				delete(subscriptionList, int(submissionId))
+
+				// Remove listener
+				listenerList[int(submissionId)].Unsubscribe(conn)
+			} else {
+				// Haven't subscribed, ignore
+			}
 		}
 	}
 }
