@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"qoj/server/src/auth"
+	problem2 "qoj/server/src/problem"
 	"strconv"
 )
 
@@ -56,12 +57,18 @@ func postSubmission(ctx *gin.Context) {
 	}
 	submissionId := submission.Id
 
+	problem, err := problem2.FetchProblemById(problemId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	// Initialise judge channel for this particular submission
 	judges[submissionId] = make(chan interface{})
 	listenerList[submissionId] = &ListenerList{}
 	go submissionHandler(submissionId)
 
-	_ = judge(submissionId, problemId, file)
+	_ = judge(submissionId, problem, file)
 	ctx.JSON(http.StatusOK, gin.H{
 		"submissionId": submissionId,
 	})

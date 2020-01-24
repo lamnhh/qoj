@@ -20,7 +20,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 	config := metadata.(map[string]interface{})
 
 	testId := config["testId"].(int)
-	problemId := config["problemId"].(int)
+	prob:= config["problem"].(problem.Problem)
 	submissionId := config["submissionId"].(int)
 
 	dirname, _ := os.Getwd()
@@ -28,7 +28,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 	tmpOutPath := filepath.Join(dirname, fmt.Sprintf("%d.out", submissionId))
 	exePath := filepath.Join(dirname, fmt.Sprintf("%d", submissionId))
 
-	path := filepath.Join(dirname, "server", "tasks", fmt.Sprintf("%d", problemId))
+	path := filepath.Join(dirname, "server", "tasks", fmt.Sprintf("%d", prob.Id))
 
 	inpPath := filepath.Join(path, fmt.Sprintf("%d.inp", testId))
 	outPath := filepath.Join(path, fmt.Sprintf("%d.out", testId))
@@ -50,7 +50,11 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 
 	cmd := fmt.Sprintf("%s < %s > %s", exePath, inpPath, tmpOutPath)
 
-	output, err := exec.Command(timeoutPath, "-t", "1", cmd).CombinedOutput()
+	output, err := exec.Command(timeoutPath,
+		"-t", fmt.Sprintf("%f", prob.TimeLimit),
+		"-m", fmt.Sprintf("%d", prob.MemoryLimit * 1024),
+		cmd,
+	).CombinedOutput()
 	if err != nil {
 		done <- map[string]interface{}{
 			"type": "result",
@@ -91,7 +95,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 		ResultChannel: done,
 		Params: map[string]interface{}{
 			"testId":       testId + 1,
-			"problemId":    problemId,
+			"problem":      prob,
 			"submissionId": submissionId,
 		},
 	})
@@ -100,7 +104,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 func compileFunc(done chan interface{}, metadata interface{}) {
 	config := metadata.(map[string]interface{})
 
-	problemId := config["problemId"].(int)
+	prob := config["problem"].(problem.Problem)
 	submissionId := config["submissionId"].(int)
 
 	cppPath := fmt.Sprintf("%d.cpp", submissionId)
@@ -123,14 +127,14 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 			ResultChannel: done,
 			Params: map[string]interface{}{
 				"testId":       1,
-				"problemId":    problemId,
+				"problem":      prob,
 				"submissionId": submissionId,
 			},
 		})
 	}
 }
 
-func judge(submissionId int, problemId int, fileHeader *multipart.FileHeader) error {
+func judge(submissionId int, problem problem.Problem, fileHeader *multipart.FileHeader) error {
 	file, err := fileHeader.Open()
 	if err != nil {
 		return err
@@ -150,7 +154,7 @@ func judge(submissionId int, problemId int, fileHeader *multipart.FileHeader) er
 		Run:           compileFunc,
 		ResultChannel: judges[submissionId],
 		Params:       map[string]interface{}{
-			"problemId":    problemId,
+			"problem":      problem,
 			"submissionId": submissionId,
 		},
 	}
