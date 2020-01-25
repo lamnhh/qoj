@@ -10,26 +10,9 @@
     <link rel="stylesheet" href="/static/index.css">
 </head>
 <body>
-    <form class="submission-form" onsubmit="event.preventDefault(); handleSubmit(this);">
-        <label class="submission-form__section">
-            <h3>Problem</h3>
-            <select name="problemId" required>
-                {{range $problem := .}}
-                    <option value="{{$problem.Id}}">{{$problem.Code}} - {{$problem.Name}}</option>
-                {{end}}
-            </select>
-        </label>
-        <label class="submission-form__section">
-            <h3>Source Code</h3>
-            <input type="file" name="file">
-        </label>
-        <button type="submit">Submit</button>
-    </form>
-
-    <input type="text" id="submissionId">
-    <button type="button" onclick="subscribe();">Subscribe</button>
-    <button type="button" onclick="unsubscribe();">Unsubscribe</button>
-
-    <script src="/static/index.js"></script>
+    <div id="root"></div>
+    <script src="./node_modules/react/umd/react.development.js"></script>
+    <script src="./node_modules/react-dom/umd/react-dom.development.js"></script>
+    <script src="/static/main.js"></script>
 </body>
 </html>

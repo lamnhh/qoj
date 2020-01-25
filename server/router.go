@@ -12,6 +12,7 @@ func InitialiseApp() *gin.Engine {
 	app := gin.Default()
 
 	app.Static("/static", "./static")
+	app.Static("/node_modules", "./node_modules")
 	app.LoadHTMLGlob("./templates/*")
 
 	app.GET("/", func(ctx *gin.Context) {
