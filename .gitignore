@@ -19,3 +19,6 @@ node_modules/*
 tmp/*
 .env
 server/tasks/*
+
+static/main.js
+static/main.js.map
