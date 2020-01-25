@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>QHH Online Judge</title>
-
-    <link rel="stylesheet" href="/static/index.css">
 </head>
 <body>
     <div id="root"></div>
