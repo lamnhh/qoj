@@ -1,13 +1,18 @@
 let path = require("path");
+let webpack = require("webpack");
 
 let mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
 module.exports = {
+  plugins: [
+    // Ignore all locale files of moment.js
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+  ],
   mode,
   devtool: "source-map",
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: [".ts", ".tsx"]
+    extensions: [".ts", ".tsx", ".js"]
   },
   module: {
     rules: [
@@ -33,9 +38,9 @@ module.exports = {
     ]
   },
 
-  entry: "./index.tsx",
+  entry: "./client/App.tsx",
   output: {
-    filename: "main.js",
+    filename: "index.js",
     path: path.join(__dirname, "static")
   },
 

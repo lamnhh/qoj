@@ -13,22 +13,17 @@ func InitialiseApp() *gin.Engine {
 
 	app.Static("/static", "./static")
 	app.Static("/node_modules", "./node_modules")
-	app.LoadHTMLGlob("./templates/*")
-
-	app.GET("/", func(ctx *gin.Context) {
-		problemList, err := problem.FetchAllProblems()
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		ctx.HTML(http.StatusOK, "index.tpl", problemList)
-	})
+	app.LoadHTMLGlob("./static/*.html")
 
 	// Routing
 	auth.InitialiseAuthRoutes(app)
 	problem.InitialiseProblemRoutes(app)
 	submission.InitialiseSubmissionSocket(app)
 	submission.InitialiseSubmissionRoutes(app)
+
+	app.Use(func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", nil)
+	})
 
 	return app
 }

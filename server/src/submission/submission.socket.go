@@ -1,11 +1,12 @@
 package submission
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 type Message struct {
@@ -20,12 +21,12 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	subscriptionList := make(map[int]int)
 	conn, err := upgrader.Upgrade(w, r, nil)
 
-	defer func() {
+	defer func(conn *websocket.Conn) {
 		// After connection closes, remove all subscriptions
 		for id := range subscriptionList {
 			listenerList[id].Unsubscribe(conn)
 		}
-	}()
+	}(conn)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -41,7 +42,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		switch message.Type {
 		case "subscribe":
 			submissionId, _ := strconv.ParseInt(message.Message, 10, 16)
-			if _, ok := subscriptionList[int(submissionId)]; ok {
+			if _, ok := subscriptionList[int(submissionId)]; ok || listenerList[int(submissionId)] == nil {
 				// Already subscribed
 			} else {
 				// Subscribe
@@ -52,7 +53,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		case "unsubscribe":
 			submissionId, _ := strconv.ParseInt(message.Message, 10, 16)
-			if _, ok := subscriptionList[int(submissionId)]; ok {
+			if _, ok := subscriptionList[int(submissionId)]; ok && listenerList[int(submissionId)] != nil {
 				// Unsubscribe
 				delete(subscriptionList, int(submissionId))
 

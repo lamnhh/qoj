@@ -1,11 +1,12 @@
 package submission
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"qoj/server/src/auth"
 	problem2 "qoj/server/src/problem"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 var submissionCount int
@@ -13,16 +14,16 @@ var submissionCount int
 func submissionHandler(submissionId int) {
 	for {
 		select {
-			case _res := <- judges[submissionId]:
-				res := _res.(map[string]interface{})
+		case _res := <-judges[submissionId]:
+			res := _res.(map[string]interface{})
 
-				connList := listenerList[submissionId].GetSubscriptionList()
-				for _, conn := range connList {
-					_ = conn.WriteJSON(res)
-				}
-				if res["type"] == "compile-error" || res["type"] == "finish" {
-					return
-				}
+			connList := listenerList[submissionId].GetSubscriptionList()
+			for _, conn := range connList {
+				_ = conn.WriteJSON(res)
+			}
+			if res["type"] == "compile-error" || res["type"] == "finish" {
+				return
+			}
 		}
 	}
 }
@@ -90,7 +91,7 @@ func getSubmission(ctx *gin.Context) {
 		filters["username"] = val
 	}
 
-	submissionList, err := fetchSubmissionList(filters)
+	submissionList, err := FetchSubmissionList(filters)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {

@@ -15,10 +15,11 @@
 # vendor/
 
 .idea/*
+.vscode/*
 node_modules/*
-tmp/*
-.env
-server/tasks/*
 
-static/main.js
-static/main.js.map
+.env
+tmp/*
+server/tasks/*
+static/index.js
+static/index.js.map

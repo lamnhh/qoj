@@ -76,7 +76,7 @@ func fetchSubmissionById(submissionId int) (Submission, error) {
 	return parseSubmissionFromRow(rows)
 }
 
-func fetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
+func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 	keyList := make([]string, 0)
 	valList := make([]interface{}, 0)
 	count := 0
@@ -94,7 +94,7 @@ func fetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 	}
 
 	sql :=
-	`SELECT
+		`SELECT
 		submissions.id,
 		submissions.username,
 		submissions.problem_id,
@@ -104,8 +104,8 @@ func fetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 	FROM
 		submissions
 		JOIN problems ON (submissions.problem_id = problems.id)` +
-	whereClause +
-	`ORDER BY
+			whereClause +
+			`ORDER BY
 		created_at DESC`
 
 	rows, err := config.DB.Query(sql, valList...)
