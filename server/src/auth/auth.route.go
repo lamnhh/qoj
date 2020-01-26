@@ -7,6 +7,7 @@ import (
 	"github.com/lib/pq"
 	"net/http"
 	user2 "qoj/server/src/user"
+	"time"
 )
 
 func postRegister(ctx *gin.Context) {
@@ -120,12 +121,22 @@ func getSecret(ctx *gin.Context) {
 	})
 }
 
+func getLogout(ctx *gin.Context) {
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "rftoken",
+		Value:    "",
+		HttpOnly: true,
+		Expires:  time.Now().Add(-time.Hour),
+	})
+	ctx.Redirect(http.StatusMovedPermanently, "/")
+}
+
 func InitialiseAuthRoutes(app *gin.Engine) {
 	app.POST("/api/register", postRegister)
 	app.POST("/api/login", postLogin)
 	app.GET("/api/refresh", getRefresh)
+	app.GET("/api/logout", getLogout)
 
 	// Protected route for token testing
 	app.GET("/api/secret", RequireAuth(), getSecret)
 }
-

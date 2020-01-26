@@ -1,20 +1,37 @@
-import React, { useState, useCallback } from "react";
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter, Route, Redirect } from "react-router-dom";
+import SubmissionPage from "./pages/SubmissionPage";
+import ProblemsetPage from "./pages/ProblemsetPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import request from "./helpers/request";
+import { setAccessToken, clearToken } from "./helpers/auth";
 
 function App() {
-  let [count, setCount] = useState(0);
-
-  let increase = useCallback(function() {
-    setCount((p) => p + 1);
+  // Get access token upon start
+  useEffect(function() {
+    request("/api/refresh")
+      .then(function({ accessToken }) {
+        setAccessToken(accessToken);
+      })
+      .catch(() => {});
   }, []);
 
   return (
-    <>
-      <h1>Count: {count}</h1>
-      <button type="button" onClick={increase}>
-        +1
-      </button>
-    </>
+    <BrowserRouter>
+      <Route path="/" exact component={ProblemsetPage}></Route>
+      <Route path="/status" component={SubmissionPage}></Route>
+      <Route path="/login" component={LoginPage}></Route>
+      <Route path="/register" component={RegisterPage}></Route>
+      <Route
+        path="/logout"
+        render={() => {
+          clearToken();
+          return <Redirect to="/"></Redirect>;
+        }}></Route>
+    </BrowserRouter>
   );
 }
 
-export default App;
+ReactDOM.render(<App />, document.getElementById("root"));

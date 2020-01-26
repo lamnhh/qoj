@@ -39,6 +39,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 		_ = os.Remove(fmt.Sprintf("%d.cpp", submissionId))
 		_ = os.Remove(fmt.Sprintf("%d.out", submissionId))
 		done <- map[string]interface{}{
+			"submissionId": submissionId,
 			"type": "finish",
 			"error": nil,
 			"message": "",
@@ -57,6 +58,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 	).CombinedOutput()
 	if err != nil {
 		done <- map[string]interface{}{
+			"submissionId": submissionId,
 			"type": "result",
 			"error": err,
 			"message": "Runtime Error",
@@ -84,6 +86,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 		}
 
 		done <- map[string]interface{}{
+			"submissionId": submissionId,
 			"type": "result",
 			"error": nil,
 			"message": fmt.Sprintf("%d | %s", testId, resultMsg),
@@ -112,6 +115,7 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	if err != nil {
 		// Compile error
 		done <- map[string]interface{}{
+			"submissionId": submissionId,
 			"type":    "compile-error",
 			"error":   err,
 			"message": string(compileOutput),
@@ -119,8 +123,10 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	} else {
 		// Successfully compiled
 		done <- map[string]interface{}{
+			"submissionId": submissionId,
 			"type":  "compile",
 			"error": nil,
+			"message": "",
 		}
 		queue.Push(queue.Task{
 			Run:           judgeFunc,
