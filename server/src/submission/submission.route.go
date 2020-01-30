@@ -99,9 +99,26 @@ func getSubmission(ctx *gin.Context) {
 	}
 }
 
+func getSubmissionIdResult(ctx *gin.Context) {
+	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission ID"})
+		return
+	}
+	submissionId := int(submissionId64)
+
+	resultList, err := getSubmissionResults(submissionId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, resultList)
+}
+
 func InitialiseSubmissionRoutes(app *gin.Engine) {
 	submissionCount = 0
 
 	app.GET("/api/submission", getSubmission)
 	app.POST("/api/submission", auth.RequireAuth(), postSubmission)
+	app.GET("/api/submission/:id/result", getSubmissionIdResult)
 }

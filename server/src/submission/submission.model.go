@@ -17,6 +17,14 @@ type Submission struct {
 	Status      string    `json:"status"`
 }
 
+type SubmissionResult struct {
+	InputPreview  string  `json:"inputPreview"`
+	OutputPreview string  `json:"outputPreview"`
+	AnswerPreview string  `json:"answerPreview"`
+	Score         float32 `json:"score"`
+	Verdict       string  `json:"verdict"`
+}
+
 func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
 	var submission Submission
 	err := rows.Scan(
@@ -93,8 +101,8 @@ func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 		whereClause = "WHERE " + strings.Join(keyList, ", ")
 	}
 
-	sql :=
-		`SELECT
+	sql := `
+	SELECT
 		submissions.id,
 		submissions.username,
 		submissions.problem_id,
@@ -104,8 +112,8 @@ func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 	FROM
 		submissions
 		JOIN problems ON (submissions.problem_id = problems.id)` +
-			whereClause +
-			`ORDER BY
+		whereClause +
+	`ORDER BY
 		created_at DESC`
 
 	rows, err := config.DB.Query(sql, valList...)
@@ -138,4 +146,28 @@ func getSubmissionScore(submissionId int) float32 {
 		score = 0
 	}
 	return score
+}
+
+func getSubmissionResults(submissionId int) ([]SubmissionResult, error) {
+	rows, err := config.DB.Query("SELECT * FROM get_submission_result($1)", submissionId)
+	if err != nil {
+		return nil, err
+	}
+
+	resultList := make([]SubmissionResult, 0)
+	for rows.Next() {
+		var result SubmissionResult
+		err := rows.Scan(
+			&result.InputPreview,
+			&result.OutputPreview,
+			&result.AnswerPreview,
+			&result.Score,
+			&result.Verdict,
+		)
+		if err == nil {
+			resultList = append(resultList, result)
+		}
+	}
+
+	return resultList, nil
 }
