@@ -14,7 +14,7 @@ type Submission struct {
 	ProblemId   int       `json:"problemId"`
 	ProblemName string    `json:"problemName"`
 	CreatedAt   time.Time `json:"createdAt"`
-	Score       int       `json:"score"`
+	Status      string    `json:"status"`
 }
 
 func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
@@ -25,7 +25,7 @@ func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
 		&submission.ProblemId,
 		&submission.ProblemName,
 		&submission.CreatedAt,
-		&submission.Score,
+		&submission.Status,
 	)
 	if err != nil {
 		return Submission{}, err
@@ -61,7 +61,7 @@ func fetchSubmissionById(submissionId int) (Submission, error) {
 			submissions.problem_id,
 			problems.name,
 			submissions.created_at,
-			submissions.score	
+			submissions.status	
 		FROM
 			submissions
 			JOIN problems ON (submissions.problem_id = problems.id)
@@ -100,7 +100,7 @@ func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 		submissions.problem_id,
 		problems.name,
 		submissions.created_at,
-		submissions.score	
+		submissions.status	
 	FROM
 		submissions
 		JOIN problems ON (submissions.problem_id = problems.id)` +
@@ -124,7 +124,18 @@ func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 	return submissionList, nil
 }
 
-func updateScore(submissionId int, score int) error {
-	_, err := config.DB.Exec("UPDATE submissions SET score = score + $1 WHERE id = $2", score, submissionId)
+func updateSubmissionStatus(submissionId int, status string) error {
+	_, err := config.DB.Exec("UPDATE submissions SET status = $1 WHERE id = $2", status, submissionId)
 	return err
+}
+
+func getSubmissionScore(submissionId int) float32 {
+	score := float32(0)
+	err := config.DB.
+		QueryRow("SELECT SUM(score) FROM submission_results WHERE submission_id = $1", submissionId).
+		Scan(&score)
+	if err != nil {
+		score = 0
+	}
+	return score
 }

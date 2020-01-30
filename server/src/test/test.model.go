@@ -1,7 +1,6 @@
 package test
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -19,42 +18,14 @@ type Test struct {
 	OutputPreview string `json:"outputPreview"`
 }
 
-func getFilePreview(path string) (string, error) {
-	f, err := os.Open(path)
-	defer func() { _ = f.Close() }()
-	if err != nil {
-		return "", err
-	}
-
-	buf := make([]byte, PREVIEW_SIZE)
-	n, err := f.Read(buf)
-	return string(buf[:n]), nil
-}
-
-func generateSingleValue(problemId int, order int, inputPreview string, outputPreview string) (string, []interface{}) {
-	pos := order * 4 + 1
-	key := fmt.Sprintf("($%d, $%d, $%d, $%d)", pos, pos + 1, pos + 2, pos + 3)
-	val := []interface{}{problemId, order, inputPreview, outputPreview}
-	return key, val
-}
-
-func parseTest(rows *sql.Rows) (Test, error) {
-	var test Test
-	err := rows.Scan(&test.Id, &test.ProblemId, &test.Order, &test.InputPreview, &test.OutputPreview)
-	if err != nil {
-		return Test{}, err
-	}
-	return test, nil
-}
-
 func CreateTests(problemId int, tmpInputPath []string, tmpOutputPath []string) ([]Test, error) {
 	keyList := make([]string, 0)
 	valList := make([]interface{}, 0)
 
 	testCount := len(tmpInputPath)
 	for i := 0; i < testCount; i++ {
-		inputPreview, _ := getFilePreview(tmpInputPath[i])
-		outputPreview, _ := getFilePreview(tmpOutputPath[i])
+		inputPreview, _ := GetFilePreview(tmpInputPath[i])
+		outputPreview, _ := GetFilePreview(tmpOutputPath[i])
 
 		key, val := generateSingleValue(problemId, i, inputPreview, outputPreview)
 		keyList = append(keyList, key)
@@ -97,6 +68,6 @@ func FetchAllTests(problemId int) ([]Test, error) {
 }
 
 func DeleteAllTests(problemId int) error {
-	_, err := config.DB.Query("DELETE FROM tests WHERE problemId = $1", problemId)
+	_, err := config.DB.Exec("DELETE FROM tests WHERE problemId = $1", problemId)
 	return err
 }

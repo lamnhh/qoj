@@ -10,14 +10,14 @@ interface SubmissionRowProps {
 
 let SubmissionRow: React.FC<SubmissionRowProps> = ({ submission }) => {
   let { socket } = useContext(WSContext);
-  let [status, setStatus] = React.useState("finished");
+  let [status, setStatus] = React.useState(submission.status.split("|")[0]);
 
   useEffect(
     function() {
       function updateStatus(event: MessageEvent) {
         let json: WSMessage = JSON.parse(event.data);
         if (json.submissionId === submission.id) {
-          setStatus(json.message);
+          setStatus(json.message.split("|")[0]);
         }
       }
 

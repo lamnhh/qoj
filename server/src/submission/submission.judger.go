@@ -17,6 +17,14 @@ import (
 
 var judges map[int]chan interface{}
 
+const (
+	VerdictAc  = "Accepted"
+	VerdictWa  = "Wrong Answer"
+	VerdictRe  = "Runtime Error"
+	VerdictTle = "Time Limit Exceeded"
+	VerdictMle = "Memory Limit Exceeded"
+)
+
 func judgeFunc(done chan interface{}, metadata interface{}) {
 	config := metadata.(map[string]interface{})
 
@@ -26,17 +34,24 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 	testList := config["testList"].([]test.Test)
 
 	if testId >= len(testList) {
+		status := fmt.Sprintf("%.2f / %d.00", getSubmissionScore(submissionId), len(testList))
+		_ = updateSubmissionStatus(submissionId, status)
 		// Clean up
 		_ = os.Remove(fmt.Sprintf("%d", submissionId))
 		_ = os.Remove(fmt.Sprintf("%d.cpp", submissionId))
 		_ = os.Remove(fmt.Sprintf("%d.out", submissionId))
 		done <- map[string]interface{}{
 			"submissionId": submissionId,
-			"type": "finish",
-			"error": nil,
-			"message": "",
+			"message":      status,
 		}
 		return
+	}
+
+	status := fmt.Sprintf("Running on test %d...", testId + 1)
+	_ = updateSubmissionStatus(submissionId, status)
+	done <- map[string]interface{}{
+		"submissionId": submissionId,
+		"message": status,
 	}
 
 	dirname, _ := os.Getwd()
@@ -56,41 +71,32 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 		"-m", fmt.Sprintf("%d", prob.MemoryLimit * 1024),
 		cmd,
 	).CombinedOutput()
-	if err != nil {
-		done <- map[string]interface{}{
-			"submissionId": submissionId,
-			"type": "result",
-			"error": err,
-			"message": "Runtime Error",
-		}
-	} else {
+	if err == nil {
 		result := strings.Split(string(output), " ")
-		resultMsg := ""
 
+		answerPreview := ""
+		score := float32(0.0)
+		verdict := ""
 		switch result[0] {
 			case "FINISHED":
 				cmp := equalfile.New(nil, equalfile.Options{})
 				equal, _ := cmp.CompareFile(outPath, tmpOutPath)
+
+				answerPreview, _ = test.GetFilePreview(outPath)
 				if equal {
-					resultMsg = "Correct"
-					_ = updateScore(submissionId, 1)
+					verdict = VerdictAc
+					score = 1.0
 				} else {
-					resultMsg = "Wrong Answer"
+					verdict = VerdictWa
 				}
 			case "TIMEOUT":
-				resultMsg = "Time Limit Exceeded"
+				verdict = VerdictTle
 			case "MEM":
-				resultMsg = "Memory Limit Exceeded"
+				verdict = VerdictMle
 			case "SIGNAL":
-				resultMsg = "Runtime Error"
+				verdict = VerdictRe
 		}
-
-		done <- map[string]interface{}{
-			"submissionId": submissionId,
-			"type": "result",
-			"error": nil,
-			"message": fmt.Sprintf("%d | %s", testId, resultMsg),
-		}
+		_ = updateScore(submissionId, testList[testId].Id, score, verdict, answerPreview)
 	}
 
 	queue.Push(queue.Task{
@@ -111,25 +117,25 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	prob := config["problem"].(problem.Problem)
 	submissionId := config["submissionId"].(int)
 
+	// Update status
+	done <- map[string]interface{}{
+		"submissionId": submissionId,
+		"message":      "Compiling...",
+	}
+	_ = updateSubmissionStatus(submissionId, "Compiling...")
+
 	cppPath := fmt.Sprintf("%d.cpp", submissionId)
 	compileOutput, err := exec.Command("g++", cppPath, "-o", fmt.Sprintf("%d", submissionId)).CombinedOutput()
 	if err != nil {
 		// Compile error
 		done <- map[string]interface{}{
 			"submissionId": submissionId,
-			"type":    "compile-error",
-			"error":   err,
-			"message": string(compileOutput),
+			"message":      "Compile Error|" + string(compileOutput),
 		}
+		_ = updateSubmissionStatus(submissionId, "Compile Error|" + string(compileOutput))
+		_ = os.Remove(cppPath)
 	} else {
 		// Successfully compiled
-		done <- map[string]interface{}{
-			"submissionId": submissionId,
-			"type":  "compile",
-			"error": nil,
-			"message": "",
-		}
-
 		testList, _ := test.FetchAllTests(prob.Id)
 		queue.Push(queue.Task{
 			Run:           judgeFunc,
