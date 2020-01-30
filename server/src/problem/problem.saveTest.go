@@ -49,19 +49,15 @@ func validateTestZip(uuid string, problemCode string) (int, error) {
 	return 0, nil
 }
 
-func saveTestData(uuid string, problemId int, problemCode string) {
+func saveTestData(uuid string, problemId int, problemCode string) ([]string, []string) {
 	extractedPath := filepath.Join(".", "server", "tasks", uuid)
-
-	// Path to save test data: ./server/tasks/id/*.inp | *.out
-	testPath := filepath.Join(".", "server", "tasks", fmt.Sprintf("%d", problemId))
-	_ = os.RemoveAll(testPath)
-	_ = os.Mkdir(testPath, os.ModePerm)
 
 	// Read all test subdirectories, each of which contains a test file
 	testList, _ := readDir(filepath.Join(extractedPath, problemCode))
 
 	// Iterate over all test directories, check if every directory contains <code>.INP and <code.OUT
-	id := 0
+	inpList := make([]string, 0)
+	outList := make([]string, 0)
 	for _, testId := range testList {
 		// fileName = ".../Code/Test00/Code.(INP|inp|OUT|out)
 		fileName := filepath.Join(extractedPath, problemCode, "Test" + testId, problemCode)
@@ -82,11 +78,11 @@ func saveTestData(uuid string, problemId int, problemCode string) {
 			outputFile = fileName + ".out"
 		}
 
-		// Save both files to "testId.inp", "testId.out"
-		id++
-		_ = os.Rename(inputFile, filepath.Join(testPath, fmt.Sprintf("%d.inp", id)))
-		_ = os.Rename(outputFile, filepath.Join(testPath, fmt.Sprintf("%d.out", id)))
+		inpList = append(inpList, inputFile)
+		outList = append(outList, outputFile)
 	}
+
+	return inpList, outList
 }
 
 func clearTemporaryData(uuid string) {

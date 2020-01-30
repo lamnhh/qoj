@@ -19,6 +19,15 @@ CREATE TABLE submissions (
     username    CHARACTER(16) REFERENCES users(username),
     problem_id  INT REFERENCES problems(id),
     created_at  TIMESTAMP DEFAULT NOW(),
-    score       INT,
+    score       INT DEFAULT 0,
     primary key (id)
+);
+
+CREATE TABLE tests (
+	id			SERIAL,
+	problem_id	INT REFERENCES problems(id),
+	ord			INT,
+	inp_preview	CHARACTER(100),
+	out_preview	CHARACTER(100),
+	primary key (id)
 );

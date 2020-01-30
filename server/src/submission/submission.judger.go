@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"qoj/server/src/problem"
 	"qoj/server/src/queue"
+	"qoj/server/src/test"
 	"strings"
 )
 
@@ -22,18 +23,9 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 	testId := config["testId"].(int)
 	prob:= config["problem"].(problem.Problem)
 	submissionId := config["submissionId"].(int)
+	testList := config["testList"].([]test.Test)
 
-	dirname, _ := os.Getwd()
-	timeoutPath := filepath.Join(dirname, "timeout")
-	tmpOutPath := filepath.Join(dirname, fmt.Sprintf("%d.out", submissionId))
-	exePath := filepath.Join(dirname, fmt.Sprintf("%d", submissionId))
-
-	path := filepath.Join(dirname, "server", "tasks", fmt.Sprintf("%d", prob.Id))
-
-	inpPath := filepath.Join(path, fmt.Sprintf("%d.inp", testId))
-	outPath := filepath.Join(path, fmt.Sprintf("%d.out", testId))
-
-	if !problem.DoesFileExists(inpPath) {
+	if testId >= len(testList) {
 		// Clean up
 		_ = os.Remove(fmt.Sprintf("%d", submissionId))
 		_ = os.Remove(fmt.Sprintf("%d.cpp", submissionId))
@@ -46,6 +38,14 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 		}
 		return
 	}
+
+	dirname, _ := os.Getwd()
+	timeoutPath := filepath.Join(dirname, "timeout")
+	tmpOutPath := filepath.Join(dirname, fmt.Sprintf("%d.out", submissionId))
+	exePath := filepath.Join(dirname, fmt.Sprintf("%d", submissionId))
+
+	inpPath := filepath.Join(dirname, "server", "tasks", fmt.Sprintf("%d.inp", testList[testId].Id))
+	outPath := filepath.Join(dirname, "server", "tasks", fmt.Sprintf("%d.out", testList[testId].Id))
 
 	log.Printf("Judging test %d\n", testId)
 
@@ -100,6 +100,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 			"testId":       testId + 1,
 			"problem":      prob,
 			"submissionId": submissionId,
+			"testList":     testList,
 		},
 	})
 }
@@ -128,13 +129,16 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 			"error": nil,
 			"message": "",
 		}
+
+		testList, _ := test.FetchAllTests(prob.Id)
 		queue.Push(queue.Task{
 			Run:           judgeFunc,
 			ResultChannel: done,
 			Params: map[string]interface{}{
-				"testId":       1,
+				"testId":       0,
 				"problem":      prob,
 				"submissionId": submissionId,
+				"testList":     testList,
 			},
 		})
 	}
