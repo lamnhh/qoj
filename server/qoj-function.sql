@@ -20,3 +20,28 @@ BEGIN
 		*;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_submission_result(sub_id INT)
+RETURNS TABLE (
+	inp_preview		TEXT,
+	out_preview		TEXT,
+	answer_preview	TEXT,
+	score			FLOAT,
+	verdict			TEXT
+)
+AS $$
+BEGIN
+	RETURN QUERY
+	SELECT
+		tests.inp_preview,
+		tests.out_preview,
+		submission_results.answer_preview,
+		submission_results.score,
+		submission_results.verdict
+	FROM
+		submission_results
+		JOIN tests ON (submission_results.test_id = tests.id)
+	ORDER BY
+		tests.ord ASC;
+END;
+$$ LANGUAGE plpgsql;
