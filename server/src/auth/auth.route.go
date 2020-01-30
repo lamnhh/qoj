@@ -41,6 +41,8 @@ func postRegister(ctx *gin.Context) {
 
 	// Send access token back to user
 	ctx.JSON(http.StatusOK, gin.H{
+		"username":    user.Username,
+		"fullname":    user.Fullname,
 		"accessToken": createAccessToken(user.Username),
 	})
 }
