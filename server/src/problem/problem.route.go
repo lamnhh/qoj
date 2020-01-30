@@ -5,6 +5,7 @@ import (
 	uuid2 "github.com/google/uuid"
 	"net/http"
 	"path/filepath"
+	"qoj/server/src/test"
 	"strconv"
 )
 
@@ -86,7 +87,9 @@ func postProblem(ctx *gin.Context) {
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		} else {
-			saveTestData(uuid, problem.Id, problem.Code)
+			// Create entries in table `tests`
+			inpList, outList := saveTestData(uuid, problem.Id, problem.Code)
+			_, _ = test.CreateTests(problem.Id, inpList, outList)
 			ctx.JSON(http.StatusOK, problem)
 		}
 	}
@@ -156,6 +159,12 @@ func putProblemIdTest(ctx *gin.Context) {
 		return
 	}
 
+	replace := ctx.Param("replace")
+	if replace != "1" && replace != "0" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid `replace` param"})
+		return
+	}
+
 	// Parse test ZIP file
 	// `file` is required
 	file, _ := ctx.FormFile("file")
@@ -177,7 +186,14 @@ func putProblemIdTest(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(code, gin.H{"error": err.Error()})
 	} else {
-		saveTestData(uuid, problem.Id, problem.Code)
+		// Replace old tests if user requires
+		if replace == "1" {
+			_ = test.DeleteAllTests(problem.Id)
+		}
+
+		// Create entries in table `tests`
+		inpList, outList := saveTestData(uuid, problem.Id, problem.Code)
+		_, _ = test.CreateTests(problem.Id, inpList, outList)
 		ctx.JSON(http.StatusOK, problem)
 	}
 	clearTemporaryData(uuid)

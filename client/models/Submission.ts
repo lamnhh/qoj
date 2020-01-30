@@ -4,7 +4,7 @@ interface Submission {
   problemId: number;
   problemName: string;
   createdAt: Date;
-  score: number;
+  status: string;
 }
 
 export default Submission;

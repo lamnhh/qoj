@@ -25,6 +25,6 @@ func FindUserByUsername(username string) (User, error){
 
 func CreateNewUser(user User) error {
 	hashedPassword := hashPassword(user.Password)
-	_, err := config.DB.Query("SELECT create_user($1, $2, $3)", user.Username, hashedPassword, user.Fullname)
+	_, err := config.DB.Exec("SELECT create_user($1, $2, $3)", user.Username, hashedPassword, user.Fullname)
 	return err
 }

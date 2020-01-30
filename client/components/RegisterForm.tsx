@@ -15,7 +15,7 @@ function RegisterForm() {
     let fullname = form.fullname.value;
     let password = form.password.value;
 
-    fetch("/api/login", {
+    fetch("/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -2,7 +2,6 @@ package auth
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"net/http"
@@ -91,8 +90,6 @@ func getRefresh(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token required"})
 		return
 	}
-
-	fmt.Println(cookie)
 
 	// Decode the cookie above for `username`
 	username, err := decodeRefreshToken(cookie)
