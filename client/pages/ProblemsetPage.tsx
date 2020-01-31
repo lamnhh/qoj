@@ -29,12 +29,14 @@ function ProblemsetPage() {
                   <td>{problem.id}</td>
                   <td className="problemset-score--wrapper">
                     <div className="problemset-score">
-                      <span>0 / 100</span>
-                      <div
-                        className="problemset-score__progress"
-                        style={{
-                          width: `${45}%`
-                        }}></div>
+                      <span>{problem.maxScore} / 100</span>
+                      <div className="problemset-score__progress--wrapper">
+                        <div
+                          className="problemset-score__progress"
+                          style={{
+                            width: `${problem.maxScore}%`
+                          }}></div>
+                      </div>
                     </div>
                   </td>
                   <td>

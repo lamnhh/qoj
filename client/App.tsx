@@ -16,6 +16,7 @@ import "./styles/index.scss";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
+  let [loading, setLoading] = useState(true);
 
   let fetchUserInformation = useCallback(function() {
     request("/api/user")
@@ -32,10 +33,15 @@ function App() {
     request("/api/refresh")
       .then(function({ accessToken }) {
         setAccessToken(accessToken);
+        setLoading(false);
         fetchUserInformation();
       })
       .catch(() => {});
   }, []);
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <AppContext.Provider

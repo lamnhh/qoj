@@ -6,20 +6,12 @@ import (
 	"net/http"
 	"path/filepath"
 	"qoj/server/src/test"
+	"qoj/server/src/token"
 	"strconv"
 )
 
 func getProblem(ctx *gin.Context) {
-	code := ctx.Query("code")
-
-	var problemList []Problem
-	var err error
-	if code == "" {
-		problemList, err = FetchAllProblems()
-	} else {
-		problemList, err = FetchProblemsByCode(code)
-	}
-
+	problemList, err := FetchAllProblems(ctx.GetString("username"))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -103,7 +95,7 @@ func getProblemId(ctx *gin.Context) {
 		return
 	}
 
-	problem, err := FetchProblemById(int(problemId))
+	problem, err := FetchProblemById(int(problemId), ctx.GetString("username"))
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -153,7 +145,7 @@ func putProblemIdTest(ctx *gin.Context) {
 		return
 	}
 
-	problem, err := FetchProblemById(int(problemId))
+	problem, err := FetchProblemById(int(problemId), "")
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -200,8 +192,8 @@ func putProblemIdTest(ctx *gin.Context) {
 }
 
 func InitialiseProblemRoutes(app *gin.Engine) {
-	app.GET("/api/problem", getProblem)
-	app.GET("/api/problem/:id", getProblemId)
+	app.GET("/api/problem", token.ParseAuth(), getProblem)
+	app.GET("/api/problem/:id", token.ParseAuth(), getProblemId)
 	app.POST("/api/problem", postProblem)
 	app.DELETE("/api/problem/:id", deleteProblemId)
 	app.PATCH("/api/problem/:id", patchProblemId)

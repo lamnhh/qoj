@@ -58,7 +58,7 @@ func postSubmission(ctx *gin.Context) {
 	}
 	submissionId := submission.Id
 
-	problem, err := problem2.FetchProblemById(problemId)
+	problem, err := problem2.FetchProblemById(problemId, "")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

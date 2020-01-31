@@ -60,6 +60,37 @@ func DecodeRefreshToken(tokenString string) (string, error) {
 	return claim.Username, nil
 }
 
+func ParseAuth() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Extract header
+		authHeader := ctx.GetHeader("Authorization")
+		if authHeader == "" {
+			ctx.Next()
+			return
+		}
+
+		// Split authHeader into 2 parts: "Bearer" and the actual token
+		authHeaderToken := strings.Split(authHeader, " ")
+		if len(authHeaderToken) != 2 {
+			// If there aren't exactly 2 parts, return a 401
+			ctx.Next()
+			return
+		}
+
+		// Extract access token as the 2nd element from authHeaderToken
+		accessToken := authHeaderToken[1]
+		username, err := DecodeAccessToken(accessToken)
+		if err != nil {
+			ctx.Next()
+			return
+		}
+
+		// Save `username` into context for later use
+		ctx.Set("username", username)
+		ctx.Next()
+	}
+}
+
 func RequireAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Extract header
