@@ -46,20 +46,22 @@ function App() {
       }}>
       <BrowserRouter>
         <Header></Header>
-        <Switch>
-          <Route path="/" exact component={ProblemsetPage}></Route>
-          <Route path="/status" component={SubmissionPage}></Route>
-          <Route path="/login" component={LoginPage}></Route>
-          <Route path="/register" component={RegisterPage}></Route>
-          <Route path="/problem/:problemId" component={ProblemPage}></Route>
-          <Route
-            path="/logout"
-            render={() => {
-              setUser(null);
-              clearToken();
-              return <Redirect to="/"></Redirect>;
-            }}></Route>
-        </Switch>
+        <div>
+          <Switch>
+            <Route path="/" exact component={ProblemsetPage}></Route>
+            <Route path="/status" component={SubmissionPage}></Route>
+            <Route path="/login" component={LoginPage}></Route>
+            <Route path="/register" component={RegisterPage}></Route>
+            <Route path="/problem/:problemId" component={ProblemPage}></Route>
+            <Route
+              path="/logout"
+              render={() => {
+                setUser(null);
+                clearToken();
+                return <Redirect to="/"></Redirect>;
+              }}></Route>
+          </Switch>
+        </div>
         <Footer></Footer>
       </BrowserRouter>
     </AppContext.Provider>

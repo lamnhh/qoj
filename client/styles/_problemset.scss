@@ -1,0 +1,81 @@
+.problemset {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.problemset table {
+  min-width: 40rem;
+  width: 100%;
+}
+
+.problemset {
+  padding-top: 3rem;
+  table {
+    border-spacing: 0;
+    border-collapse: collapse;
+  }
+  th {
+    font-size: 1.3rem;
+    border-bottom: 0.2rem solid #ddd;
+  }
+  td {
+    font-size: 1.4rem;
+    border-top: 0.1rem solid #ddd;
+  }
+  th,
+  td:not(.problemset-score) {
+    text-align: left;
+  }
+
+  tr {
+    height: 4rem;
+  }
+
+  tr:not(:first-child):hover {
+    background-color: #f5f5f5;
+  }
+
+  tr:nth-child(2n + 1) {
+    background-color: lighten(#f5f5f5, 1%);
+  }
+
+  a {
+    color: $theme;
+    text-decoration: none;
+    transition: color 0.2s linear;
+    &:focus,
+    &:hover {
+      color: #444;
+    }
+  }
+}
+
+.problemset-score--wrapper {
+  padding: 0.4rem;
+  padding-right: 1.6rem;
+}
+
+.problemset-score {
+  background-color: #000;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.6rem 0;
+  position: relative;
+  text-align: center;
+  span {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.problemset-score__progress {
+  background-color: lighten($theme, 8%);
+  border-radius: 0.3rem;
+  top: 0.4rem;
+  left: 0.4rem;
+  bottom: 0.4rem;
+  position: absolute;
+  z-index: 0;
+}

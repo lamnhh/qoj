@@ -14,31 +14,40 @@ function ProblemsetPage() {
       <header className="page-name align-left-right">
         <h1>Problemset</h1>
       </header>
-      <section>
-        <table>
-          <thead>
+      <section className="align-left-right">
+        <div className="problemset">
+          <table>
             <tr>
-              <th>ID</th>
-              <th>Score</th>
+              <th>#</th>
+              <th>Your score</th>
+              <th>Problem code</th>
               <th>Problem title</th>
             </tr>
-          </thead>
-          <tbody>
             {problemList.map(function(problem) {
               return (
                 <tr key={problem.id}>
                   <td>{problem.id}</td>
-                  <td>0/100</td>
+                  <td className="problemset-score--wrapper">
+                    <div className="problemset-score">
+                      <span>0 / 100</span>
+                      <div
+                        className="problemset-score__progress"
+                        style={{
+                          width: `${45}%`
+                        }}></div>
+                    </div>
+                  </td>
                   <td>
-                    <Link to={"/problem/" + problem.id}>
-                      {problem.code} - {problem.name}
-                    </Link>
+                    <Link to={"/problem/" + problem.id}>{problem.code}</Link>
+                  </td>
+                  <td>
+                    <Link to={"/problem/" + problem.id}>{problem.name}</Link>
                   </td>
                 </tr>
               );
             })}
-          </tbody>
-        </table>
+          </table>
+        </div>
       </section>
     </>
   );
