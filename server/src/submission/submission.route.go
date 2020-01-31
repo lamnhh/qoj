@@ -84,7 +84,7 @@ func getSubmission(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
 			return
 		}
-		filters["problemId"] = int(problemId)
+		filters["problem_id"] = int(problemId)
 	}
 
 	if val := ctx.Query("username"); val != "" {

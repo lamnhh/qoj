@@ -4,11 +4,13 @@ import Submission from "../models/Submission";
 import WSContext from "../WSContext";
 import WSMessage from "../models/WSMessage";
 
-interface SubmissionRowProps {
+interface SubmissionListItemProps {
   submission: Submission;
 }
 
-let SubmissionRow: React.FC<SubmissionRowProps> = ({ submission }) => {
+let SubmissionListItem: React.FC<SubmissionListItemProps> = ({
+  submission
+}) => {
   let { socket } = useContext(WSContext);
   let [status, setStatus] = React.useState(submission.status.split("|")[0]);
 
@@ -55,4 +57,4 @@ let SubmissionRow: React.FC<SubmissionRowProps> = ({ submission }) => {
   );
 };
 
-export default SubmissionRow;
+export default SubmissionListItem;

@@ -6,4 +6,13 @@ interface Problem {
   memoryLimit: number;
 }
 
+const emptyProblem: Problem = {
+  id: 0,
+  code: "",
+  name: "",
+  timeLimit: 0,
+  memoryLimit: 0
+};
+
 export default Problem;
+export { emptyProblem };
