@@ -2,8 +2,8 @@ package submission
 
 import (
 	"net/http"
-	"qoj/server/src/auth"
 	problem2 "qoj/server/src/problem"
+	"qoj/server/src/token"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -119,6 +119,6 @@ func InitialiseSubmissionRoutes(app *gin.Engine) {
 	submissionCount = 0
 
 	app.GET("/api/submission", getSubmission)
-	app.POST("/api/submission", auth.RequireAuth(), postSubmission)
+	app.POST("/api/submission", token.RequireAuth(), postSubmission)
 	app.GET("/api/submission/:id/result", getSubmissionIdResult)
 }

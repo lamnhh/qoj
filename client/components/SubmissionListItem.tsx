@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import moment from "moment";
 import Submission from "../models/Submission";
-import WSContext from "../WSContext";
+import WSContext from "../contexts/WSContext";
 import WSMessage from "../models/WSMessage";
 
 interface SubmissionListItemProps {

@@ -1,7 +1,9 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext } from "react";
+import { NavLink, Link } from "react-router-dom";
+import AppContext from "../contexts/AppContext";
 
 function Header() {
+  let { user } = useContext(AppContext);
   return (
     <header>
       <img src="/static/logo.jpeg" alt="Logo" />
@@ -13,13 +15,26 @@ function Header() {
           <li>
             <NavLink to="/status">Submission</NavLink>
           </li>
-          <li>
-            <NavLink to="/login">Sign in</NavLink>
-          </li>
-          <li>
-            <NavLink to="/register">Register</NavLink>
-          </li>
         </ul>
+      </nav>
+      <nav>
+        {user !== null ? (
+          <ul>
+            <li>{user.username}</li>
+            <li>
+              <Link to="/logout">Sign out</Link>
+            </li>
+          </ul>
+        ) : (
+          <ul>
+            <li>
+              <Link to="/login">Sign in</Link>
+            </li>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
+          </ul>
+        )}
       </nav>
     </header>
   );

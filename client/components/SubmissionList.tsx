@@ -1,7 +1,7 @@
 import React from "react";
 import Submission from "../models/Submission";
 import SubmissionListItem from "./SubmissionListItem";
-import WSContext from "../WSContext";
+import WSContext from "../contexts/WSContext";
 import request from "../helpers/request";
 
 interface SubmissionListProps {

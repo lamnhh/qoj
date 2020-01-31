@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"net/http"
+	"qoj/server/src/token"
 	user2 "qoj/server/src/user"
 	"time"
 )
@@ -35,15 +36,13 @@ func postRegister(ctx *gin.Context) {
 	// Set refresh token in cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:     "rftoken",
-		Value:    createRefreshToken(user.Username),
+		Value:    token.CreateRefreshToken(user.Username),
 		HttpOnly: true,
 	})
 
 	// Send access token back to user
 	ctx.JSON(http.StatusOK, gin.H{
-		"username":    user.Username,
-		"fullname":    user.Fullname,
-		"accessToken": createAccessToken(user.Username),
+		"accessToken": token.CreateAccessToken(user.Username),
 	})
 }
 
@@ -72,15 +71,13 @@ func postLogin(ctx *gin.Context) {
 	// Set refresh token in cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:     "rftoken",
-		Value:    createRefreshToken(user.Username),
+		Value:    token.CreateRefreshToken(user.Username),
 		HttpOnly: true,
 	})
 
 	// Return (username, fullname)
 	ctx.JSON(http.StatusOK, gin.H{
-		"username":    user.Username,
-		"fullname":    user.Fullname,
-		"accessToken": createAccessToken(user.Username),
+		"accessToken": token.CreateAccessToken(user.Username),
 	})
 }
 
@@ -94,7 +91,7 @@ func getRefresh(ctx *gin.Context) {
 	}
 
 	// Decode the cookie above for `username`
-	username, err := decodeRefreshToken(cookie)
+	username, err := token.DecodeRefreshToken(cookie)
 	if err != nil {
 		// Cannot decode JWT, or JWT is expired, return 401
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
@@ -104,19 +101,13 @@ func getRefresh(ctx *gin.Context) {
 	// Set new refresh token in cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:     "rftoken",
-		Value:    createRefreshToken(username),
+		Value:    token.CreateRefreshToken(username),
 		HttpOnly: true,
 	})
 
 	// Send access token back to user
 	ctx.JSON(http.StatusOK, gin.H{
-		"accessToken": createAccessToken(username),
-	})
-}
-
-func getSecret(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"secret": "Hello there",
+		"accessToken": token.CreateAccessToken(username),
 	})
 }
 
@@ -135,7 +126,4 @@ func InitialiseAuthRoutes(app *gin.Engine) {
 	app.POST("/api/login", postLogin)
 	app.GET("/api/refresh", getRefresh)
 	app.GET("/api/logout", getLogout)
-
-	// Protected route for token testing
-	app.GET("/api/secret", RequireAuth(), getSecret)
 }

@@ -1,4 +1,4 @@
-package auth
+package token
 
 import (
 	"errors"
@@ -28,15 +28,15 @@ func createToken(username string, jwtKey []byte, expirationTime time.Duration) s
 	return tokenString
 }
 
-func createAccessToken(username string) string {
+func CreateAccessToken(username string) string {
 	return createToken(username, []byte(os.Getenv("JWT_ACCESS_SECRET")), 5 * time.Minute)
 }
 
-func createRefreshToken(username string) string {
+func CreateRefreshToken(username string) string {
 	return createToken(username, []byte(os.Getenv("JWT_REFRESH_SECRET")), 7 * 24 * time.Hour)
 }
 
-func decodeAccessToken(tokenString string) (string, error) {
+func DecodeAccessToken(tokenString string) (string, error) {
 	claim := UserClaim{}
 
 	token, err := jwt.ParseWithClaims(tokenString, &claim, func(token *jwt.Token) (i interface{}, err error) {
@@ -48,7 +48,7 @@ func decodeAccessToken(tokenString string) (string, error) {
 	return claim.Username, nil
 }
 
-func decodeRefreshToken(tokenString string) (string, error) {
+func DecodeRefreshToken(tokenString string) (string, error) {
 	claim := UserClaim{}
 
 	token, err := jwt.ParseWithClaims(tokenString, &claim, func(token *jwt.Token) (i interface{}, err error) {
@@ -79,7 +79,7 @@ func RequireAuth() gin.HandlerFunc {
 
 		// Extract access token as the 2nd element from authHeaderToken
 		accessToken := authHeaderToken[1]
-		username, err := decodeAccessToken(accessToken)
+		username, err := DecodeAccessToken(accessToken)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return

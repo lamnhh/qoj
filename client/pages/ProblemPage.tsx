@@ -3,12 +3,14 @@ import React, {
   FormEvent,
   useEffect,
   useState,
-  useRef
+  useRef,
+  useContext
 } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Problem, { emptyProblem } from "../models/Problem";
 import SubmissionList from "../components/SubmissionList";
+import AppContext from "../contexts/AppContext";
 
 interface FormElements extends HTMLFormElement {
   file: HTMLInputElement;
@@ -21,6 +23,7 @@ interface ProblemPageRouterProps {
 function ProblemPage() {
   let history = useHistory();
   let problemId = useParams<ProblemPageRouterProps>().problemId;
+  let isLoggedIn = useContext(AppContext).user !== null;
 
   let [problem, setProblem] = useState<Problem>(emptyProblem);
   useEffect(
@@ -87,17 +90,19 @@ function ProblemPage() {
           tabIndex={tab !== 0 ? -1 : undefined}>
           Contraints
         </button>
-        <button
-          type="button"
-          role="tab"
-          aria-label="Submit"
-          aria-selected={tab === 1 ? "true" : "false"}
-          aria-controls="tab-submit"
-          id="submit"
-          onClick={() => setTab(1)}
-          tabIndex={tab !== 1 ? -1 : undefined}>
-          Submit
-        </button>
+        {isLoggedIn && (
+          <button
+            type="button"
+            role="tab"
+            aria-label="Submit"
+            aria-selected={tab === 1 ? "true" : "false"}
+            aria-controls="tab-submit"
+            id="submit"
+            onClick={() => setTab(1)}
+            tabIndex={tab !== 1 ? -1 : undefined}>
+            Submit
+          </button>
+        )}
         <button
           type="button"
           role="tab"
@@ -129,17 +134,19 @@ function ProblemPage() {
           </tr>
         </table>
       </div>
-      <div
-        tabIndex={0}
-        role="tabpanel"
-        id="tab-submit"
-        aria-labelledby="submit"
-        hidden={tab !== 1}>
-        <form onSubmit={handleSubmit}>
-          <input type="file" name="file" required />
-          <button type="submit">Submit</button>
-        </form>
-      </div>
+      {isLoggedIn && (
+        <div
+          tabIndex={0}
+          role="tabpanel"
+          id="tab-submit"
+          aria-labelledby="submit"
+          hidden={tab !== 1}>
+          <form onSubmit={handleSubmit}>
+            <input type="file" name="file" required />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      )}
       <div
         tabIndex={0}
         role="tabpanel"

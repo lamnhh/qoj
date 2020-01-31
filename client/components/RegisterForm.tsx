@@ -1,6 +1,7 @@
-import React, { useCallback, FormEvent } from "react";
+import React, { useCallback, FormEvent, useContext } from "react";
 import { setAccessToken } from "../helpers/auth";
 import { useHistory } from "react-router-dom";
+import AppContext from "../contexts/AppContext";
 
 interface RegisterFormElement extends HTMLFontElement {
   username: HTMLInputElement;
@@ -10,6 +11,7 @@ interface RegisterFormElement extends HTMLFontElement {
 
 function RegisterForm() {
   let history = useHistory();
+  let { fetchUserInformation } = useContext(AppContext);
 
   let handleLogin = useCallback(
     function(event: FormEvent) {
@@ -28,6 +30,7 @@ function RegisterForm() {
       }).then(function(res) {
         res.json().then(function({ accessToken }) {
           setAccessToken(accessToken);
+          fetchUserInformation();
           history.push("/");
         });
       });
