@@ -1,3 +1,23 @@
+$theme: #228b22;
+
 html {
   font-size: 62.5%;
 }
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+* {
+  font-family: "Nanum Gothic", sans-serif;
+  box-sizing: border-box;
+}
+
+.align-left-right {
+  padding-left: 15%;
+  padding-right: 15%;
+}
+
+@import "./header";

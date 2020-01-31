@@ -11,7 +11,7 @@ function ProblemsetPage() {
 
   return (
     <>
-      <header>
+      <header className="page-name align-left-right">
         <h1>Problemset</h1>
       </header>
       <section>

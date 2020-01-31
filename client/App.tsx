@@ -12,6 +12,7 @@ import Footer from "./components/Footer";
 import ProblemPage from "./pages/ProblemPage";
 import User from "./models/User";
 import AppContext from "./contexts/AppContext";
+import "./styles/index.scss";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
