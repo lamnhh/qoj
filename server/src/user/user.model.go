@@ -4,7 +4,7 @@ import "qoj/server/config"
 
 type LoginAuth struct {
 	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Password string `json:"password,omitempty" binding:"required"`
 }
 
 type User struct {

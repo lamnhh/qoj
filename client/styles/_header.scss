@@ -1,0 +1,126 @@
+.header {
+  display: flex;
+  flex-direction: column-reverse;
+
+  ul {
+    padding-left: 0;
+  }
+}
+
+.header__logo-wrapper {
+  text-decoration: none;
+}
+
+.header__logo {
+  color: $theme;
+  font-size: 2.4rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 1.6rem 0;
+}
+
+.header__main-nav--wrapper {
+  align-items: stretch;
+  border-bottom: 0.1rem solid #ddd;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header__user-nav {
+  border-bottom: 0.1rem solid #eee;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  text-align: right;
+  ul {
+    margin: 0.4rem 0;
+  }
+  a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.24s linear;
+    &:focus,
+    &:hover {
+      color: $theme;
+      font-weight: 600;
+      outline: none;
+    }
+  }
+  li {
+    color: #999;
+    display: inline-block;
+    font-size: 1.3rem;
+    line-height: 1.5;
+    list-style: none;
+  }
+  .divider::before {
+    content: "/";
+    font-size: 1.6rem;
+    margin: 0 0.4rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #bbb;
+  }
+}
+
+.header__main-nav {
+  ul {
+    margin: 0;
+  }
+  a {
+    color: #999;
+    display: block;
+    padding: 2.2rem 0;
+    text-decoration: none;
+    transition: color 0.1s linear;
+  }
+  li {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    list-style: none;
+    text-transform: uppercase;
+    position: relative;
+    &:hover,
+    &.active {
+      a {
+        color: $theme;
+        font-weight: bold;
+        outline: none;
+      }
+    }
+    &.match {
+      &::before {
+        background-color: $theme;
+        content: "";
+        height: 0.24rem;
+        right: -1rem;
+        bottom: 0;
+        left: -1rem;
+        position: absolute;
+      }
+      a {
+        color: $theme;
+        font-weight: bold;
+        outline: none;
+      }
+    }
+  }
+  li + li {
+    margin-left: 5rem;
+  }
+}
+
+.page-name {
+  background: url("/static/header-bg.jpg") center;
+  text-transform: uppercase;
+  padding-top: 2.4rem;
+  padding-bottom: 2.4rem;
+  h1 {
+    font-size: 2.4rem;
+    font-weight: normal;
+    line-height: 1.5;
+    margin: 0;
+  }
+}

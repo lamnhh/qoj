@@ -2,8 +2,8 @@ package submission
 
 import (
 	"net/http"
-	"qoj/server/src/auth"
 	problem2 "qoj/server/src/problem"
+	"qoj/server/src/token"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -58,7 +58,7 @@ func postSubmission(ctx *gin.Context) {
 	}
 	submissionId := submission.Id
 
-	problem, err := problem2.FetchProblemById(problemId)
+	problem, err := problem2.FetchProblemById(problemId, "")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -84,7 +84,7 @@ func getSubmission(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
 			return
 		}
-		filters["problemId"] = int(problemId)
+		filters["problem_id"] = int(problemId)
 	}
 
 	if val := ctx.Query("username"); val != "" {
@@ -119,6 +119,6 @@ func InitialiseSubmissionRoutes(app *gin.Engine) {
 	submissionCount = 0
 
 	app.GET("/api/submission", getSubmission)
-	app.POST("/api/submission", auth.RequireAuth(), postSubmission)
+	app.POST("/api/submission", token.RequireAuth(), postSubmission)
 	app.GET("/api/submission/:id/result", getSubmissionIdResult)
 }

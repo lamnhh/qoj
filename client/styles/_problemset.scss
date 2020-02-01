@@ -1,0 +1,53 @@
+.problemset {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.problemset table {
+  min-width: 40rem;
+  width: 100%;
+}
+
+.problemset {
+  padding-top: 3rem;
+}
+
+.problemset-score--wrapper {
+  padding: 0.4rem;
+  padding-right: 1.6rem;
+}
+
+.problemset-score {
+  background-color: #000;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.6rem 0;
+  position: relative;
+  text-align: center;
+  span {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.problemset-score__progress--wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: 0.4rem;
+}
+
+.problemset-score__progress {
+  background-color: lighten($theme, 8%);
+  border-radius: 0.3rem;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: 0;
+}

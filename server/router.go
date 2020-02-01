@@ -6,6 +6,7 @@ import (
 	"qoj/server/src/auth"
 	"qoj/server/src/problem"
 	"qoj/server/src/submission"
+	"qoj/server/src/user"
 )
 
 func InitialiseApp() *gin.Engine {
@@ -20,6 +21,7 @@ func InitialiseApp() *gin.Engine {
 	problem.InitialiseProblemRoutes(app)
 	submission.InitialiseSubmissionSocket(app)
 	submission.InitialiseSubmissionRoutes(app)
+	user.InitialiseUserRoutes(app)
 
 	app.Use(func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)

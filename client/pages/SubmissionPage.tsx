@@ -1,42 +1,17 @@
 import React from "react";
-import Submission from "../models/Submission";
-import SubmissionRow from "../components/SubmissionRow";
-import WSContext from "../WSContext";
-import request from "../helpers/request";
+import SubmissionList from "../components/SubmissionList";
 
-interface SubmissionPageState {
-  loading: boolean;
-  submissionList: Array<Submission>;
-}
-
-class SubmissionPage extends React.Component<{}, SubmissionPageState> {
-  socket = new WebSocket("ws://localhost:3000/ws");
-  state: SubmissionPageState = { loading: true, submissionList: [] };
-
-  componentDidMount() {
-    this.socket.onopen = () => {
-      this.setState({ loading: false });
-    };
-
-    request("/api/submission").then((submissionList: Array<Submission>) => {
-      this.setState({ submissionList });
-    });
-  }
-
-  render() {
-    if (this.state.loading) {
-      return null;
-    }
-
-    let { submissionList } = this.state;
-    return (
-      <WSContext.Provider value={{ socket: this.socket }}>
-        {submissionList.map(function(submission) {
-          return <SubmissionRow key={submission.id} submission={submission}></SubmissionRow>;
-        })}
-      </WSContext.Provider>
-    );
-  }
+function SubmissionPage() {
+  return (
+    <>
+      <header className="page-name align-left-right">
+        <h1>Submission Status</h1>
+      </header>
+      <section className="align-left-right submission-page">
+        <SubmissionList baseUrl="/api/submission"></SubmissionList>
+      </section>
+    </>
+  );
 }
 
 export default SubmissionPage;

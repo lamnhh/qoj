@@ -68,6 +68,6 @@ func FetchAllTests(problemId int) ([]Test, error) {
 }
 
 func DeleteAllTests(problemId int) error {
-	_, err := config.DB.Exec("DELETE FROM tests WHERE problemId = $1", problemId)
+	_, err := config.DB.Exec("DELETE FROM tests WHERE problem_id = $1", problemId)
 	return err
 }

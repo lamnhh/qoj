@@ -1,57 +1,52 @@
-import React, { useState, useCallback, FormEvent, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Problem from "../models/Problem";
 import request from "../helpers/request";
-import { useHistory } from "react-router-dom";
-
-interface FormElements extends HTMLFormElement {
-  problemId: HTMLSelectElement;
-  file: HTMLInputElement;
-}
+import { Link } from "react-router-dom";
+import ScoreBar from "../components/ScoreBar";
 
 function ProblemsetPage() {
   let [problemList, setProblemList] = useState<Array<Problem>>([]);
-
-  let history = useHistory();
-
-  let handleSubmit = useCallback(function(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    let form = event.target as FormElements;
-
-    let problemId = form.problemId.value;
-    let file = form.file.files![0];
-
-    let body = new FormData();
-    body.append("problemId", problemId);
-    body.append("file", file);
-
-    request("/api/submission", {
-      method: "POST",
-      body
-    }).then(function() {
-      history.push("/status");
-    });
-  }, []);
-
   useEffect(function() {
-    request("/api/problem").then(function(problemList: Array<Problem>) {
-      setProblemList(problemList);
-    });
+    request("/api/problem").then(setProblemList);
   }, []);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <select name="problemId">
-        {problemList.map(function(problem) {
-          return (
-            <option key={problem.id} value={problem.id}>
-              {problem.code} - {problem.name}
-            </option>
-          );
-        })}
-      </select>
-      <input type="file" name="file"></input>
-      <button type="submit">Submit</button>
-    </form>
+    <>
+      <header className="page-name align-left-right">
+        <h1>Problemset</h1>
+      </header>
+      <section className="align-left-right">
+        <div className="problemset">
+          <table className="my-table striped">
+            <tr className="my-table__header">
+              <th>#</th>
+              <th>Your score</th>
+              <th>Problem code</th>
+              <th>Problem title</th>
+            </tr>
+            {problemList.map(function(problem) {
+              return (
+                <tr key={problem.id}>
+                  <td>{problem.id}</td>
+                  <td>
+                    <ScoreBar
+                      maxScore={problem.maxScore}
+                      testCount={problem.testCount}
+                    />
+                  </td>
+                  <td>
+                    <Link to={"/problem/" + problem.id}>{problem.code}</Link>
+                  </td>
+                  <td>
+                    <Link to={"/problem/" + problem.id}>{problem.name}</Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </table>
+        </div>
+      </section>
+    </>
   );
 }
 

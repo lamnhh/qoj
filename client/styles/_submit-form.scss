@@ -1,0 +1,67 @@
+.submit-form {
+  padding-top: 1.5rem;
+  width: 80rem;
+}
+
+.submit-form label {
+  display: block;
+  span {
+    display: block;
+  }
+  input,
+  textarea,
+  select {
+    display: block;
+    width: 100%;
+  }
+}
+
+.submit-form label + label {
+  margin-top: 1rem;
+}
+
+.submit-form span {
+  color: #555;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  padding: 0.8rem 0;
+}
+
+.submit-form textarea,
+.submit-form select {
+  background-color: #fff;
+  border: 0.1rem solid #bbb;
+  border-radius: 0.6rem;
+  color: #666;
+  padding: 0.8rem 0 0.8rem 1.6rem;
+  transition: all 0.1s linear;
+  &:focus {
+    box-shadow: 0 0 0.6rem $theme;
+    outline: none;
+  }
+}
+
+.submit-form select {
+  font-size: 1.6rem;
+}
+
+.submit-form textarea {
+  font-family: monospace;
+  min-height: 32rem;
+}
+
+.submit-form button {
+  background-color: #fff;
+  border: 0.1rem solid #ccc;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: #666;
+  font-weight: bold;
+  margin-top: 3rem;
+  padding: 1rem 2.4rem;
+  transition: background-color 0.1s linear;
+  &:focus,
+  &:hover {
+    background-color: #eee;
+  }
+}

@@ -14,6 +14,8 @@ type Problem struct {
 	Name        string  `json:"name" binding:"required"`
 	TimeLimit   float32 `json:"timeLimit" binding:"required"`
 	MemoryLimit int     `json:"memoryLimit" binding:"required"`
+	MaxScore    float32 `json:"maxScore"`
+	TestCount   int     `json:"testCount"`
 }
 
 func CreateProblem(problem Problem) (int, error) {
@@ -47,8 +49,8 @@ func DeleteProblem(problemId int) error {
 	return nil
 }
 
-func FetchAllProblems() ([]Problem, error) {
-	rows, err := config.DB.Query("SELECT * FROM problems")
+func FetchAllProblems(username string) ([]Problem, error) {
+	rows, err := config.DB.Query("SELECT * FROM get_problem_list($1)", username)
 	if err != nil {
 		return []Problem{}, err
 	}
@@ -56,7 +58,15 @@ func FetchAllProblems() ([]Problem, error) {
 	problemList := make([]Problem, 0)
 	for rows.Next() {
 		var problem Problem
-		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit); err != nil {
+		if err := rows.Scan(
+			&problem.Id,
+			&problem.Code,
+			&problem.Name,
+			&problem.TimeLimit,
+			&problem.MemoryLimit,
+			&problem.MaxScore,
+			&problem.TestCount,
+		); err != nil {
 			return []Problem{}, err
 		}
 		normaliseProblem(&problem)
@@ -66,10 +76,18 @@ func FetchAllProblems() ([]Problem, error) {
 	return problemList, nil
 }
 
-func FetchProblemById(problemId int) (Problem, error) {
+func FetchProblemById(problemId int, username string) (Problem, error) {
 	var problem Problem
-	err := config.DB.QueryRow("SELECT * FROM problems WHERE id = $1", problemId).
-		Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit)
+	err := config.DB.QueryRow("SELECT * FROM get_problem_by_id($1, $2)", problemId, username).
+		Scan(
+			&problem.Id,
+			&problem.Code,
+			&problem.Name,
+			&problem.TimeLimit,
+			&problem.MemoryLimit,
+			&problem.MaxScore,
+			&problem.TestCount,
+		)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// rows.Next() means no rows was returned. In other words, no problem with such ID exists
@@ -83,28 +101,9 @@ func FetchProblemById(problemId int) (Problem, error) {
 	return problem, nil
 }
 
-func FetchProblemsByCode(code string) ([]Problem, error) {
-	rows, err := config.DB.Query("SELECT * FROM problems WHERE code = $1", code)
-	if err != nil {
-		return []Problem{}, err
-	}
-
-	problemList := make([]Problem, 0)
-	for rows.Next() {
-		var problem Problem
-		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit); err != nil {
-			return []Problem{}, err
-		}
-		normaliseProblem(&problem)
-		problemList = append(problemList, problem)
-	}
-
-	return problemList, nil
-}
-
 func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, error) {
 	// Fetch old problem metadata
-	problem, err := FetchProblemById(problemId)
+	problem, err := FetchProblemById(problemId, "")
 	if err != nil {
 		return problem, err
 	}
@@ -134,7 +133,7 @@ func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, err
 			problem.MemoryLimit,
 			problem.Id,
 		).
-		Scan(&problem.Id, &problem.Code, &problem.Name)
+		Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit)
 	if err != nil {
 		return Problem{}, err
 	}
