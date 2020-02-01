@@ -5,6 +5,7 @@ interface Problem {
   timeLimit: number;
   memoryLimit: number;
   maxScore: number;
+  testCount: number;
 }
 
 const emptyProblem: Problem = {
@@ -13,7 +14,8 @@ const emptyProblem: Problem = {
   name: "",
   timeLimit: 0,
   memoryLimit: 0,
-  maxScore: 0
+  maxScore: 0,
+  testCount: 0
 };
 
 export default Problem;

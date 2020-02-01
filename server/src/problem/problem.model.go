@@ -15,6 +15,7 @@ type Problem struct {
 	TimeLimit   float32 `json:"timeLimit" binding:"required"`
 	MemoryLimit int     `json:"memoryLimit" binding:"required"`
 	MaxScore    float32 `json:"maxScore"`
+	TestCount   int     `json:"testCount"`
 }
 
 func CreateProblem(problem Problem) (int, error) {
@@ -57,7 +58,15 @@ func FetchAllProblems(username string) ([]Problem, error) {
 	problemList := make([]Problem, 0)
 	for rows.Next() {
 		var problem Problem
-		if err := rows.Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit, &problem.MaxScore); err != nil {
+		if err := rows.Scan(
+			&problem.Id,
+			&problem.Code,
+			&problem.Name,
+			&problem.TimeLimit,
+			&problem.MemoryLimit,
+			&problem.MaxScore,
+			&problem.TestCount,
+		); err != nil {
 			return []Problem{}, err
 		}
 		normaliseProblem(&problem)
@@ -70,7 +79,15 @@ func FetchAllProblems(username string) ([]Problem, error) {
 func FetchProblemById(problemId int, username string) (Problem, error) {
 	var problem Problem
 	err := config.DB.QueryRow("SELECT * FROM get_problem_by_id($1, $2)", problemId, username).
-		Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit, &problem.MaxScore)
+		Scan(
+			&problem.Id,
+			&problem.Code,
+			&problem.Name,
+			&problem.TimeLimit,
+			&problem.MemoryLimit,
+			&problem.MaxScore,
+			&problem.TestCount,
+		)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// rows.Next() means no rows was returned. In other words, no problem with such ID exists
@@ -116,7 +133,7 @@ func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, err
 			problem.MemoryLimit,
 			problem.Id,
 		).
-		Scan(&problem.Id, &problem.Code, &problem.Name)
+		Scan(&problem.Id, &problem.Code, &problem.Name, &problem.TimeLimit, &problem.MemoryLimit)
 	if err != nil {
 		return Problem{}, err
 	}

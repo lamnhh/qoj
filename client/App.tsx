@@ -33,10 +33,12 @@ function App() {
     request("/api/refresh")
       .then(function({ accessToken }) {
         setAccessToken(accessToken);
-        setLoading(false);
         fetchUserInformation();
       })
-      .catch(() => {});
+      .catch(function() {})
+      .then(function() {
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {

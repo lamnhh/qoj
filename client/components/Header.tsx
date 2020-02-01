@@ -30,7 +30,7 @@ function Header() {
         <nav className="header__main-nav">
           <ul>
             <MainNavItem path="/" label="Problemset" />
-            <MainNavItem path="/submission" label="Submission" />
+            <MainNavItem path="/status" label="Submission" />
             <MainNavItem path="/contests" label="Contests" />
           </ul>
         </nav>

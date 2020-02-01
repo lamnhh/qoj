@@ -4,10 +4,12 @@ import SubmissionList from "../components/SubmissionList";
 function SubmissionPage() {
   return (
     <>
-      <header>
+      <header className="page-name align-left-right">
         <h1>Submission Status</h1>
       </header>
-      <SubmissionList baseUrl="/api/submission"></SubmissionList>;
+      <section className="align-left-right submission-page">
+        <SubmissionList baseUrl="/api/submission"></SubmissionList>;
+      </section>
     </>
   );
 }

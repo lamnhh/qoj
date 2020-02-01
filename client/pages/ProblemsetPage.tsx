@@ -1,7 +1,8 @@
-import React, { useState, useCallback, FormEvent, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Problem from "../models/Problem";
 import request from "../helpers/request";
 import { Link } from "react-router-dom";
+import ScoreBar from "../components/ScoreBar";
 
 function ProblemsetPage() {
   let [problemList, setProblemList] = useState<Array<Problem>>([]);
@@ -27,17 +28,8 @@ function ProblemsetPage() {
               return (
                 <tr key={problem.id}>
                   <td>{problem.id}</td>
-                  <td className="problemset-score--wrapper">
-                    <div className="problemset-score">
-                      <span>{problem.maxScore} / 100</span>
-                      <div className="problemset-score__progress--wrapper">
-                        <div
-                          className="problemset-score__progress"
-                          style={{
-                            width: `${problem.maxScore}%`
-                          }}></div>
-                      </div>
-                    </div>
+                  <td>
+                    <ScoreBar problem={problem}></ScoreBar>
                   </td>
                   <td>
                     <Link to={"/problem/" + problem.id}>{problem.code}</Link>
