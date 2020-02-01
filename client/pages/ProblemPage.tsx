@@ -23,7 +23,7 @@ function ProblemPage() {
     [problemId]
   );
 
-  let [tab, setTab] = useState(1);
+  let [tab, setTab] = useState(0);
   let tabListRef = useRef<HTMLDivElement>(null);
 
   useEffect(

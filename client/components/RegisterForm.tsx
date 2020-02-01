@@ -39,11 +39,28 @@ function RegisterForm() {
   );
 
   return (
-    <form onSubmit={handleLogin}>
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="text" name="fullname" placeholder="Full name" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Register</button>
+    <form className="auth-form" onSubmit={handleLogin}>
+      <div className="auth-form__header">
+        <h1>Register</h1>
+        <div className="auth-form__header-icon">
+          <i className="fa fa-sign-in"></i>
+        </div>
+      </div>
+      <div className="auth-form__body">
+        <label>
+          <span>Username</span>
+          <input type="text" name="username" required />
+        </label>
+        <label>
+          <span>Full name</span>
+          <input type="text" name="fullname" required />
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" required />
+        </label>
+        <button type="submit">Register</button>
+      </div>
     </form>
   );
 }

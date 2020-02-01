@@ -4,10 +4,12 @@ import LoginForm from "../components/LoginForm";
 function LoginPage() {
   return (
     <>
-      <header>
+      <header className="page-name align-left-right">
         <h1>Sign In</h1>
       </header>
-      <LoginForm></LoginForm>
+      <section className="auth-page">
+        <LoginForm />
+      </section>
     </>
   );
 }

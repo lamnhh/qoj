@@ -38,10 +38,24 @@ function LoginForm() {
   );
 
   return (
-    <form onSubmit={handleLogin}>
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
+    <form className="auth-form" onSubmit={handleLogin}>
+      <div className="auth-form__header">
+        <h1>Sign in</h1>
+        <div className="auth-form__header-icon">
+          <i className="fa fa-key"></i>
+        </div>
+      </div>
+      <div className="auth-form__body">
+        <label>
+          <span>Username</span>
+          <input type="text" name="username" required />
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" required />
+        </label>
+        <button type="submit">Sign in</button>
+      </div>
     </form>
   );
 }

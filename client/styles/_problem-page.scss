@@ -24,7 +24,7 @@
 .problem-page__tablist {
   position: relative;
   &::after {
-    background-color: #eee;
+    background-color: #ccc;
     content: "";
     height: 0.1rem;
     left: 0;
@@ -36,8 +36,8 @@
 }
 
 .problem-page__tab {
-  background-color: #f8f8f8;
-  border: 0.1rem solid #eee;
+  background-color: #eee;
+  border: 0.1rem solid #ccc;
   color: #666;
   font-weight: bold;
   padding: 1.2rem 0;

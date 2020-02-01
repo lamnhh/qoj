@@ -4,10 +4,12 @@ import RegisterForm from "../components/RegisterForm";
 function RegisterPage() {
   return (
     <>
-      <header>
+      <header className="page-name align-left-right">
         <h1>Register</h1>
       </header>
-      <RegisterForm></RegisterForm>
+      <section className="auth-page">
+        <RegisterForm />
+      </section>
     </>
   );
 }
