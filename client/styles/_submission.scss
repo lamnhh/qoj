@@ -1,0 +1,40 @@
+.submission-page {
+  padding-top: 3rem;
+}
+
+.submission-list--wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.submission-list {
+  min-width: 100rem;
+  width: 100%;
+}
+
+.submission-list .date {
+  width: 18rem;
+}
+
+.submission-list .id {
+  width: 4rem;
+}
+
+.submission-list .status-cell {
+  width: 25rem;
+}
+
+.submission-list .status {
+  display: inline-block;
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding-right: 1.6rem;
+  text-align: center;
+  width: 100%;
+  &.status-ce {
+    color: red;
+  }
+  &.status-running {
+    color: gray;
+  }
+}

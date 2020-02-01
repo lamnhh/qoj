@@ -1,25 +1,45 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState, ReactElement } from "react";
 import moment from "moment";
 import Submission from "../models/Submission";
 import WSContext from "../contexts/WSContext";
 import WSMessage from "../models/WSMessage";
+import ScoreBar from "./ScoreBar";
+import { Link } from "react-router-dom";
 
 interface SubmissionListItemProps {
   submission: Submission;
 }
 
-let SubmissionListItem: React.FC<SubmissionListItemProps> = ({
-  submission
-}) => {
+function parseSubmissionStatus(status: string): ReactElement {
+  let display = status.split("|")[0];
+  let tokens = display.split("/").map(a => parseInt(a));
+  if (tokens.length === 2) {
+    return <ScoreBar maxScore={tokens[0]} testCount={tokens[1]}></ScoreBar>;
+  }
+
+  if (display.split(" ")[0] === "Compile") {
+    return <span className="status status-ce">{display}</span>;
+  }
+  return <span className="status status-running">{display}</span>;
+}
+
+function SubmissionListItem({ submission }: SubmissionListItemProps) {
   let { socket } = useContext(WSContext);
-  let [status, setStatus] = React.useState(submission.status.split("|")[0]);
+  let [status, setStatus] = useState<ReactElement>(<></>);
+
+  useEffect(
+    function() {
+      setStatus(parseSubmissionStatus(submission.status));
+    },
+    [submission.status]
+  );
 
   useEffect(
     function() {
       function updateStatus(event: MessageEvent) {
         let json: WSMessage = JSON.parse(event.data);
         if (json.submissionId === submission.id) {
-          setStatus(json.message.split("|")[0]);
+          setStatus(parseSubmissionStatus(json.message));
         }
       }
 
@@ -45,16 +65,23 @@ let SubmissionListItem: React.FC<SubmissionListItemProps> = ({
   );
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)" }}>
-      <h3>{submission.id}</h3>
-      <h3>{moment(submission.createdAt).format("MMM/DD/YYYY hh:mm:ss")}</h3>
-      <h3>{submission.username}</h3>
-      <h3>
-        {submission.problemId} - {submission.problemName}
-      </h3>
-      <h3>{status}</h3>
-    </div>
+    <tr>
+      <td className="id">{submission.id}</td>
+      <td className="date">
+        {moment(submission.createdAt).format("YYYY-MM-DD hh:mm:ss")}
+      </td>
+      <td>
+        <Link to={"/user/" + submission.username}>{submission.username}</Link>
+      </td>
+      <td>
+        <Link to={"/problem/" + submission.problemId}>
+          {submission.problemId} - {submission.problemName}
+        </Link>
+      </td>
+      <td>C++17</td>
+      <td className="status-cell">{status}</td>
+    </tr>
   );
-};
+}
 
 export default SubmissionListItem;

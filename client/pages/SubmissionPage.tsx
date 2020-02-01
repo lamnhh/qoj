@@ -8,7 +8,7 @@ function SubmissionPage() {
         <h1>Submission Status</h1>
       </header>
       <section className="align-left-right submission-page">
-        <SubmissionList baseUrl="/api/submission"></SubmissionList>;
+        <SubmissionList baseUrl="/api/submission"></SubmissionList>
       </section>
     </>
   );

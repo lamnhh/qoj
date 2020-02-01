@@ -53,15 +53,27 @@ class SubmissionList extends React.Component<
 
     let { submissionList } = this.state;
     return (
-      <WSContext.Provider value={{ socket: this.socket }}>
-        {submissionList.map(function(submission) {
-          return (
-            <SubmissionListItem
-              key={submission.id}
-              submission={submission}></SubmissionListItem>
-          );
-        })}
-      </WSContext.Provider>
+      <div className="submission-list--wrapper">
+        <table className="submission-list my-table">
+          <tr>
+            <th className="id">#</th>
+            <th className="date">Submission time</th>
+            <th>Handle</th>
+            <th>Problem</th>
+            <th>Language</th>
+            <th className="status-cell">Result</th>
+          </tr>
+          <WSContext.Provider value={{ socket: this.socket }}>
+            {submissionList.map(function(submission) {
+              return (
+                <SubmissionListItem
+                  key={submission.id}
+                  submission={submission}></SubmissionListItem>
+              );
+            })}
+          </WSContext.Provider>
+        </table>
+      </div>
     );
   }
 }

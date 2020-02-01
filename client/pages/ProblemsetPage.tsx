@@ -17,7 +17,7 @@ function ProblemsetPage() {
       </header>
       <section className="align-left-right">
         <div className="problemset">
-          <table>
+          <table className="my-table">
             <tr>
               <th>#</th>
               <th>Your score</th>
@@ -29,7 +29,10 @@ function ProblemsetPage() {
                 <tr key={problem.id}>
                   <td>{problem.id}</td>
                   <td>
-                    <ScoreBar problem={problem}></ScoreBar>
+                    <ScoreBar
+                      maxScore={problem.maxScore}
+                      testCount={problem.testCount}
+                    />
                   </td>
                   <td>
                     <Link to={"/problem/" + problem.id}>{problem.code}</Link>

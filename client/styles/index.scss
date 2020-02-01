@@ -17,17 +17,19 @@ body {
 }
 
 .align-left-right {
-  padding-left: 15%;
-  padding-right: 15%;
+  padding-left: 12%;
+  padding-right: 12%;
 }
 
 #root {
   min-height: 100%;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  grid-template-columns: 100%;
 }
 
 @import "./header";
 @import "./problemset";
 @import "./footer";
-@import "./submission-page";
+@import "./submission";
+@import "./table";

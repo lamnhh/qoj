@@ -1,18 +1,22 @@
 import React from "react";
-import Problem from "../models/Problem";
 
-function ScoreBar({ problem }: { problem: Problem }) {
+interface ScoreBarProps {
+  maxScore: number;
+  testCount: number;
+}
+
+function ScoreBar({ maxScore, testCount }: ScoreBarProps) {
   return (
     <div className="problemset-score--wrapper">
       <div className="problemset-score">
         <span>
-          {problem.maxScore} / {problem.testCount}
+          {maxScore} / {testCount}
         </span>
         <div className="problemset-score__progress--wrapper">
           <div
             className="problemset-score__progress"
             style={{
-              width: `${(problem.maxScore / problem.testCount) * 100}%`
+              width: `${(maxScore / testCount) * 100}%`
             }}></div>
         </div>
       </div>
