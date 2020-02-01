@@ -1,27 +1,17 @@
-import React, {
-  useCallback,
-  FormEvent,
-  useEffect,
-  useState,
-  useRef,
-  useContext
-} from "react";
-import { useParams, useHistory } from "react-router-dom";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { useParams } from "react-router-dom";
 import request from "../helpers/request";
 import Problem, { emptyProblem } from "../models/Problem";
 import SubmissionList from "../components/SubmissionList";
 import AppContext from "../contexts/AppContext";
-
-interface FormElements extends HTMLFormElement {
-  file: HTMLInputElement;
-}
+import ScoreBar from "../components/ScoreBar";
+import SubmitForm from "../components/SubmitForm";
 
 interface ProblemPageRouterProps {
   problemId: string;
 }
 
 function ProblemPage() {
-  let history = useHistory();
   let problemId = useParams<ProblemPageRouterProps>().problemId;
   let isLoggedIn = useContext(AppContext).user !== null;
 
@@ -33,131 +23,151 @@ function ProblemPage() {
     [problemId]
   );
 
-  let handleSubmit = useCallback(
-    function(event: FormEvent<HTMLFormElement>) {
-      event.preventDefault();
-      let form = event.target as FormElements;
-      let file = form.file.files![0];
-
-      let body = new FormData();
-      body.append("problemId", problemId);
-      body.append("file", file);
-
-      request("/api/submission", {
-        method: "POST",
-        body
-      }).then(function() {
-        history.push("/status");
-      });
-    },
-    [problemId]
-  );
-
-  let [tab, setTab] = useState(0);
+  let [tab, setTab] = useState(1);
   let tabListRef = useRef<HTMLDivElement>(null);
 
-  useEffect(function() {
-    let tabList = tabListRef.current!;
-    let tabs = tabList.querySelectorAll('[role="tab"]');
-    tabList.addEventListener("keydown", function(e) {
-      if (e.keyCode === 39) {
-        setTab(function(tab) {
-          let newTab = (tab + 1) % 3;
-          (tabs[newTab] as HTMLElement).focus();
-          return newTab;
-        });
-      } else if (e.keyCode === 37) {
-        setTab(function(tab) {
-          let newTab = (tab + 2) % 3;
-          (tabs[newTab] as HTMLElement).focus();
-          return newTab;
-        });
+  useEffect(
+    function() {
+      let tabList = tabListRef.current!;
+      let tabs = tabList.querySelectorAll('[role="tab"]');
+      let len = tabs.length;
+
+      function tabNavigator(e: KeyboardEvent) {
+        if (e.keyCode === 39) {
+          setTab(function(tab) {
+            let newTab = (tab + 1) % len;
+            return newTab;
+          });
+        } else if (e.keyCode === 37) {
+          setTab(function(tab) {
+            let newTab = (tab + len - 1) % len;
+            return newTab;
+          });
+        }
       }
-    });
-  }, []);
+
+      tabList.addEventListener("keydown", tabNavigator);
+      return function() {
+        tabList.removeEventListener("keydown", tabNavigator);
+      };
+    },
+    [isLoggedIn]
+  );
+
+  useEffect(
+    function() {
+      let tabList = tabListRef.current!;
+      let tabs = tabList.querySelectorAll('[role="tab"]');
+      (tabs[tab] as HTMLElement).focus();
+    },
+    [tab]
+  );
 
   return (
-    <section>
-      <div ref={tabListRef} role="tablist" aria-label="Actions">
-        <button
-          type="button"
-          role="tab"
-          aria-label="View contraints"
-          aria-selected={tab === 0 ? "true" : "false"}
-          aria-controls="tab-contraints"
-          id="constraints"
-          onClick={() => setTab(0)}
-          tabIndex={tab !== 0 ? -1 : undefined}>
-          Contraints
-        </button>
-        {isLoggedIn && (
+    <>
+      <header className="page-name align-left-right">
+        <h1>View Problem - {problem.name}</h1>
+      </header>
+      <section className="problem-page align-left-right">
+        <h1 className="problem-page__problem-name">
+          {problem.id}. {problem.code} - {problem.name}
+        </h1>
+        <div
+          className="problem-page__tablist"
+          ref={tabListRef}
+          role="tablist"
+          aria-label="Actions">
           <button
+            className="problem-page__tab"
             type="button"
             role="tab"
-            aria-label="Submit"
-            aria-selected={tab === 1 ? "true" : "false"}
-            aria-controls="tab-submit"
-            id="submit"
-            onClick={() => setTab(1)}
-            tabIndex={tab !== 1 ? -1 : undefined}>
-            Submit
+            aria-label="View contraints"
+            aria-selected={tab === 0 ? "true" : "false"}
+            aria-controls="tab-contraints"
+            id="constraints"
+            onClick={() => setTab(0)}
+            tabIndex={tab !== 0 ? -1 : undefined}>
+            Contraints
           </button>
-        )}
-        <button
-          type="button"
-          role="tab"
-          aria-label="View all submissions of this problem"
-          aria-selected={tab === 2 ? "true" : "false"}
-          aria-controls="tab-submission"
-          id="submission"
-          onClick={() => setTab(2)}
-          tabIndex={tab !== 2 ? -1 : undefined}>
-          Submission
-        </button>
-      </div>
-      <div
-        tabIndex={0}
-        role="tabpanel"
-        id="tab-constraints"
-        aria-labelledby="constraints"
-        hidden={tab !== 0}>
-        <table>
-          <tr>
-            <th>Time Limit</th>
-            <td>
-              {problem.timeLimit} second{problem.timeLimit !== 1 ? "s" : ""}
-            </td>
-          </tr>
-          <tr>
-            <th>Memory Limit</th>
-            <td>{problem.memoryLimit} MB</td>
-          </tr>
-        </table>
-      </div>
-      {isLoggedIn && (
-        <div
-          tabIndex={0}
-          role="tabpanel"
-          id="tab-submit"
-          aria-labelledby="submit"
-          hidden={tab !== 1}>
-          <form onSubmit={handleSubmit}>
-            <input type="file" name="file" required />
-            <button type="submit">Submit</button>
-          </form>
+          {isLoggedIn && (
+            <button
+              className="problem-page__tab"
+              type="button"
+              role="tab"
+              aria-label="Submit"
+              aria-selected={tab === 1 ? "true" : "false"}
+              aria-controls="tab-submit"
+              id="submit"
+              onClick={() => setTab(1)}
+              tabIndex={tab !== 1 ? -1 : undefined}>
+              Submit
+            </button>
+          )}
+          <button
+            className="problem-page__tab"
+            type="button"
+            role="tab"
+            aria-label="View all submissions of this problem"
+            aria-selected={tab === 2 ? "true" : "false"}
+            aria-controls="tab-submission"
+            id="submission"
+            onClick={() => setTab(2)}
+            tabIndex={tab !== 2 ? -1 : undefined}>
+            Submission
+          </button>
         </div>
-      )}
-      <div
-        tabIndex={0}
-        role="tabpanel"
-        id="tab-submission"
-        aria-labelledby="submission"
-        hidden={tab !== 2}>
-        {tab === 2 && (
-          <SubmissionList baseUrl={"/api/submission?problemId=" + problemId} />
-        )}
-      </div>
-    </section>
+        <div className="problem-page__tabpanel">
+          <div
+            tabIndex={0}
+            role="tabpanel"
+            id="tab-constraints"
+            aria-labelledby="constraints"
+            hidden={tab !== 0}>
+            <table className="my-table problem-page__constraints">
+              <tr className="my-table__header">
+                <th>Time limit</th>
+                <th>Memory limit</th>
+                <th className="score">Your score</th>
+              </tr>
+              <tr>
+                <td>
+                  {problem.timeLimit} second{problem.timeLimit !== 1 ? "s" : ""}
+                </td>
+                <td>{problem.memoryLimit} MB</td>
+                <td className="score">
+                  <ScoreBar
+                    maxScore={problem.maxScore}
+                    testCount={problem.testCount}
+                  />
+                </td>
+              </tr>
+            </table>
+          </div>
+          {isLoggedIn && (
+            <div
+              tabIndex={0}
+              role="tabpanel"
+              id="tab-submit"
+              aria-labelledby="submit"
+              hidden={tab !== 1}>
+              <SubmitForm problemId={problemId}></SubmitForm>
+            </div>
+          )}
+          <div
+            tabIndex={0}
+            role="tabpanel"
+            id="tab-submission"
+            aria-labelledby="submission"
+            hidden={tab !== 2}>
+            {tab === 2 && (
+              <SubmissionList
+                baseUrl={"/api/submission?problemId=" + problemId}
+              />
+            )}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
 

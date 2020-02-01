@@ -54,8 +54,8 @@ class SubmissionList extends React.Component<
     let { submissionList } = this.state;
     return (
       <div className="submission-list--wrapper">
-        <table className="submission-list my-table">
-          <tr>
+        <table className="submission-list my-table striped">
+          <tr className="my-table__header">
             <th className="id">#</th>
             <th className="date">Submission time</th>
             <th>Handle</th>

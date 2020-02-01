@@ -17,8 +17,8 @@ function ProblemsetPage() {
       </header>
       <section className="align-left-right">
         <div className="problemset">
-          <table className="my-table">
-            <tr>
+          <table className="my-table striped">
+            <tr className="my-table__header">
               <th>#</th>
               <th>Your score</th>
               <th>Problem code</th>
