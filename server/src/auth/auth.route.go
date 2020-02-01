@@ -118,7 +118,7 @@ func getLogout(ctx *gin.Context) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(-time.Hour),
 	})
-	ctx.Redirect(http.StatusMovedPermanently, "/")
+	ctx.JSON(http.StatusOK, gin.H{})
 }
 
 func InitialiseAuthRoutes(app *gin.Engine) {

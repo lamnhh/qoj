@@ -60,7 +60,7 @@ function ProblemPage() {
       let tabs = tabList.querySelectorAll('[role="tab"]');
       (tabs[tab] as HTMLElement).focus();
     },
-    [tab]
+    [isLoggedIn, tab]
   );
 
   return (
@@ -108,11 +108,11 @@ function ProblemPage() {
             type="button"
             role="tab"
             aria-label="View all submissions of this problem"
-            aria-selected={tab === 2 ? "true" : "false"}
+            aria-selected={tab === (isLoggedIn ? 2 : 1) ? "true" : "false"}
             aria-controls="tab-submission"
             id="submission"
-            onClick={() => setTab(2)}
-            tabIndex={tab !== 2 ? -1 : undefined}>
+            onClick={() => setTab(isLoggedIn ? 2 : 1)}
+            tabIndex={tab !== (isLoggedIn ? 2 : 1) ? -1 : undefined}>
             Submission
           </button>
         </div>
@@ -158,8 +158,8 @@ function ProblemPage() {
             role="tabpanel"
             id="tab-submission"
             aria-labelledby="submission"
-            hidden={tab !== 2}>
-            {tab === 2 && (
+            hidden={tab !== (isLoggedIn ? 2 : 1)}>
+            {tab === (isLoggedIn ? 2 : 1) && (
               <SubmissionList
                 baseUrl={"/api/submission?problemId=" + problemId}
               />
