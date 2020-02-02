@@ -160,9 +160,7 @@ function ProblemPage() {
             aria-labelledby="submission"
             hidden={tab !== (isLoggedIn ? 2 : 1)}>
             {tab === (isLoggedIn ? 2 : 1) && (
-              <SubmissionList
-                baseUrl={"/api/submission?problemId=" + problemId}
-              />
+              <SubmissionList params={[["problemId", String(problemId)]]} />
             )}
           </div>
         </div>

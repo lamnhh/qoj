@@ -14,4 +14,9 @@ function parsePage(page: string): number {
   return ans;
 }
 
-export { range, parsePage };
+function buildURL(url: string, params: Array<[string, string]>) {
+  let paramString = params.map(([key, value]) => `${key}=${value}`).join("&");
+  return url + "?" + paramString;
+}
+
+export { range, parsePage, buildURL };

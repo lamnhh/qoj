@@ -84,7 +84,7 @@ func fetchSubmissionById(submissionId int) (Submission, error) {
 	return parseSubmissionFromRow(rows)
 }
 
-func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
+func CountSubmission(filters map[string]interface{}) (int, error) {
 	keyList := make([]string, 0)
 	valList := make([]interface{}, 0)
 	count := 0
@@ -101,7 +101,37 @@ func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 		whereClause = "WHERE " + strings.Join(keyList, ", ")
 	}
 
-	sql := `
+	sql := fmt.Sprintf(`
+	SELECT
+		COUNT(*)
+	FROM
+		submissions
+		JOIN problems ON (submissions.problem_id = problems.id)
+	%s`, whereClause)
+
+	ans := 0
+	err := config.DB.QueryRow(sql, valList...).Scan(&ans)
+	return ans, err
+}
+
+func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]Submission, error) {
+	keyList := make([]string, 0)
+	valList := make([]interface{}, 0)
+	count := 0
+	for k, v := range filters {
+		count++
+		keyList = append(keyList, fmt.Sprintf("%s = $%d", k, count))
+		valList = append(valList, v)
+	}
+
+	var whereClause string
+	if len(keyList) == 0 {
+		whereClause = ""
+	} else {
+		whereClause = "WHERE " + strings.Join(keyList, ", ")
+	}
+
+	sql := fmt.Sprintf(`
 	SELECT
 		submissions.id,
 		submissions.username,
@@ -111,10 +141,11 @@ func FetchSubmissionList(filters map[string]interface{}) ([]Submission, error) {
 		submissions.status	
 	FROM
 		submissions
-		JOIN problems ON (submissions.problem_id = problems.id)` +
-		whereClause +
-	`ORDER BY
-		created_at DESC`
+		JOIN problems ON (submissions.problem_id = problems.id)
+	%s
+	ORDER BY
+		created_at DESC
+	OFFSET %d LIMIT %d`, whereClause, page * size, size)
 
 	rows, err := config.DB.Query(sql, valList...)
 	if err != nil {
