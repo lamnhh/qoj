@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"qoj/server/config"
 	"strconv"
+	"strings"
 )
 
 type Problem struct {
@@ -143,4 +144,89 @@ func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, err
 
 	normaliseProblem(&problem)
 	return problem, nil
+}
+
+func FetchSolvedProblemsOfUser(username string) ([]map[string]interface{}, error) {
+	cmd := `
+	SELECT
+		DISTINCT(problem_id),
+		problems.code
+	FROM
+		problems
+		JOIN submissions ON (problems.id = submissions.problem_id)
+		LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
+	WHERE
+		submissions.username = $1
+	GROUP BY
+		submissions.id,
+		problems.id,
+		problems.code
+	HAVING
+		MIN(score) = 1
+	ORDER BY
+		problems.code, problem_id;`
+
+	rows, err := config.DB.Query(cmd, username)
+	if err != nil {
+		return nil, err
+	}
+
+	problemList := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		var (
+			id   string
+			code string
+		)
+		_ = rows.Scan(&id, &code)
+		problemList = append(problemList, map[string]interface{}{
+			"id":   id,
+			"code": strings.TrimSpace(code),
+		})
+	}
+	return problemList, nil
+}
+
+func FetchPartiallySolvedProblemsOfUser(username string) ([]map[string]interface{}, error) {
+	cmd := `
+	SELECT 
+		id,
+		code
+	FROM
+		(SELECT
+			problems.*,
+			COALESCE(MIN(score), 0) as score
+		FROM
+			problems
+			JOIN submissions ON (problems.id = submissions.problem_id)
+			LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
+		WHERE
+			submissions.username = $1
+		GROUP BY
+			submissions.id, problems.id) s
+	GROUP BY
+		id,
+		code
+	HAVING
+		MAX(score) < 1
+	ORDER BY
+		code;`
+
+	rows, err := config.DB.Query(cmd, username)
+	if err != nil {
+		return nil, err
+	}
+
+	problemList := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		var (
+			id   string
+			code string
+		)
+		_ = rows.Scan(&id, &code)
+		problemList = append(problemList, map[string]interface{}{
+			"id":   id,
+			"code": strings.TrimSpace(code),
+		})
+	}
+	return problemList, nil
 }

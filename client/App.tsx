@@ -14,6 +14,7 @@ import User from "./models/User";
 import AppContext from "./contexts/AppContext";
 import "./styles/index.scss";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
+import UserPage from "./pages/UserPage";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
@@ -80,6 +81,9 @@ function App() {
                         <Route
                           path="/problem/:problemId"
                           component={ProblemPage}></Route>
+                        <Route
+                          path="/user/:username"
+                          component={UserPage}></Route>
                         <Route
                           path="/logout"
                           render={() => {
