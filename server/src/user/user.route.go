@@ -10,6 +10,23 @@ import (
 )
 
 func getUser(ctx *gin.Context) {
+	username := ctx.GetString("username")
+	user, err := FindUserByUsername(username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": fmt.Sprintf("User `%s` does not exist", username),
+			})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+	} else {
+		user.Password = ""
+		ctx.JSON(http.StatusOK, user)
+	}
+}
+
+func getUserPublic(ctx *gin.Context) {
 	username := ctx.Param("username")
 	user, err := FindUserByUsername(username)
 	if err != nil {
@@ -71,7 +88,8 @@ func getUserPartial(ctx *gin.Context) {
 }
 
 func InitialiseUserRoutes(app *gin.Engine) {
-	app.GET("/api/user/:username", token.RequireAuth(), getUser)
+	app.GET("/api/user", token.RequireAuth(), getUser)
+	app.GET("/api/user/:username/public", getUserPublic)
 	app.GET("/api/user/:username/solved", getUserSolved)
 	app.GET("/api/user/:username/partial", getUserPartial)
 }
