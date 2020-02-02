@@ -13,6 +13,7 @@ import ProblemPage from "./pages/ProblemPage";
 import User from "./models/User";
 import AppContext from "./contexts/AppContext";
 import "./styles/index.scss";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
@@ -54,21 +55,45 @@ function App() {
       }}>
       <BrowserRouter>
         <Header></Header>
-        <div>
-          <Switch>
-            <Route path="/" exact component={ProblemsetPage}></Route>
-            <Route path="/status" component={SubmissionPage}></Route>
-            <Route path="/login" component={LoginPage}></Route>
-            <Route path="/register" component={RegisterPage}></Route>
-            <Route path="/problem/:problemId" component={ProblemPage}></Route>
-            <Route
-              path="/logout"
-              render={() => {
-                setUser(null);
-                clearToken();
-                return <Redirect to="/"></Redirect>;
-              }}></Route>
-          </Switch>
+        <div className="page-body">
+          <Route
+            render={function({ location }) {
+              return (
+                <TransitionGroup component={null}>
+                  <CSSTransition
+                    key={location.key}
+                    timeout={200}
+                    classNames="fade">
+                    <div className="switch-wrapper">
+                      <Switch location={location}>
+                        <Route
+                          path="/"
+                          exact
+                          component={ProblemsetPage}></Route>
+                        <Route
+                          path="/status"
+                          component={SubmissionPage}></Route>
+                        <Route path="/login" component={LoginPage}></Route>
+                        <Route
+                          path="/register"
+                          component={RegisterPage}></Route>
+                        <Route
+                          path="/problem/:problemId"
+                          component={ProblemPage}></Route>
+                        <Route
+                          path="/logout"
+                          render={() => {
+                            setUser(null);
+                            clearToken();
+                            return <Redirect to="/"></Redirect>;
+                          }}></Route>
+                      </Switch>
+                    </div>
+                  </CSSTransition>
+                </TransitionGroup>
+              );
+            }}
+          />
         </div>
         <Footer></Footer>
       </BrowserRouter>
