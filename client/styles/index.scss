@@ -28,6 +28,16 @@ body {
   grid-template-columns: 100%;
 }
 
+.page-body {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.switch-wrapper {
+  grid-row: 1;
+  grid-column: 1;
+}
+
 @import "./header";
 @import "./problemset";
 @import "./footer";
@@ -36,3 +46,4 @@ body {
 @import "./problem-page";
 @import "./submit-form";
 @import "./auth";
+@import "./animation";
