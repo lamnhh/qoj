@@ -1,0 +1,48 @@
+.pagination-button {
+  background-color: #fff;
+  border: 0.1rem solid #ccc;
+  border-right: none;
+  color: $theme;
+  height: 3.2rem;
+  width: 3.6rem;
+
+  transition: 0.1s all linear;
+
+  &:not(.active) {
+    cursor: pointer;
+  }
+
+  &:first-child {
+    border-radius: 0.4rem 0 0 0.4rem;
+    width: 4rem;
+  }
+
+  &:last-child {
+    border-radius: 0 0.4rem 0.4rem 0;
+    border-right: 0.1rem solid #ccc;
+    width: 4rem;
+  }
+}
+
+.pagination-button:not(:disabled):not(.active) {
+  &:focus,
+  &:hover {
+    background-color: #eee;
+    outline: none;
+  }
+}
+
+.pagination-button.active {
+  background-color: lighten($theme, 4%);
+  border-color: lighten($theme, 4%);
+  border-right: 0.1rem solid lighten($theme, 4%);
+  color: #fff;
+}
+
+.pagination-button.active + .pagination-button {
+  border-left: none;
+}
+
+.pagination-button:disabled {
+  cursor: not-allowed;
+}

@@ -1,14 +1,34 @@
 import React, { useState, useEffect } from "react";
 import Problem from "../models/Problem";
-import request from "../helpers/request";
-import { Link } from "react-router-dom";
+import { requestWithHeaders } from "../helpers/request";
+import { Link, useLocation, useHistory } from "react-router-dom";
 import ScoreBar from "../components/ScoreBar";
+import qs from "querystring";
+import Pagination from "../components/Pagination";
+import { parsePage } from "../helpers/common-helper";
+
+interface ProblemsetPageQuery extends qs.ParsedUrlQuery {
+  page: string;
+}
 
 function ProblemsetPage() {
+  let [problemCount, setProblemCount] = useState(0);
   let [problemList, setProblemList] = useState<Array<Problem>>([]);
-  useEffect(function() {
-    request("/api/problem").then(setProblemList);
-  }, []);
+
+  const pageSize = 20;
+  let history = useHistory();
+  let queries = qs.parse(useLocation().search.slice(1)) as ProblemsetPageQuery;
+  let currentPage = parsePage(queries.page);
+  useEffect(
+    function() {
+      let url = `/api/problem?page=${currentPage}&size=${pageSize}`;
+      requestWithHeaders(url).then(function([problemList, headers]) {
+        setProblemList(problemList);
+        setProblemCount(parseInt(headers.get("x-count")!));
+      });
+    },
+    [currentPage]
+  );
 
   return (
     <>
@@ -44,6 +64,14 @@ function ProblemsetPage() {
               );
             })}
           </table>
+          <Pagination
+            totalCount={problemCount}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={function(page: number) {
+              history.push("/?page=" + page);
+            }}
+          />
         </div>
       </section>
     </>

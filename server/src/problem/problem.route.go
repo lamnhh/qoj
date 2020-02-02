@@ -1,21 +1,27 @@
 package problem
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	uuid2 "github.com/google/uuid"
 	"net/http"
 	"path/filepath"
+	"qoj/server/src/common"
 	"qoj/server/src/test"
 	"qoj/server/src/token"
 	"strconv"
 )
 
 func getProblem(ctx *gin.Context) {
-	problemList, err := FetchAllProblems(ctx.GetString("username"))
+	page := common.ParseQueryInt(ctx, "page", 1) - 1
+	size := common.ParseQueryInt(ctx, "size", 20)
+	problemList, problemCount, err := FetchAllProblems(ctx.GetString("username"), page, size)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	ctx.Writer.Header().Set("x-count", fmt.Sprintf("%d", problemCount))
 	ctx.JSON(http.StatusOK, problemList)
 }
 

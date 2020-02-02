@@ -46,7 +46,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_problem_list(_username CHARACTER(16))
+CREATE OR REPLACE FUNCTION get_problem_list(_username CHARACTER(16), _page INT, _size INT)
 RETURNS TABLE (
 	id			INT,
 	code		CHARACTER(10),
@@ -84,15 +84,17 @@ BEGIN
                 LEFT JOIN submissions ON (problems.id = submissions.problem_id)
                 LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
             GROUP BY
-                problems.id, problems.code, problems.name, problems.tl, problems.ml,submissions.id, submissions.username) s
+                problems.id, problems.code, problems.name, problems.tl, problems.ml,submissions.id, submissions.username
+			ORDER BY
+				problems.id DESC) s
         GROUP BY
-            s.id, s.code, s.name, s.tl, s.ml
-        ORDER BY
-            s.id ASC
-    ) s
+            s.id, s.code, s.name, s.tl, s.ml) s
         LEFT JOIN tests ON (s.id = tests.problem_id)
     GROUP BY
-        s.id, s.code, s.name, s.tl, s.ml, s.max_score;
+        s.id, s.code, s.name, s.tl, s.ml, s.max_score
+	ORDER BY
+		s.id DESC
+	OFFSET _page * _size LIMIT _size;
 END;
 $$ LANGUAGE plpgsql;
 

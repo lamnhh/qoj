@@ -49,10 +49,10 @@ func DeleteProblem(problemId int) error {
 	return nil
 }
 
-func FetchAllProblems(username string) ([]Problem, error) {
-	rows, err := config.DB.Query("SELECT * FROM get_problem_list($1)", username)
+func FetchAllProblems(username string, page int, size int) ([]Problem, int, error) {
+	rows, err := config.DB.Query("SELECT * FROM get_problem_list($1, $2, $3)", username, page, size)
 	if err != nil {
-		return []Problem{}, err
+		return []Problem{}, 0, err
 	}
 
 	problemList := make([]Problem, 0)
@@ -67,13 +67,16 @@ func FetchAllProblems(username string) ([]Problem, error) {
 			&problem.MaxScore,
 			&problem.TestCount,
 		); err != nil {
-			return []Problem{}, err
+			return []Problem{}, 0, err
 		}
 		normaliseProblem(&problem)
 		problemList = append(problemList, problem)
 	}
 
-	return problemList, nil
+	problemCount := 0
+	_ = config.DB.QueryRow("SELECT COUNT(*) FROM problems").Scan(&problemCount)
+
+	return problemList, problemCount, nil
 }
 
 func FetchProblemById(problemId int, username string) (Problem, error) {

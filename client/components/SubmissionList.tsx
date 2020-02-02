@@ -32,7 +32,7 @@ class SubmissionList extends React.Component<
     };
 
     request(this.props.baseUrl).then((submissionList: Array<Submission>) => {
-      this.setState({ submissionList: submissionList.slice(0, 5) });
+      this.setState({ submissionList });
     });
   }
 

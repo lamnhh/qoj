@@ -21,7 +21,7 @@ function isExpired(token: string): boolean {
   }
 }
 
-async function request(url: RequestInfo, init: RequestInit = {}) {
+async function parseInit(init: RequestInit) {
   init.headers = new Headers(init.headers);
   if (hasToken()) {
     let token = getAccessToken();
@@ -33,6 +33,10 @@ async function request(url: RequestInfo, init: RequestInit = {}) {
       init.headers.set("Authorization", "Bearer " + token);
     } catch (err) {}
   }
+}
+
+async function request(url: RequestInfo, init: RequestInit = {}) {
+  parseInit(init);
   return await fetch(url, init).then(function(res) {
     if (res.ok) {
       return res.json();
@@ -41,4 +45,18 @@ async function request(url: RequestInfo, init: RequestInit = {}) {
   });
 }
 
+async function requestWithHeaders(
+  url: RequestInfo,
+  init: RequestInit = {}
+): Promise<[any, Headers]> {
+  parseInit(init);
+  return await fetch(url, init).then(function(res) {
+    if (res.ok) {
+      return Promise.all([res.json(), res.headers]);
+    }
+    throw res.json();
+  });
+}
+
 export default request;
+export { requestWithHeaders };
