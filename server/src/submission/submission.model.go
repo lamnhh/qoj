@@ -98,7 +98,7 @@ func CountSubmission(filters map[string]interface{}) (int, error) {
 	if len(keyList) == 0 {
 		whereClause = ""
 	} else {
-		whereClause = "WHERE " + strings.Join(keyList, ", ")
+		whereClause = "WHERE " + strings.Join(keyList, " AND ")
 	}
 
 	sql := fmt.Sprintf(`
@@ -128,7 +128,7 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 	if len(keyList) == 0 {
 		whereClause = ""
 	} else {
-		whereClause = "WHERE " + strings.Join(keyList, ", ")
+		whereClause = "WHERE " + strings.Join(keyList, " AND ")
 	}
 
 	sql := fmt.Sprintf(`

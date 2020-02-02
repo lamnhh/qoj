@@ -13,7 +13,8 @@ interface ProblemPageRouterProps {
 
 function ProblemPage() {
   let problemId = useParams<ProblemPageRouterProps>().problemId;
-  let isLoggedIn = useContext(AppContext).user !== null;
+  let user = useContext(AppContext).user;
+  let isLoggedIn = user !== null;
 
   let [problem, setProblem] = useState<Problem>(emptyProblem);
   useEffect(
@@ -90,30 +91,44 @@ function ProblemPage() {
             Contraints
           </button>
           {isLoggedIn && (
-            <button
-              className="problem-page__tab"
-              type="button"
-              role="tab"
-              aria-label="Submit"
-              aria-selected={tab === 1 ? "true" : "false"}
-              aria-controls="tab-submit"
-              id="submit"
-              onClick={() => setTab(1)}
-              tabIndex={tab !== 1 ? -1 : undefined}>
-              Submit
-            </button>
+            <React.Fragment>
+              <button
+                className="problem-page__tab"
+                type="button"
+                role="tab"
+                aria-label="Submit"
+                aria-selected={tab === 1 ? "true" : "false"}
+                aria-controls="tab-submit"
+                id="submit"
+                onClick={() => setTab(1)}
+                tabIndex={tab !== 1 ? -1 : undefined}>
+                Submit
+              </button>
+              <button
+                className="problem-page__tab"
+                type="button"
+                role="tab"
+                aria-label="My submissions"
+                aria-selected={tab === 2 ? "true" : "false"}
+                aria-controls="tab-mine"
+                id="mine"
+                onClick={() => setTab(2)}
+                tabIndex={tab !== 2 ? -1 : undefined}>
+                My Submissions
+              </button>
+            </React.Fragment>
           )}
           <button
             className="problem-page__tab"
             type="button"
             role="tab"
             aria-label="View all submissions of this problem"
-            aria-selected={tab === (isLoggedIn ? 2 : 1) ? "true" : "false"}
+            aria-selected={tab === (isLoggedIn ? 3 : 1) ? "true" : "false"}
             aria-controls="tab-submission"
             id="submission"
-            onClick={() => setTab(isLoggedIn ? 2 : 1)}
-            tabIndex={tab !== (isLoggedIn ? 2 : 1) ? -1 : undefined}>
-            Submission
+            onClick={() => setTab(isLoggedIn ? 3 : 1)}
+            tabIndex={tab !== (isLoggedIn ? 3 : 1) ? -1 : undefined}>
+            Status
           </button>
         </div>
         <div className="problem-page__tabpanel">
@@ -144,22 +159,39 @@ function ProblemPage() {
             </table>
           </div>
           {isLoggedIn && (
-            <div
-              tabIndex={0}
-              role="tabpanel"
-              id="tab-submit"
-              aria-labelledby="submit"
-              hidden={tab !== 1}>
-              <SubmitForm problemId={problemId}></SubmitForm>
-            </div>
+            <React.Fragment>
+              <div
+                tabIndex={0}
+                role="tabpanel"
+                id="tab-submit"
+                aria-labelledby="submit"
+                hidden={tab !== 1}>
+                <SubmitForm problemId={problemId}></SubmitForm>
+              </div>
+              <div
+                tabIndex={0}
+                role="tabpanel"
+                id="tab-mine"
+                aria-labelledby="mine"
+                hidden={tab !== 2}>
+                {tab === 2 && (
+                  <SubmissionList
+                    params={[
+                      ["problemId", String(problemId)],
+                      ["username", user!.username]
+                    ]}
+                  />
+                )}
+              </div>
+            </React.Fragment>
           )}
           <div
             tabIndex={0}
             role="tabpanel"
             id="tab-submission"
             aria-labelledby="submission"
-            hidden={tab !== (isLoggedIn ? 2 : 1)}>
-            {tab === (isLoggedIn ? 2 : 1) && (
+            hidden={tab !== (isLoggedIn ? 3 : 1)}>
+            {tab === (isLoggedIn ? 3 : 1) && (
               <SubmissionList params={[["problemId", String(problemId)]]} />
             )}
           </div>
