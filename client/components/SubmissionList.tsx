@@ -2,28 +2,73 @@ import React from "react";
 import Submission from "../models/Submission";
 import SubmissionListItem from "./SubmissionListItem";
 import WSContext from "../contexts/WSContext";
-import request from "../helpers/request";
+import { requestWithHeaders } from "../helpers/request";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import qs from "querystring";
+import { parsePage, buildURL } from "../helpers/common-helper";
+import Pagination from "./Pagination";
 
-interface SubmissionListProps {
-  baseUrl: string;
+interface SubmissionListQuery extends qs.ParsedUrlQuery {
+  page: string;
+}
+
+interface SubmissionListProps extends RouteComponentProps {
+  params: Array<[string, string]>;
 }
 
 interface SubmissionListState {
+  page: number;
+  submissionCount: number;
   loading: boolean;
   submissionList: Array<Submission>;
 }
+
+const pageSize = 15;
 
 class SubmissionList extends React.Component<
   SubmissionListProps,
   SubmissionListState
 > {
   socket = new WebSocket("ws://localhost:3000/ws");
-  state: SubmissionListState = { loading: true, submissionList: [] };
+
+  constructor(props: SubmissionListProps) {
+    super(props);
+    this.state = {
+      page: -1,
+      submissionCount: 0,
+      loading: true,
+      submissionList: []
+    };
+  }
+
+  fetchCurrentPage = () => {
+    let queries = qs.parse(
+      this.props.location.search.slice(1)
+    ) as SubmissionListQuery;
+    this.setState({ page: parsePage(queries.page) });
+  };
 
   fetchSubmissionList = () => {
-    request(this.props.baseUrl).then((submissionList: Array<Submission>) => {
-      this.setState({ submissionList });
-    });
+    let { page } = this.state;
+    if (page === -1) {
+      return;
+    }
+
+    let url = buildURL(
+      "/api/submission",
+      this.props.params.concat([
+        ["page", String(page)],
+        ["size", String(pageSize)]
+      ])
+    );
+    requestWithHeaders(url).then(
+      ([submissionList, headers]: [Array<Submission>, Headers]) => {
+        this.setState({
+          submissionList,
+          submissionCount: parseInt(headers.get("x-count")!)
+        });
+      }
+    );
   };
 
   componentDidMount() {
@@ -31,13 +76,17 @@ class SubmissionList extends React.Component<
       this.setState({ loading: false });
     };
 
-    request(this.props.baseUrl).then((submissionList: Array<Submission>) => {
-      this.setState({ submissionList: submissionList.slice(0, 5) });
-    });
+    this.fetchCurrentPage();
   }
 
-  componentDidUpdate(prevProps: SubmissionListProps) {
-    if (prevProps.baseUrl !== this.props.baseUrl) {
+  componentDidUpdate(
+    prevProps: SubmissionListProps,
+    prevState: SubmissionListState
+  ) {
+    if (prevProps.location.search !== this.props.location.search) {
+      this.fetchCurrentPage();
+    }
+    if (prevState.page !== this.state.page) {
       this.fetchSubmissionList();
     }
   }
@@ -73,9 +122,22 @@ class SubmissionList extends React.Component<
             })}
           </WSContext.Provider>
         </table>
+        <Pagination
+          totalCount={this.state.submissionCount}
+          currentPage={this.state.page}
+          pageSize={pageSize}
+          onPageChange={(page: number) => {
+            this.props.history.push({
+              pathname: this.props.location.pathname,
+              search: "?page=" + page
+            });
+          }}
+        />
       </div>
     );
   }
 }
 
-export default SubmissionList;
+let SubmissionListWithRouter = withRouter(SubmissionList);
+
+export default SubmissionListWithRouter;

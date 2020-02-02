@@ -1,7 +1,9 @@
 package submission
 
 import (
+	"fmt"
 	"net/http"
+	"qoj/server/src/common"
 	problem2 "qoj/server/src/problem"
 	"qoj/server/src/token"
 	"strconv"
@@ -91,10 +93,20 @@ func getSubmission(ctx *gin.Context) {
 		filters["username"] = val
 	}
 
-	submissionList, err := FetchSubmissionList(filters)
+	page := common.ParseQueryInt(ctx, "page", 1) - 1
+	size := common.ParseQueryInt(ctx, "size", 20)
+	submissionList, err := FetchSubmissionList(filters, page, size)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	count, err := CountSubmission(filters)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	} else {
+		ctx.Writer.Header().Set("x-count", fmt.Sprintf("%d", count))
 		ctx.JSON(http.StatusOK, submissionList)
 	}
 }
