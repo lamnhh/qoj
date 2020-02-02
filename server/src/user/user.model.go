@@ -1,6 +1,8 @@
 package user
 
-import "qoj/server/config"
+import (
+	"qoj/server/config"
+)
 
 type LoginAuth struct {
 	Username string `json:"username" binding:"required"`
