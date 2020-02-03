@@ -15,7 +15,7 @@ function SettingsPage() {
         <h1>Settings</h1>
       </header>
       <section className="settings-page align-left-right">
-        <GeneralSettingsForm username={user.username} />
+        <GeneralSettingsForm user={user} />
       </section>
     </>
   );

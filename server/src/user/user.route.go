@@ -102,6 +102,29 @@ func postUserProfilePicture(ctx *gin.Context) {
 	}
 }
 
+func patchUser(ctx *gin.Context) {
+	username := ctx.GetString("username")
+
+	patch := PatchUser{}
+	if err := ctx.ShouldBindJSON(&patch); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	modifiers := make(map[string]interface{})
+	if val := patch.Fullname; val != "" {
+		modifiers["fullname"] = val
+	}
+
+	user, err := UpdateUserProfile(username, modifiers)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		user.Password = ""
+		ctx.JSON(http.StatusOK, user)
+	}
+}
+
 func InitialiseUserRoutes(app *gin.Engine) {
 	app.GET("/api/user", token.RequireAuth(), getUser)
 	app.GET("/api/user/:username/public", getUserPublic)
@@ -110,4 +133,7 @@ func InitialiseUserRoutes(app *gin.Engine) {
 
 	// Endpoint to upload profile picture
 	app.POST("/api/user/profile-picture", token.RequireAuth(), postUserProfilePicture)
+
+	// Update current user's information
+	app.PATCH("/api/user", token.RequireAuth(), patchUser)
 }
