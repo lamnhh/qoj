@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import GeneralSettingsForm from "../components/GeneralSettingsForm";
 import AppContext from "../contexts/AppContext";
 import { Redirect } from "react-router-dom";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
 function SettingsPage() {
   let user = useContext(AppContext).user;
@@ -14,9 +15,16 @@ function SettingsPage() {
       <header className="page-name align-left-right">
         <h1>Settings</h1>
       </header>
-      <section className="settings-page align-left-right">
-        <GeneralSettingsForm user={user} />
-      </section>
+      <Tabs className="settings-page align-left-right">
+        <TabList className="tab-list">
+          <Tab>General Settings</Tab>
+          <Tab>Change Password</Tab>
+        </TabList>
+        <TabPanel>
+          <GeneralSettingsForm user={user} />
+          <div>Change Password</div>
+        </TabPanel>
+      </Tabs>
     </>
   );
 }
