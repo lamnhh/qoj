@@ -11,14 +11,15 @@ type LoginAuth struct {
 
 type User struct {
 	LoginAuth
-	Fullname string `json:"fullname" binding:"required"`
+	Fullname       string `json:"fullname" binding:"required"`
+	ProfilePicture string `json:"profilePicture"`
 }
 
-func FindUserByUsername(username string) (User, error){
+func FindUserByUsername(username string) (User, error) {
 	var user User
 	err := config.DB.
-		QueryRow("SELECT RTRIM(username), password, RTRIM(fullname) FROM users WHERE username = $1", username).
-		Scan(&user.Username, &user.Password, &user.Fullname)
+		QueryRow("SELECT RTRIM(username), password, RTRIM(fullname), profile_picture FROM users WHERE username = $1", username).
+		Scan(&user.Username, &user.Password, &user.Fullname, &user.ProfilePicture)
 	if err != nil {
 		return User{}, err
 	}

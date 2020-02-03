@@ -20,6 +20,8 @@ function UserPage() {
     [username]
   );
 
+  let [nocache] = useState(new Date().getTime());
+
   return (
     <>
       <header className="page-name align-left-right">
@@ -28,7 +30,7 @@ function UserPage() {
       <section className="user-page align-left-right">
         <div className="user-page__info">
           <img
-            src="/static/profile-picture-placeholder.png"
+            src={user.profilePicture + "?" + nocache} // Disable cache for this particular image
             alt={`${username}'s profile picture`}
           />
           <h1>{user.fullname}</h1>

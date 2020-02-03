@@ -87,9 +87,27 @@ func getUserPartial(ctx *gin.Context) {
 	}
 }
 
+func postUserProfilePicture(ctx *gin.Context) {
+	username := ctx.GetString("username")
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if path, err := updateProfilePicture(username, file); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"path": path})
+	}
+}
+
 func InitialiseUserRoutes(app *gin.Engine) {
 	app.GET("/api/user", token.RequireAuth(), getUser)
 	app.GET("/api/user/:username/public", getUserPublic)
 	app.GET("/api/user/:username/solved", getUserSolved)
 	app.GET("/api/user/:username/partial", getUserPartial)
+
+	// Endpoint to upload profile picture
+	app.POST("/api/user/profile-picture", token.RequireAuth(), postUserProfilePicture)
 }

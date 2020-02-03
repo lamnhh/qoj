@@ -14,6 +14,7 @@ func InitialiseApp() *gin.Engine {
 
 	app.Static("/static", "./static")
 	app.Static("/node_modules", "./node_modules")
+	app.Static("/profile-picture", "./server/profile-picture")
 	app.LoadHTMLGlob("./static/*.html")
 
 	// Routing
@@ -22,6 +23,7 @@ func InitialiseApp() *gin.Engine {
 	submission.InitialiseSubmissionSocket(app)
 	submission.InitialiseSubmissionRoutes(app)
 	user.InitialiseUserRoutes(app)
+	user.InitialiseAvatarLocks()
 
 	app.Use(func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
