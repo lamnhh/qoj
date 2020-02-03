@@ -15,15 +15,16 @@ import AppContext from "./contexts/AppContext";
 import "./styles/index.scss";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import UserPage from "./pages/UserPage";
+import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
   let [loading, setLoading] = useState(true);
 
   let fetchUserInformation = useCallback(function() {
-    request("/api/user")
-      .then(function({ username, fullname }) {
-        setUser({ username, fullname });
+    return request("/api/user")
+      .then(function(user: User) {
+        setUser(user);
       })
       .catch(function() {
         setUser(null);
@@ -35,7 +36,7 @@ function App() {
     request("/api/refresh")
       .then(function({ accessToken }) {
         setAccessToken(accessToken);
-        fetchUserInformation();
+        return fetchUserInformation();
       })
       .catch(function() {})
       .then(function() {
@@ -84,6 +85,16 @@ function App() {
                         <Route
                           path="/user/:username"
                           component={UserPage}></Route>
+                        <Route
+                          path="/settings/profile"
+                          render={function(props) {
+                            return <SettingsPage tab={0} {...props} />;
+                          }}></Route>
+                        <Route
+                          path="/settings/password"
+                          render={function(props) {
+                            return <SettingsPage tab={1} {...props} />;
+                          }}></Route>
                         <Route
                           path="/logout"
                           render={() => {

@@ -38,10 +38,12 @@ async function parseInit(init: RequestInit) {
 async function request(url: RequestInfo, init: RequestInit = {}) {
   parseInit(init);
   return await fetch(url, init).then(function(res) {
-    if (res.ok) {
-      return res.json();
-    }
-    throw res.json();
+    return res.json().then(function(data) {
+      if (res.ok) {
+        return data;
+      }
+      throw data;
+    });
   });
 }
 
@@ -51,10 +53,12 @@ async function requestWithHeaders(
 ): Promise<[any, Headers]> {
   parseInit(init);
   return await fetch(url, init).then(function(res) {
-    if (res.ok) {
-      return Promise.all([res.json(), res.headers]);
-    }
-    throw res.json();
+    return res.json().then(function(data) {
+      if (res.ok) {
+        return [data, res.headers];
+      }
+      throw data;
+    });
   });
 }
 

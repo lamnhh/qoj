@@ -27,13 +27,23 @@ function RegisterForm() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ username, fullname, password })
-      }).then(function(res) {
-        res.json().then(function({ accessToken }) {
+      })
+        .then(function(res) {
+          return res.json().then(function(data) {
+            if (res.ok) {
+              return data;
+            }
+            throw data;
+          });
+        })
+        .then(function({ accessToken }) {
           setAccessToken(accessToken);
           fetchUserInformation();
           history.push("/");
+        })
+        .catch(function({ error }) {
+          alert(error);
         });
-      });
     },
     [history]
   );

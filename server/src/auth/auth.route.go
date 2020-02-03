@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"net/http"
@@ -56,15 +55,9 @@ func postLogin(ctx *gin.Context) {
 	}
 
 	// Find user with username `userLogin.Username`
-	user, err := user2.FindUserByUsername(userLogin.Username)
+	user, code, err := user2.Login(userLogin.Username, userLogin.Password)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			// If `username` does not exist, return a 404
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "User \"" + userLogin.Username + "\" does not exist"})
-		} else {
-			// Otherwise, return a 500
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		}
+		ctx.JSON(code, gin.H{"error": err.Error()})
 		return
 	}
 

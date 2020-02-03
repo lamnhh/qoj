@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import request from "../helpers/request";
 import Problem, { emptyProblem } from "../models/Problem";
@@ -6,6 +6,7 @@ import SubmissionList from "../components/SubmissionList";
 import AppContext from "../contexts/AppContext";
 import ScoreBar from "../components/ScoreBar";
 import SubmitForm from "../components/SubmitForm";
+import { Tabs, TabList, TabPanel, Tab } from "react-tabs";
 
 interface ProblemPageRouterProps {
   problemId: string;
@@ -24,46 +25,6 @@ function ProblemPage() {
     [problemId]
   );
 
-  let [tab, setTab] = useState(0);
-  let tabListRef = useRef<HTMLDivElement>(null);
-
-  useEffect(
-    function() {
-      let tabList = tabListRef.current!;
-      let tabs = tabList.querySelectorAll('[role="tab"]');
-      let len = tabs.length;
-
-      function tabNavigator(e: KeyboardEvent) {
-        if (e.keyCode === 39) {
-          setTab(function(tab) {
-            let newTab = (tab + 1) % len;
-            return newTab;
-          });
-        } else if (e.keyCode === 37) {
-          setTab(function(tab) {
-            let newTab = (tab + len - 1) % len;
-            return newTab;
-          });
-        }
-      }
-
-      tabList.addEventListener("keydown", tabNavigator);
-      return function() {
-        tabList.removeEventListener("keydown", tabNavigator);
-      };
-    },
-    [isLoggedIn]
-  );
-
-  useEffect(
-    function() {
-      let tabList = tabListRef.current!;
-      let tabs = tabList.querySelectorAll('[role="tab"]');
-      (tabs[tab] as HTMLElement).focus();
-    },
-    [isLoggedIn, tab]
-  );
-
   return (
     <>
       <header className="page-name align-left-right">
@@ -73,71 +34,28 @@ function ProblemPage() {
         <h1 className="problem-page__problem-name">
           {problem.id}. {problem.code} - {problem.name}
         </h1>
-        <div
-          className="problem-page__tablist"
-          ref={tabListRef}
-          role="tablist"
-          aria-label="Actions">
-          <button
-            className="problem-page__tab"
-            type="button"
-            role="tab"
-            aria-label="View contraints"
-            aria-selected={tab === 0 ? "true" : "false"}
-            aria-controls="tab-contraints"
-            id="constraints"
-            onClick={() => setTab(0)}
-            tabIndex={tab !== 0 ? -1 : undefined}>
-            Contraints
-          </button>
-          {isLoggedIn && (
-            <React.Fragment>
-              <button
-                className="problem-page__tab"
-                type="button"
-                role="tab"
-                aria-label="Submit"
-                aria-selected={tab === 1 ? "true" : "false"}
-                aria-controls="tab-submit"
-                id="submit"
-                onClick={() => setTab(1)}
-                tabIndex={tab !== 1 ? -1 : undefined}>
+        <Tabs>
+          <TabList className="my-tablist">
+            <Tab className="my-tab" aria-label="View problem's contraints">
+              Contraints
+            </Tab>
+            {isLoggedIn && (
+              <Tab className="my-tab" aria-label="Submit your solution">
                 Submit
-              </button>
-              <button
-                className="problem-page__tab"
-                type="button"
-                role="tab"
-                aria-label="My submissions"
-                aria-selected={tab === 2 ? "true" : "false"}
-                aria-controls="tab-mine"
-                id="mine"
-                onClick={() => setTab(2)}
-                tabIndex={tab !== 2 ? -1 : undefined}>
+              </Tab>
+            )}
+            {isLoggedIn && (
+              <Tab className="my-tab" aria-label="View your submissions">
                 My Submissions
-              </button>
-            </React.Fragment>
-          )}
-          <button
-            className="problem-page__tab"
-            type="button"
-            role="tab"
-            aria-label="View all submissions of this problem"
-            aria-selected={tab === (isLoggedIn ? 3 : 1) ? "true" : "false"}
-            aria-controls="tab-submission"
-            id="submission"
-            onClick={() => setTab(isLoggedIn ? 3 : 1)}
-            tabIndex={tab !== (isLoggedIn ? 3 : 1) ? -1 : undefined}>
-            Status
-          </button>
-        </div>
-        <div className="problem-page__tabpanel">
-          <div
-            tabIndex={0}
-            role="tabpanel"
-            id="tab-constraints"
-            aria-labelledby="constraints"
-            hidden={tab !== 0}>
+              </Tab>
+            )}
+            <Tab
+              className="my-tab"
+              aria-label="View all submissions of this problem">
+              Status
+            </Tab>
+          </TabList>
+          <TabPanel>
             <table className="my-table problem-page__constraints">
               <tr className="my-table__header">
                 <th>Time limit</th>
@@ -157,45 +75,26 @@ function ProblemPage() {
                 </td>
               </tr>
             </table>
-          </div>
+          </TabPanel>
           {isLoggedIn && (
-            <React.Fragment>
-              <div
-                tabIndex={0}
-                role="tabpanel"
-                id="tab-submit"
-                aria-labelledby="submit"
-                hidden={tab !== 1}>
-                <SubmitForm problemId={problemId}></SubmitForm>
-              </div>
-              <div
-                tabIndex={0}
-                role="tabpanel"
-                id="tab-mine"
-                aria-labelledby="mine"
-                hidden={tab !== 2}>
-                {tab === 2 && (
-                  <SubmissionList
-                    params={[
-                      ["problemId", String(problemId)],
-                      ["username", user!.username]
-                    ]}
-                  />
-                )}
-              </div>
-            </React.Fragment>
+            <TabPanel>
+              <SubmitForm problemId={problemId}></SubmitForm>
+            </TabPanel>
           )}
-          <div
-            tabIndex={0}
-            role="tabpanel"
-            id="tab-submission"
-            aria-labelledby="submission"
-            hidden={tab !== (isLoggedIn ? 3 : 1)}>
-            {tab === (isLoggedIn ? 3 : 1) && (
-              <SubmissionList params={[["problemId", String(problemId)]]} />
-            )}
-          </div>
-        </div>
+          {isLoggedIn && (
+            <TabPanel>
+              <SubmissionList
+                params={[
+                  ["problemId", String(problemId)],
+                  ["username", user!.username]
+                ]}
+              />
+            </TabPanel>
+          )}
+          <TabPanel>
+            <SubmissionList params={[["problemId", String(problemId)]]} />
+          </TabPanel>
+        </Tabs>
       </section>
     </>
   );

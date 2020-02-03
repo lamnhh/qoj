@@ -1,0 +1,52 @@
+.my-tabpanel {
+  padding-top: 1rem;
+}
+
+.my-tablist {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  &::after {
+    background-color: #ccc;
+    content: "";
+    height: 0.1rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    z-index: 0;
+  }
+}
+
+.my-tab {
+  background-color: #eee;
+  border: 0.1rem solid #ccc;
+  color: #666;
+  display: inline-block;
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 1.2rem 2.4rem;
+  position: relative;
+  text-align: center;
+  z-index: 1;
+  transition: all linear 0.15s;
+  &[aria-selected="true"] {
+    background-color: #fff;
+    color: $theme;
+    border-bottom-color: #fff;
+  }
+  &[aria-selected="false"] {
+    cursor: pointer;
+    &:hover {
+      background-color: $theme;
+      color: #fff;
+    }
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
+.my-tab + .my-tab {
+  margin-left: 0.4rem;
+}
