@@ -86,8 +86,15 @@ function App() {
                           path="/user/:username"
                           component={UserPage}></Route>
                         <Route
-                          path="/settings"
-                          component={SettingsPage}></Route>
+                          path="/settings/profile"
+                          render={function(props) {
+                            return <SettingsPage tab={0} {...props} />;
+                          }}></Route>
+                        <Route
+                          path="/settings/password"
+                          render={function(props) {
+                            return <SettingsPage tab={1} {...props} />;
+                          }}></Route>
                         <Route
                           path="/logout"
                           render={() => {

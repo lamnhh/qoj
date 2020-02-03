@@ -43,7 +43,7 @@ function Header() {
             </li>
             <li className="divider"></li>
             <li>
-              <Link to="/settings">Settings</Link>
+              <Link to="/settings/profile">Settings</Link>
             </li>
             <li className="divider"></li>
             <li>

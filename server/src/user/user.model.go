@@ -1,7 +1,11 @@
 package user
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"qoj/server/config"
 	"strings"
 )
@@ -19,6 +23,27 @@ type User struct {
 
 type PatchUser struct {
 	Fullname string `json:"fullname"`
+}
+
+type PutPasswordUser struct {
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}
+
+func Login(username string, password string) (User, int, error) {
+	user, err := FindUserByUsername(username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return User{}, http.StatusNotFound, errors.New(fmt.Sprintf("User `%s` does not exist", username))
+		}
+		return User{}, http.StatusInternalServerError, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return User{}, http.StatusBadRequest, errors.New("Wrong password")
+	}
+	user.Password = ""
+	return user, http.StatusOK, nil
 }
 
 func FindUserByUsername(username string) (User, error) {

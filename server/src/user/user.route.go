@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"qoj/server/config"
 	"qoj/server/src/problem"
 	"qoj/server/src/token"
 )
@@ -125,6 +126,30 @@ func patchUser(ctx *gin.Context) {
 	}
 }
 
+func putUserPassword(ctx *gin.Context) {
+	username := ctx.GetString("username")
+
+	body := PutPasswordUser{}
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, code, err := Login(username, body.OldPassword)
+	if err != nil {
+		ctx.JSON(code, gin.H{"error": err.Error()})
+		return
+	}
+
+	hashedPassword := hashPassword(body.NewPassword)
+	_, err = config.DB.Exec("UPDATE users SET password = $1 WHERE username = $2", hashedPassword, username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{})
+	}
+}
+
 func InitialiseUserRoutes(app *gin.Engine) {
 	app.GET("/api/user", token.RequireAuth(), getUser)
 	app.GET("/api/user/:username/public", getUserPublic)
@@ -136,4 +161,7 @@ func InitialiseUserRoutes(app *gin.Engine) {
 
 	// Update current user's information
 	app.PATCH("/api/user", token.RequireAuth(), patchUser)
+
+	// Update password
+	app.PUT("/api/user/password", token.RequireAuth(), putUserPassword)
 }

@@ -1,8 +1,12 @@
 .settings-page {
-  display: flex;
-  justify-content: center;
+  padding-top: 3rem;
 }
 
 .settings-page input[type="file"] {
   height: unset;
+}
+
+.settings-page .react-tabs__tab-panel {
+  display: flex;
+  justify-content: center;
 }
