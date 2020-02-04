@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"qoj/server/src/common"
 	problem2 "qoj/server/src/problem"
+	"qoj/server/src/result"
 	"qoj/server/src/token"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
-
-var submissionCount int
 
 func submissionHandler(submissionId int) {
 	for {
@@ -114,7 +113,7 @@ func getSubmissionIdResult(ctx *gin.Context) {
 	}
 	submissionId := int(submissionId64)
 
-	resultList, err := getSubmissionResults(submissionId)
+	resultList, err := result.GetResultsOfSubmission(submissionId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -123,8 +122,6 @@ func getSubmissionIdResult(ctx *gin.Context) {
 }
 
 func InitialiseSubmissionRoutes(app *gin.Engine) {
-	submissionCount = 0
-
 	app.GET("/api/submission", getSubmission)
 	app.POST("/api/submission", token.RequireAuth(), postSubmission)
 	app.GET("/api/submission/:id/result", getSubmissionIdResult)

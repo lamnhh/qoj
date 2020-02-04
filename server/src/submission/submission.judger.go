@@ -3,26 +3,17 @@ package submission
 import (
 	"errors"
 	"fmt"
-	"github.com/udhos/equalfile"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"qoj/server/src/problem"
 	"qoj/server/src/queue"
+	result2 "qoj/server/src/result"
 	"qoj/server/src/test"
-	"strings"
 )
 
 var judges map[int]chan interface{}
-
-const (
-	VerdictAc  = "Accepted"
-	VerdictWa  = "Wrong Answer"
-	VerdictRe  = "Runtime Error"
-	VerdictTle = "Time Limit Exceeded"
-	VerdictMle = "Memory Limit Exceeded"
-)
 
 func judgeFunc(done chan interface{}, metadata interface{}) {
 	config := metadata.(map[string]interface{})
@@ -65,38 +56,14 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 
 	cmd := fmt.Sprintf("%s < %s > %s", exePath, inpPath, tmpOutPath)
 
-	output, err := exec.Command(timeoutPath,
+	output, _ := exec.Command(timeoutPath,
 		"-t", fmt.Sprintf("%f", prob.TimeLimit),
 		"-m", fmt.Sprintf("%d", prob.MemoryLimit * 1024),
 		cmd,
 	).CombinedOutput()
-	if err == nil {
-		result := strings.Split(string(output), " ")
 
-		answerPreview := ""
-		score := float32(0.0)
-		verdict := ""
-		switch result[0] {
-			case "FINISHED":
-				cmp := equalfile.New(nil, equalfile.Options{})
-				equal, _ := cmp.CompareFile(outPath, tmpOutPath)
-
-				answerPreview, _ = test.GetFilePreview(outPath)
-				if equal {
-					verdict = VerdictAc
-					score = 1.0
-				} else {
-					verdict = VerdictWa
-				}
-			case "TIMEOUT":
-				verdict = VerdictTle
-			case "MEM":
-				verdict = VerdictMle
-			case "SIGNAL":
-				verdict = VerdictRe
-		}
-		_ = updateScore(submissionId, testList[testId].Id, score, verdict, answerPreview)
-	}
+	result := result2.ParseResultFromString(string(output), tmpOutPath, outPath)
+	_ = result2.UpdateResult(submissionId, testList[testId].Id, result)
 
 	queue.Push(queue.Task{
 		Run:           judgeFunc,
@@ -177,5 +144,3 @@ func judge(submissionId int, problem problem.Problem, code string) error {
 	queue.Push(compileTask)
 	return nil
 }
-
-// TIMEOUT CPU 0.51 MEM 18612 MAXMEM 18612 STALE 0 MAXMEM_RSS 2500

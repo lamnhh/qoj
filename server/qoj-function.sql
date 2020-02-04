@@ -27,7 +27,9 @@ RETURNS TABLE (
 	out_preview		TEXT,
 	answer_preview	TEXT,
 	score			FLOAT,
-	verdict			TEXT
+	verdict			TEXT,
+	execution_time	FLOAT,
+	memory_used		INT
 )
 AS $$
 BEGIN
@@ -37,10 +39,14 @@ BEGIN
 		tests.out_preview,
 		submission_results.answer_preview,
 		submission_results.score,
-		submission_results.verdict
+		submission_results.verdict,
+		submission_results.execution_time,
+		submission_results.memory_used
 	FROM
 		submission_results
 		JOIN tests ON (submission_results.test_id = tests.id)
+	WHERE
+	    submission_id = sub_id
 	ORDER BY
 		tests.ord ASC;
 END;

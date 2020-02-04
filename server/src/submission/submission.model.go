@@ -14,20 +14,14 @@ type CodeSubmission struct {
 }
 
 type Submission struct {
-	Id          int       `json:"id"`
-	Username    string    `json:"username"`
-	ProblemId   int       `json:"problemId"`
-	ProblemName string    `json:"problemName"`
-	CreatedAt   time.Time `json:"createdAt"`
-	Status      string    `json:"status"`
-}
-
-type SubmissionResult struct {
-	InputPreview  string  `json:"inputPreview"`
-	OutputPreview string  `json:"outputPreview"`
-	AnswerPreview string  `json:"answerPreview"`
-	Score         float32 `json:"score"`
-	Verdict       string  `json:"verdict"`
+	Id            int       `json:"id"`
+	Username      string    `json:"username"`
+	ProblemId     int       `json:"problemId"`
+	ProblemName   string    `json:"problemName"`
+	CreatedAt     time.Time `json:"createdAt"`
+	Status        string    `json:"status"`
+	ExecutionTime float32   `json:"executionTime"`
+	MemoryUsed    int       `json:"memoryUsed"`
 }
 
 func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
@@ -39,6 +33,8 @@ func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
 		&submission.ProblemName,
 		&submission.CreatedAt,
 		&submission.Status,
+		&submission.ExecutionTime,
+		&submission.MemoryUsed,
 	)
 	if err != nil {
 		return Submission{}, err
@@ -74,12 +70,22 @@ func fetchSubmissionById(submissionId int) (Submission, error) {
 			submissions.problem_id,
 			problems.name,
 			submissions.created_at,
-			submissions.status	
+			submissions.status,
+			COALESCE(MAX(execution_time), 0) as execution_time,
+			COALESCE(MAX(memory_used), 0) as memory_used
 		FROM
 			submissions
 			JOIN problems ON (submissions.problem_id = problems.id)
+			LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
 		WHERE
-			submissions.id = $1`,
+			submissions.id = $1
+		GROUP BY
+			submissions.id,
+			submissions.username,
+			submissions.problem_id,
+			problems.name,
+			submissions.created_at,
+			submissions.status`,
 		submissionId,
 	)
 	if err != nil {
@@ -143,11 +149,21 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 		submissions.problem_id,
 		problems.name,
 		submissions.created_at,
-		submissions.status	
+		submissions.status,
+		COALESCE(MAX(execution_time), 0) as execution_time,
+		COALESCE(MAX(memory_used), 0) as memory_used
 	FROM
 		submissions
 		JOIN problems ON (submissions.problem_id = problems.id)
+		LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
 	%s
+	GROUP BY
+		submissions.id,
+		submissions.username,
+		submissions.problem_id,
+		problems.name,
+		submissions.created_at,
+		submissions.status
 	ORDER BY
 		created_at DESC
 	OFFSET %d LIMIT %d`, whereClause, page * size, size)
@@ -182,28 +198,4 @@ func getSubmissionScore(submissionId int) float32 {
 		score = 0
 	}
 	return score
-}
-
-func getSubmissionResults(submissionId int) ([]SubmissionResult, error) {
-	rows, err := config.DB.Query("SELECT * FROM get_submission_result($1)", submissionId)
-	if err != nil {
-		return nil, err
-	}
-
-	resultList := make([]SubmissionResult, 0)
-	for rows.Next() {
-		var result SubmissionResult
-		err := rows.Scan(
-			&result.InputPreview,
-			&result.OutputPreview,
-			&result.AnswerPreview,
-			&result.Score,
-			&result.Verdict,
-		)
-		if err == nil {
-			resultList = append(resultList, result)
-		}
-	}
-
-	return resultList, nil
 }
