@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"qoj/server/src/auth"
+	"qoj/server/src/language"
 	"qoj/server/src/problem"
 	"qoj/server/src/submission"
 	"qoj/server/src/user"
@@ -24,6 +25,7 @@ func InitialiseApp() *gin.Engine {
 	submission.InitialiseSubmissionRoutes(app)
 	user.InitialiseUserRoutes(app)
 	user.InitialiseAvatarLocks()
+	language.InitialiseLanguageRoutes(app)
 
 	app.Use(func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)

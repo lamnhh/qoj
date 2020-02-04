@@ -25,11 +25,11 @@ function parseSubmissionStatus(status: string): ReactElement {
 
 function SubmissionListItem({ submission }: SubmissionListItemProps) {
   let { socket } = useContext(WSContext);
-  let [status, setStatus] = useState<ReactElement>(<></>);
+  let [status, setStatus] = useState("");
 
   useEffect(
     function() {
-      setStatus(parseSubmissionStatus(submission.status));
+      setStatus(submission.status);
     },
     [submission.status]
   );
@@ -39,7 +39,7 @@ function SubmissionListItem({ submission }: SubmissionListItemProps) {
       function updateStatus(event: MessageEvent) {
         let json: WSMessage = JSON.parse(event.data);
         if (json.submissionId === submission.id) {
-          setStatus(parseSubmissionStatus(json.message));
+          setStatus(json.message);
         }
       }
 
@@ -64,6 +64,8 @@ function SubmissionListItem({ submission }: SubmissionListItemProps) {
     [submission.id]
   );
 
+  let isFinished = status.split("/").length === 2;
+
   return (
     <tr>
       <td className="id">{submission.id}</td>
@@ -78,8 +80,10 @@ function SubmissionListItem({ submission }: SubmissionListItemProps) {
           {submission.problemId} - {submission.problemName}
         </Link>
       </td>
-      <td>C++17</td>
-      <td className="status-cell">{status}</td>
+      <td>{submission.language}</td>
+      <td className="status-cell">{parseSubmissionStatus(status)}</td>
+      <td>{isFinished ? Math.floor(submission.executionTime * 1000) : 0} ms</td>
+      <td>{isFinished ? submission.memoryUsed : 0} KB</td>
     </tr>
   );
 }

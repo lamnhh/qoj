@@ -9,8 +9,9 @@ import (
 )
 
 type CodeSubmission struct {
-	ProblemId int    `json:"problemId" binding:"required"`
-	Code      string `json:"code" binding:"required"`
+	ProblemId  int    `json:"problemId" binding:"required"`
+	Code       string `json:"code" binding:"required"`
+	LanguageId int    `json:"languageId" binding:"required"`
 }
 
 type Submission struct {
@@ -22,6 +23,8 @@ type Submission struct {
 	Status        string    `json:"status"`
 	ExecutionTime float32   `json:"executionTime"`
 	MemoryUsed    int       `json:"memoryUsed"`
+	LanguageId    int       `json:"languageId"`
+	Language      string    `json:"language"`
 }
 
 func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
@@ -35,6 +38,8 @@ func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
 		&submission.Status,
 		&submission.ExecutionTime,
 		&submission.MemoryUsed,
+		&submission.LanguageId,
+		&submission.Language,
 	)
 	if err != nil {
 		return Submission{}, err
@@ -45,11 +50,12 @@ func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
 	return submission, nil
 }
 
-func createSubmission(username string, problemId int) (Submission, error) {
+func createSubmission(username string, problemId int, languageId int) (Submission, error) {
 	rows, err := config.DB.Query(
-		"INSERT INTO submissions(username, problem_id) VALUES ($1, $2) RETURNING id",
+		"INSERT INTO submissions(username, problem_id, language_id) VALUES ($1, $2, $3) RETURNING id",
 		username,
 		problemId,
+		languageId,
 	)
 	if err != nil {
 		return Submission{}, err
@@ -62,6 +68,11 @@ func createSubmission(username string, problemId int) (Submission, error) {
 	return fetchSubmissionById(submissionId)
 }
 
+func updateCompilationMessage(submissionId int, msg string) error {
+	_, err := config.DB.Exec("UPDATE submissions SET compile_msg = $1 WHERE submission_id = $2", msg, submissionId)
+	return err
+}
+
 func fetchSubmissionById(submissionId int) (Submission, error) {
 	rows, err := config.DB.Query(
 		`SELECT
@@ -72,10 +83,13 @@ func fetchSubmissionById(submissionId int) (Submission, error) {
 			submissions.created_at,
 			submissions.status,
 			COALESCE(MAX(execution_time), 0) as execution_time,
-			COALESCE(MAX(memory_used), 0) as memory_used
+			COALESCE(MAX(memory_used), 0) as memory_used,
+			languages.id,
+			languages.name
 		FROM
 			submissions
 			JOIN problems ON (submissions.problem_id = problems.id)
+			JOIN languages ON (submissions.language_id = languages.id)
 			LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
 		WHERE
 			submissions.id = $1
@@ -85,7 +99,9 @@ func fetchSubmissionById(submissionId int) (Submission, error) {
 			submissions.problem_id,
 			problems.name,
 			submissions.created_at,
-			submissions.status`,
+			submissions.status,
+			languages.id,
+			languages.name`,
 		submissionId,
 	)
 	if err != nil {
@@ -151,10 +167,13 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 		submissions.created_at,
 		submissions.status,
 		COALESCE(MAX(execution_time), 0) as execution_time,
-		COALESCE(MAX(memory_used), 0) as memory_used
+		COALESCE(MAX(memory_used), 0) as memory_used,
+		languages.id,
+		languages.name
 	FROM
 		submissions
 		JOIN problems ON (submissions.problem_id = problems.id)
+		JOIN languages ON (submissions.language_id = languages.id)
 		LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
 	%s
 	GROUP BY
@@ -163,7 +182,9 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 		submissions.problem_id,
 		problems.name,
 		submissions.created_at,
-		submissions.status
+		submissions.status,
+		languages.id,
+		languages.name
 	ORDER BY
 		created_at DESC
 	OFFSET %d LIMIT %d`, whereClause, page * size, size)

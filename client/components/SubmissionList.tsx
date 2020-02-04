@@ -111,6 +111,8 @@ class SubmissionList extends React.Component<
             <th>Problem</th>
             <th>Language</th>
             <th className="status-cell">Result</th>
+            <th>Execution time</th>
+            <th>Memory</th>
           </tr>
           <WSContext.Provider value={{ socket: this.socket }}>
             {submissionList.map(function(submission) {

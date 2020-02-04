@@ -7,10 +7,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"qoj/server/src/language"
 	"qoj/server/src/problem"
 	"qoj/server/src/queue"
 	result2 "qoj/server/src/result"
 	"qoj/server/src/test"
+	"strings"
 )
 
 var judges map[int]chan interface{}
@@ -22,13 +24,14 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 	prob:= config["problem"].(problem.Problem)
 	submissionId := config["submissionId"].(int)
 	testList := config["testList"].([]test.Test)
+	srcPath := config["srcPath"].(string)
 
 	if testId >= len(testList) {
 		status := fmt.Sprintf("%.2f / %d.00", getSubmissionScore(submissionId), len(testList))
 		_ = updateSubmissionStatus(submissionId, status)
 		// Clean up
 		_ = os.Remove(fmt.Sprintf("%d", submissionId))
-		_ = os.Remove(fmt.Sprintf("%d.cpp", submissionId))
+		_ = os.Remove(srcPath)
 		_ = os.Remove(fmt.Sprintf("%d.out", submissionId))
 		done <- map[string]interface{}{
 			"submissionId": submissionId,
@@ -73,6 +76,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 			"problem":      prob,
 			"submissionId": submissionId,
 			"testList":     testList,
+			"srcPath":      srcPath,
 		},
 	})
 }
@@ -82,6 +86,8 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 
 	prob := config["problem"].(problem.Problem)
 	submissionId := config["submissionId"].(int)
+	compilationCommand := config["compilationCommand"].(string)
+	srcPath := config["srcPath"].(string)
 
 	// Update status
 	done <- map[string]interface{}{
@@ -90,8 +96,13 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	}
 	_ = updateSubmissionStatus(submissionId, "Compiling...")
 
-	cppPath := fmt.Sprintf("%d.cpp", submissionId)
-	compileOutput, err := exec.Command("g++", cppPath, "-o", fmt.Sprintf("%d", submissionId)).CombinedOutput()
+	sid := fmt.Sprintf("%d", submissionId)
+	cmd := fmt.Sprintf(compilationCommand, sid, sid)
+	tok := strings.Split(cmd, " ")
+
+	compileOutput, err := exec.Command(tok[0], tok[1:]...).CombinedOutput()
+	_ = updateCompilationMessage(submissionId, string(compileOutput))
+
 	if err != nil {
 		// Compile error
 		done <- map[string]interface{}{
@@ -99,7 +110,7 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 			"message":      "Compile Error|" + string(compileOutput),
 		}
 		_ = updateSubmissionStatus(submissionId, "Compile Error|" + string(compileOutput))
-		_ = os.Remove(cppPath)
+		_ = os.Remove(srcPath)
 	} else {
 		// Successfully compiled
 		testList, _ := test.FetchAllTests(prob.Id)
@@ -111,14 +122,15 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 				"problem":      prob,
 				"submissionId": submissionId,
 				"testList":     testList,
+				"srcPath":      srcPath,
 			},
 		})
 	}
 }
 
-func judge(submissionId int, problem problem.Problem, code string) error {
-	// Create file "{submissionId}.cpp"
-	file, err := os.Create(fmt.Sprintf("%d.cpp", submissionId))
+func judge(submissionId int, code string, prob problem.Problem, lang language.Language) error {
+	// Create file "{submissionId}.{ext}"
+	file, err := os.Create(fmt.Sprintf("%d%s", submissionId, lang.Extension))
 	if err != nil {
 		return err
 	}
@@ -136,8 +148,10 @@ func judge(submissionId int, problem problem.Problem, code string) error {
 		Run:           compileFunc,
 		ResultChannel: judges[submissionId],
 		Params:       map[string]interface{}{
-			"problem":      problem,
-			"submissionId": submissionId,
+			"problem":            prob,
+			"compilationCommand": lang.Command,
+			"submissionId":       submissionId,
+			"srcPath":            fmt.Sprintf("%d%s", submissionId, lang.Extension),
 		},
 	}
 

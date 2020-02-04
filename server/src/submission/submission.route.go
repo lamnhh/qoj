@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"qoj/server/src/common"
+	"qoj/server/src/language"
 	problem2 "qoj/server/src/problem"
 	"qoj/server/src/result"
 	"qoj/server/src/token"
@@ -52,8 +53,15 @@ func postSubmission(ctx *gin.Context) {
 		return
 	}
 
+	// Check if languageId exists
+	lang, err := language.FetchLanguageById(body.LanguageId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	// Create submission entry in database
-	submission, err := createSubmission(username, body.ProblemId)
+	submission, err := createSubmission(username, body.ProblemId, body.LanguageId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -65,7 +73,7 @@ func postSubmission(ctx *gin.Context) {
 	listenerList[submissionId] = &ListenerList{}
 	go submissionHandler(submissionId)
 
-	_ = judge(submissionId, problem, body.Code)
+	_ = judge(submissionId, body.Code, problem, lang)
 	ctx.JSON(http.StatusOK, gin.H{
 		"submissionId": submissionId,
 	})

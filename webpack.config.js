@@ -1,7 +1,8 @@
 let path = require("path");
 let webpack = require("webpack");
 
-let mode = process.env.NODE_ENV === "development" ? "development" : "production";
+let mode =
+  process.env.NODE_ENV === "development" ? "development" : "production";
 
 module.exports = {
   plugins: [
