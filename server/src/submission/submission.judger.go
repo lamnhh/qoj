@@ -1,11 +1,10 @@
 package submission
 
 import (
+	"errors"
 	"fmt"
 	"github.com/udhos/equalfile"
-	"io"
 	"log"
-	"mime/multipart"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -150,20 +149,20 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	}
 }
 
-func judge(submissionId int, problem problem.Problem, fileHeader *multipart.FileHeader) error {
-	file, err := fileHeader.Open()
+func judge(submissionId int, problem problem.Problem, code string) error {
+	// Create file "{submissionId}.cpp"
+	file, err := os.Create(fmt.Sprintf("%d.cpp", submissionId))
 	if err != nil {
 		return err
 	}
 
-	// Save uploaded code to "{submissionId}.cpp"
-	cppPath := fmt.Sprintf("%d.cpp", submissionId)
-	cppFile, err := os.Create(cppPath)
+	// Write `code` to `file`
+	n, err := file.WriteString(code)
 	if err != nil {
 		return err
 	}
-	if _, err := io.Copy(cppFile, file); err != nil {
-		return err
+	if n != len(code) {
+		return errors.New("Internal Server Error")
 	}
 
 	compileTask := queue.Task{

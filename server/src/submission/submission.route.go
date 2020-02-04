@@ -31,47 +31,42 @@ func submissionHandler(submissionId int) {
 }
 
 func postSubmission(ctx *gin.Context) {
-	// Request must be a form-data
+	username := ctx.GetString("username")
+	body := CodeSubmission{}
 
-	// Parse current username
-	usernameInterface, _ := ctx.Get("username")
-	username := usernameInterface.(string)
-
-	// Parse problemId
-	problemIdInt64, err := strconv.ParseInt(ctx.PostForm("problemId"), 10, 16)
-	if err != nil {
+	// Parse JSON body
+	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	problemId := int(problemIdInt64)
 
-	// Parse solution file
-	file, err := ctx.FormFile("file")
+	// Validate code length (<= 50000B)
+	if len(body.Code) > 50000 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Solution file exceeds 50000B"})
+		return
+	}
+
+	// Check if problemId exists
+	problem, err := problem2.FetchProblemById(body.ProblemId, "")
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Create submission entry in database
-	submission, err := createSubmission(username, problemId)
+	submission, err := createSubmission(username, body.ProblemId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	submissionId := submission.Id
 
-	problem, err := problem2.FetchProblemById(problemId, "")
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
 	// Initialise judge channel for this particular submission
 	judges[submissionId] = make(chan interface{})
 	listenerList[submissionId] = &ListenerList{}
 	go submissionHandler(submissionId)
 
-	_ = judge(submissionId, problem, file)
+	_ = judge(submissionId, problem, body.Code)
 	ctx.JSON(http.StatusOK, gin.H{
 		"submissionId": submissionId,
 	})

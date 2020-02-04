@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+type CodeSubmission struct {
+	ProblemId int    `json:"problemId" binding:"required"`
+	Code      string `json:"code" binding:"required"`
+}
+
 type Submission struct {
 	Id          int       `json:"id"`
 	Username    string    `json:"username"`
