@@ -9,16 +9,24 @@ import React, {
 import { useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Language from "../models/Language";
+import CodeMirror, { EditorFromTextArea } from "codemirror";
 
 interface FormElements extends HTMLFormElement {
   languageId: HTMLSelectElement;
-  code: HTMLTextAreaElement;
   file: HTMLInputElement;
 }
 
 function SubmitForm({ problemId }: { problemId: string }) {
   let history = useHistory();
   let codeRef = useRef<HTMLTextAreaElement>(null);
+  let editor = useRef<EditorFromTextArea | null>(null);
+
+  useEffect(function() {
+    editor.current = CodeMirror.fromTextArea(codeRef.current!, {
+      lineNumbers: true,
+      mode: "text/x-c++src"
+    });
+  }, []);
 
   let [languageList, setLanguagelist] = useState<Array<Language>>([]);
   useEffect(function() {
@@ -29,7 +37,7 @@ function SubmitForm({ problemId }: { problemId: string }) {
     function(event: FormEvent<HTMLFormElement>) {
       event.preventDefault();
       let form = event.target as FormElements;
-      let code = form.code.value;
+      let code = editor.current!.getValue();
       let languageId = parseInt(form.languageId.value);
 
       request("/api/submission", {
@@ -55,17 +63,15 @@ function SubmitForm({ problemId }: { problemId: string }) {
     }
 
     let file = files[0];
+    element.value = "";
     if (file.size > 50000) {
       alert("Solution file exceeds 50000B");
-      element.value = "";
       return;
     }
 
     let reader = new FileReader();
     reader.onload = function() {
-      if (codeRef.current) {
-        codeRef.current.value = String(this.result);
-      }
+      editor.current!.setValue(String(this.result));
     };
 
     reader.readAsText(file, "utf-8");
@@ -74,8 +80,8 @@ function SubmitForm({ problemId }: { problemId: string }) {
   return (
     <form className="submit-form" onSubmit={handleSubmit}>
       <label>
-        <span>Language</span>
-        <select className="submit-form__language" name="languageId">
+        <span className="submit-form__field-name">Language</span>
+        <select className="submit-form__input" name="languageId">
           {languageList.map(function(language) {
             return (
               <option key={language.id} value={language.id}>
@@ -86,17 +92,21 @@ function SubmitForm({ problemId }: { problemId: string }) {
         </select>
       </label>
       <label>
-        <span>Source code</span>
-        <textarea
-          ref={codeRef}
-          className="submit-form__editor"
-          name="code"></textarea>
+        <span className="submit-form__field-name">Source code</span>
+        <textarea className="submit-form__input" ref={codeRef}></textarea>
       </label>
       <label>
-        <span>Or choose file</span>
-        <input type="file" name="file" required onChange={onFileUpload} />
+        <span className="submit-form__field-name">Or choose file</span>
+        <input
+          className="submit-form__input"
+          type="file"
+          name="file"
+          onChange={onFileUpload}
+        />
       </label>
-      <button type="submit">Submit</button>
+      <button type="submit" className="submit-form__submit-btn">
+        Submit
+      </button>
     </form>
   );
 }
