@@ -79,9 +79,43 @@ function App() {
                         <Route
                           path="/register"
                           component={RegisterPage}></Route>
+
                         <Route
+                          exact
                           path="/problem/:problemId"
-                          component={ProblemPage}></Route>
+                          render={props => (
+                            <ProblemPage tab={0} {...props}></ProblemPage>
+                          )}
+                        />
+                        <Route
+                          path="/problem/:problemId/submit"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return (
+                              <ProblemPage tab={1} {...props}></ProblemPage>
+                            );
+                          }}
+                        />
+                        <Route
+                          path="/problem/:problemId/my"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return (
+                              <ProblemPage tab={2} {...props}></ProblemPage>
+                            );
+                          }}
+                        />
+                        <Route
+                          path="/problem/:problemId/status"
+                          render={props => (
+                            <ProblemPage tab={3} {...props}></ProblemPage>
+                          )}
+                        />
+
                         <Route
                           path="/user/:username"
                           component={UserPage}></Route>

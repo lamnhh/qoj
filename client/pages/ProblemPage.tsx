@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useContext, useCallback } from "react";
+import { useParams, RouteComponentProps, useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Problem, { emptyProblem } from "../models/Problem";
 import SubmissionList from "../components/SubmissionList";
@@ -8,11 +8,15 @@ import ScoreBar from "../components/ScoreBar";
 import SubmitForm from "../components/SubmitForm";
 import { Tabs, TabList, TabPanel, Tab } from "react-tabs";
 
+interface ProblemPageProps extends RouteComponentProps {
+  tab: number;
+}
+
 interface ProblemPageRouterProps {
   problemId: string;
 }
 
-function ProblemPage() {
+function ProblemPage({ tab }: ProblemPageProps) {
   let problemId = useParams<ProblemPageRouterProps>().problemId;
   let user = useContext(AppContext).user;
   let isLoggedIn = user !== null;
@@ -21,6 +25,29 @@ function ProblemPage() {
   useEffect(
     function() {
       request("/api/problem/" + problemId).then(setProblem);
+    },
+    [problemId]
+  );
+
+  let history = useHistory();
+  let onTabChange = useCallback(
+    function(tab) {
+      let url = "/problem/" + problemId;
+      switch (tab) {
+        case 0:
+          url += "";
+          break;
+        case 1:
+          url += "/submit";
+          break;
+        case 2:
+          url += "/my";
+          break;
+        case 3:
+          url += "/status";
+          break;
+      }
+      history.push(url);
     },
     [problemId]
   );
@@ -34,21 +61,23 @@ function ProblemPage() {
         <h1 className="problem-page__problem-name">
           {problem.id}. {problem.code} - {problem.name}
         </h1>
-        <Tabs>
+        <Tabs selectedIndex={tab} onSelect={onTabChange}>
           <TabList className="my-tablist">
             <Tab className="my-tab" aria-label="View problem's contraints">
               Contraints
             </Tab>
-            {isLoggedIn && (
-              <Tab className="my-tab" aria-label="Submit your solution">
-                Submit
-              </Tab>
-            )}
-            {isLoggedIn && (
-              <Tab className="my-tab" aria-label="View your submissions">
-                My Submissions
-              </Tab>
-            )}
+            <Tab
+              className="my-tab"
+              aria-label="Submit your solution"
+              disabled={!isLoggedIn}>
+              Submit
+            </Tab>
+            <Tab
+              className="my-tab"
+              aria-label="View your submissions"
+              disabled={!isLoggedIn}>
+              My Submissions
+            </Tab>
             <Tab
               className="my-tab"
               aria-label="View all submissions of this problem">
@@ -76,21 +105,19 @@ function ProblemPage() {
               </tr>
             </table>
           </TabPanel>
-          {isLoggedIn && (
-            <TabPanel>
-              <SubmitForm problemId={problemId}></SubmitForm>
-            </TabPanel>
-          )}
-          {isLoggedIn && (
-            <TabPanel>
+          <TabPanel>
+            <SubmitForm problemId={problemId}></SubmitForm>
+          </TabPanel>
+          <TabPanel>
+            {user && (
               <SubmissionList
                 params={[
                   ["problemId", String(problemId)],
                   ["username", user!.username]
                 ]}
               />
-            </TabPanel>
-          )}
+            )}
+          </TabPanel>
           <TabPanel>
             <SubmissionList params={[["problemId", String(problemId)]]} />
           </TabPanel>
