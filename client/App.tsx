@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
-import SubmissionPage from "./pages/SubmissionPage";
+import StatusPage from "./pages/StatusPage";
 import ProblemsetPage from "./pages/ProblemsetPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -16,6 +16,7 @@ import "./styles/index.scss";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
+import SubmissionPage from "./pages/SubmissionPage";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
@@ -72,9 +73,7 @@ function App() {
                           path="/"
                           exact
                           component={ProblemsetPage}></Route>
-                        <Route
-                          path="/status"
-                          component={SubmissionPage}></Route>
+                        <Route path="/status" component={StatusPage}></Route>
                         <Route path="/login" component={LoginPage}></Route>
                         <Route
                           path="/register"
@@ -129,6 +128,11 @@ function App() {
                           render={function(props) {
                             return <SettingsPage tab={1} {...props} />;
                           }}></Route>
+
+                        <Route
+                          path="/submission/:submissionId"
+                          component={SubmissionPage}></Route>
+
                         <Route
                           path="/logout"
                           render={() => {

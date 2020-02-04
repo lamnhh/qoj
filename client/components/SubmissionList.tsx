@@ -1,7 +1,6 @@
 import React from "react";
 import Submission from "../models/Submission";
 import SubmissionListItem from "./SubmissionListItem";
-import WSContext from "../contexts/WSContext";
 import { requestWithHeaders } from "../helpers/request";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import qs from "querystring";
@@ -114,15 +113,15 @@ class SubmissionList extends React.Component<
             <th>Execution time</th>
             <th>Memory</th>
           </tr>
-          <WSContext.Provider value={{ socket: this.socket }}>
-            {submissionList.map(function(submission) {
-              return (
-                <SubmissionListItem
-                  key={submission.id}
-                  submission={submission}></SubmissionListItem>
-              );
-            })}
-          </WSContext.Provider>
+          {submissionList.map(submission => {
+            return (
+              <SubmissionListItem
+                key={submission.id}
+                submission={submission}
+                socket={this.socket}
+              />
+            );
+          })}
         </table>
         <Pagination
           totalCount={this.state.submissionCount}

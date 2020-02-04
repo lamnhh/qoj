@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState, ReactElement } from "react";
+import React, { useEffect, useState, ReactElement } from "react";
 import moment from "moment";
 import Submission from "../models/Submission";
-import WSContext from "../contexts/WSContext";
 import WSMessage from "../models/WSMessage";
 import ScoreBar from "./ScoreBar";
 import { Link } from "react-router-dom";
 
 interface SubmissionListItemProps {
   submission: Submission;
+  socket?: WebSocket;
 }
 
 function parseSubmissionStatus(status: string): ReactElement {
@@ -23,8 +23,7 @@ function parseSubmissionStatus(status: string): ReactElement {
   return <span className="status status-running">{display}</span>;
 }
 
-function SubmissionListItem({ submission }: SubmissionListItemProps) {
-  let { socket } = useContext(WSContext);
+function SubmissionListItem({ submission, socket }: SubmissionListItemProps) {
   let [status, setStatus] = useState("");
 
   useEffect(
@@ -36,6 +35,10 @@ function SubmissionListItem({ submission }: SubmissionListItemProps) {
 
   useEffect(
     function() {
+      if (!socket) {
+        return;
+      }
+
       function updateStatus(event: MessageEvent) {
         let json: WSMessage = JSON.parse(event.data);
         if (json.submissionId === submission.id) {
@@ -61,14 +64,15 @@ function SubmissionListItem({ submission }: SubmissionListItemProps) {
         socket.removeEventListener("message", updateStatus);
       };
     },
-    [submission.id]
+    [submission.id, socket]
   );
 
   let isFinished = status.split("/").length === 2;
-
   return (
     <tr>
-      <td className="id">{submission.id}</td>
+      <td className="id">
+        <Link to={"/submission/" + submission.id}>{submission.id}</Link>
+      </td>
       <td className="date">
         {moment(submission.createdAt).format("YYYY-MM-DD hh:mm:ss")}
       </td>

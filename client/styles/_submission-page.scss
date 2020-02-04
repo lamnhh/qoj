@@ -1,0 +1,27 @@
+.submission-page {
+  padding-top: 3rem;
+}
+
+.submission-page__compile-msg {
+  border: 0.1rem solid #ccc;
+  border-radius: 0.5rem;
+  margin-top: 2rem;
+  overflow: hidden;
+
+  h2 {
+    background-color: #f5f5f5;
+    border-bottom: 0.1rem solid #ccc;
+    color: #333;
+    font-size: 1.6rem;
+    font-weight: normal;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0.8rem 1.6rem;
+  }
+  pre {
+    font-family: monospace;
+    font-size: 1.6rem;
+    margin: 0;
+    padding: 1.6rem;
+  }
+}

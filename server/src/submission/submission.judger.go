@@ -65,7 +65,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 		cmd,
 	).CombinedOutput()
 
-	result := result2.ParseResultFromString(string(output), tmpOutPath, outPath)
+	result := result2.ParseResultFromString(string(output), outPath, tmpOutPath)
 	_ = result2.UpdateResult(submissionId, testList[testId].Id, result)
 
 	queue.Push(queue.Task{
@@ -101,7 +101,9 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	tok := strings.Split(cmd, " ")
 
 	compileOutput, err := exec.Command(tok[0], tok[1:]...).CombinedOutput()
-	_ = updateCompilationMessage(submissionId, string(compileOutput))
+	if err := updateCompilationMessage(submissionId, string(compileOutput)); err != nil {
+		fmt.Println(err)
+	}
 
 	if err != nil {
 		// Compile error

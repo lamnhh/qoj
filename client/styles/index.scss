@@ -38,10 +38,26 @@ body {
   grid-column: 1;
 }
 
+.CodeMirror {
+  border: 0.1rem solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1.6rem;
+  height: auto;
+  overflow: hidden;
+}
+
+.CodeMirror * {
+  font-family: monospace;
+}
+
+.CodeMirror-cursors {
+  visibility: hidden !important;
+}
+
 @import "./header";
 @import "./problemset";
 @import "./footer";
-@import "./submission";
+@import "./submission-list";
 @import "./table";
 @import "./problem-page";
 @import "./submit-form";
@@ -51,3 +67,6 @@ body {
 @import "./user-page";
 @import "./settings-page";
 @import "./my-tabview";
+@import "./status-page";
+@import "./submission-page";
+@import "./test-result";

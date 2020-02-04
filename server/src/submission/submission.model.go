@@ -25,6 +25,7 @@ type Submission struct {
 	MemoryUsed    int       `json:"memoryUsed"`
 	LanguageId    int       `json:"languageId"`
 	Language      string    `json:"language"`
+	Code          string    `json:"code,omitempty"`
 }
 
 func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
@@ -50,12 +51,13 @@ func parseSubmissionFromRow(rows *sql.Rows) (Submission, error) {
 	return submission, nil
 }
 
-func createSubmission(username string, problemId int, languageId int) (Submission, error) {
+func createSubmission(username string, problemId int, languageId int, code string) (Submission, error) {
 	rows, err := config.DB.Query(
-		"INSERT INTO submissions(username, problem_id, language_id) VALUES ($1, $2, $3) RETURNING id",
+		"INSERT INTO submissions(username, problem_id, language_id, code) VALUES ($1, $2, $3, $4) RETURNING id",
 		username,
 		problemId,
 		languageId,
+		code,
 	)
 	if err != nil {
 		return Submission{}, err
@@ -65,15 +67,27 @@ func createSubmission(username string, problemId int, languageId int) (Submissio
 	for rows.Next() {
 		_ = rows.Scan(&submissionId)
 	}
-	return fetchSubmissionById(submissionId)
+	return FetchSubmissionById(submissionId)
 }
 
 func updateCompilationMessage(submissionId int, msg string) error {
-	_, err := config.DB.Exec("UPDATE submissions SET compile_msg = $1 WHERE submission_id = $2", msg, submissionId)
+	_, err := config.DB.Exec("UPDATE submissions SET compile_msg = $1 WHERE id = $2", msg, submissionId)
 	return err
 }
 
-func fetchSubmissionById(submissionId int) (Submission, error) {
+func fetchCode(submissionId int) (string, error) {
+	code := ""
+	err := config.DB.QueryRow("SELECT code FROM submissions WHERE id = $1", submissionId).Scan(&code)
+	return code, err
+}
+
+func fetchCompilationMessage(submissionId int) (string, error) {
+	msg := ""
+	err := config.DB.QueryRow("SELECT compile_msg FROM submissions WHERE id = $1", submissionId).Scan(&msg)
+	return msg, err
+}
+
+func FetchSubmissionById(submissionId int) (Submission, error) {
 	rows, err := config.DB.Query(
 		`SELECT
 			submissions.id,
@@ -107,8 +121,12 @@ func fetchSubmissionById(submissionId int) (Submission, error) {
 	if err != nil {
 		return Submission{}, err
 	}
-	rows.Next()
-	return parseSubmissionFromRow(rows)
+
+	var ans Submission
+	for rows.Next() {
+		ans, _ = parseSubmissionFromRow(rows)
+	}
+	return ans, nil
 }
 
 func CountSubmission(filters map[string]interface{}) (int, error) {

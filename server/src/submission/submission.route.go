@@ -1,6 +1,7 @@
 package submission
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"qoj/server/src/common"
@@ -61,7 +62,7 @@ func postSubmission(ctx *gin.Context) {
 	}
 
 	// Create submission entry in database
-	submission, err := createSubmission(username, body.ProblemId, body.LanguageId)
+	submission, err := createSubmission(username, body.ProblemId, body.LanguageId, body.Code)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -113,6 +114,26 @@ func getSubmission(ctx *gin.Context) {
 	}
 }
 
+func getSubmissionId(ctx *gin.Context) {
+	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission ID"})
+		return
+	}
+	submissionId := int(submissionId64)
+
+	submission, err := FetchSubmissionById(submissionId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Submission #%d does not exist", submissionId)})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+	} else {
+		ctx.JSON(http.StatusOK, submission)
+	}
+}
+
 func getSubmissionIdResult(ctx *gin.Context) {
 	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
 	if err != nil {
@@ -129,8 +150,43 @@ func getSubmissionIdResult(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resultList)
 }
 
+func getSubmissionIdCode(ctx *gin.Context) {
+	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission ID"})
+		return
+	}
+	submissionId := int(submissionId64)
+
+	code, err := fetchCode(submissionId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"code": code})
+	}
+}
+
+func getSubmissionIdCompile(ctx *gin.Context) {
+	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission ID"})
+		return
+	}
+	submissionId := int(submissionId64)
+
+	msg, err := fetchCompilationMessage(submissionId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"compileMessage": msg})
+	}
+}
+
 func InitialiseSubmissionRoutes(app *gin.Engine) {
 	app.GET("/api/submission", getSubmission)
+	app.GET("/api/submission/:id", getSubmissionId)
 	app.POST("/api/submission", token.RequireAuth(), postSubmission)
 	app.GET("/api/submission/:id/result", getSubmissionIdResult)
+	app.GET("/api/submission/:id/code", getSubmissionIdCode)
+	app.GET("/api/submission/:id/compile", getSubmissionIdCompile)
 }
