@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import SubmissionListItem from "../components/SubmissionListItem";
 import Submission from "../models/Submission";
 import request from "../helpers/request";
-import CodeMirror from "codemirror";
+import CodeMirror, { EditorFromTextArea } from "codemirror";
 import ResultList from "../components/ResultList";
 
 interface SubmissionPageRouterProps {
@@ -17,6 +17,7 @@ function SubmissionPage() {
   let [compileMessage, setCompileMessage] = useState("");
 
   let codeRef = useRef(null);
+  let editor = useRef<EditorFromTextArea | null>(null);
 
   useEffect(
     function() {
@@ -31,18 +32,21 @@ function SubmissionPage() {
     [submissionId]
   );
 
+  useEffect(function() {
+    editor.current = CodeMirror.fromTextArea(codeRef.current!, {
+      lineNumbers: true,
+      readOnly: "nocursor",
+      mode: "text/x-c++src"
+    });
+  }, []);
+
   useEffect(
     function() {
-      if (!codeRef.current) {
-        return;
+      if (editor.current) {
+        editor.current.setValue(code);
       }
-      CodeMirror.fromTextArea(codeRef.current!, {
-        lineNumbers: true,
-        readOnly: "nocursor",
-        mode: "text/x-c++src"
-      }).setValue(code);
     },
-    [code, codeRef.current]
+    [code, editor.current]
   );
 
   return (
@@ -50,31 +54,29 @@ function SubmissionPage() {
       <header className="page-name align-left-right">
         <h1>Submission #{submissionId}</h1>
       </header>
-      {submission && (
-        <section className="submission-page align-left-right">
-          <table className="submission-list my-table">
-            <tr className="my-table__header">
-              <th className="id">#</th>
-              <th className="date">Submission time</th>
-              <th>Handle</th>
-              <th>Problem</th>
-              <th>Language</th>
-              <th className="status-cell">Result</th>
-              <th>Execution time</th>
-              <th>Memory</th>
-            </tr>
-            <SubmissionListItem submission={submission} />
-          </table>
-          <textarea ref={codeRef}></textarea>
-          {compileMessage.length > 0 && (
-            <div className="submission-page__compile-msg">
-              <h2>Compilation message</h2>
-              <pre>{compileMessage}</pre>
-            </div>
-          )}
-          <ResultList submissionId={submissionId} />
-        </section>
-      )}
+      <section className="submission-page align-left-right">
+        <table className="submission-list my-table">
+          <tr className="my-table__header">
+            <th className="id">#</th>
+            <th className="date">Submission time</th>
+            <th>Handle</th>
+            <th>Problem</th>
+            <th>Language</th>
+            <th className="status-cell">Result</th>
+            <th>Execution time</th>
+            <th>Memory</th>
+          </tr>
+          {submission && <SubmissionListItem submission={submission} />}
+        </table>
+        <textarea ref={codeRef}></textarea>
+        {compileMessage.length > 0 && (
+          <div className="submission-page__compile-msg">
+            <h2>Compilation message</h2>
+            <pre>{compileMessage}</pre>
+          </div>
+        )}
+        <ResultList submissionId={submissionId} />
+      </section>
     </>
   );
 }

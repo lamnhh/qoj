@@ -13,9 +13,14 @@ func GetFilePreview(path string) (string, error) {
 		return "", err
 	}
 
-	buf := make([]byte, PREVIEW_SIZE)
+	buf := make([]byte, PREVIEW_SIZE + 1)
 	n, err := f.Read(buf)
-	return string(buf[:n]), nil
+
+	ans := string(buf[:n])
+	if len(ans) > PREVIEW_SIZE {
+		ans = ans[:(PREVIEW_SIZE - 3)] + "..."
+	}
+	return ans, nil
 }
 
 func generateSingleValue(problemId int, order int, inputPreview string, outputPreview string) (string, []interface{}) {

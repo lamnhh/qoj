@@ -67,11 +67,16 @@ function SubmissionListItem({ submission, socket }: SubmissionListItemProps) {
     [submission.id, socket]
   );
 
-  let isFinished = status.split("/").length === 2;
+  let isFinished =
+    status.split("/").length === 2 || status.split("|")[0] === "Compile Error";
   return (
     <tr>
       <td className="id">
-        <Link to={"/submission/" + submission.id}>{submission.id}</Link>
+        {isFinished ? (
+          <Link to={"/submission/" + submission.id}>{submission.id}</Link>
+        ) : (
+          submission.id
+        )}
       </td>
       <td className="date">
         {moment(submission.createdAt).format("YYYY-MM-DD hh:mm:ss")}

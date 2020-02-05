@@ -9,7 +9,7 @@ function ResultListItem({ result, index }: { result: Result; index: number }) {
       <div className="test-result__body">
         <p className="test-result__metadata">
           <h4>
-            <strong>Time:</strong> {result.executionTime} ms
+            <strong>Time:</strong> {Math.floor(result.executionTime * 1000)} ms
           </h4>
           .{" "}
           <h4>
