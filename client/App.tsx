@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
-import SubmissionPage from "./pages/SubmissionPage";
+import StatusPage from "./pages/StatusPage";
 import ProblemsetPage from "./pages/ProblemsetPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -16,6 +16,7 @@ import "./styles/index.scss";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
+import SubmissionPage from "./pages/SubmissionPage";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
@@ -72,16 +73,48 @@ function App() {
                           path="/"
                           exact
                           component={ProblemsetPage}></Route>
-                        <Route
-                          path="/status"
-                          component={SubmissionPage}></Route>
+                        <Route path="/status" component={StatusPage}></Route>
                         <Route path="/login" component={LoginPage}></Route>
                         <Route
                           path="/register"
                           component={RegisterPage}></Route>
+
                         <Route
+                          exact
                           path="/problem/:problemId"
-                          component={ProblemPage}></Route>
+                          render={props => (
+                            <ProblemPage tab={0} {...props}></ProblemPage>
+                          )}
+                        />
+                        <Route
+                          path="/problem/:problemId/submit"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return (
+                              <ProblemPage tab={1} {...props}></ProblemPage>
+                            );
+                          }}
+                        />
+                        <Route
+                          path="/problem/:problemId/my"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return (
+                              <ProblemPage tab={2} {...props}></ProblemPage>
+                            );
+                          }}
+                        />
+                        <Route
+                          path="/problem/:problemId/status"
+                          render={props => (
+                            <ProblemPage tab={3} {...props}></ProblemPage>
+                          )}
+                        />
+
                         <Route
                           path="/user/:username"
                           component={UserPage}></Route>
@@ -95,6 +128,11 @@ function App() {
                           render={function(props) {
                             return <SettingsPage tab={1} {...props} />;
                           }}></Route>
+
+                        <Route
+                          path="/submission/:submissionId"
+                          component={SubmissionPage}></Route>
+
                         <Route
                           path="/logout"
                           render={() => {

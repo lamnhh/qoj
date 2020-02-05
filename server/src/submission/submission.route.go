@@ -1,17 +1,18 @@
 package submission
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"qoj/server/src/common"
+	"qoj/server/src/language"
 	problem2 "qoj/server/src/problem"
+	"qoj/server/src/result"
 	"qoj/server/src/token"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
-
-var submissionCount int
 
 func submissionHandler(submissionId int) {
 	for {
@@ -31,47 +32,49 @@ func submissionHandler(submissionId int) {
 }
 
 func postSubmission(ctx *gin.Context) {
-	// Request must be a form-data
+	username := ctx.GetString("username")
+	body := CodeSubmission{}
 
-	// Parse current username
-	usernameInterface, _ := ctx.Get("username")
-	username := usernameInterface.(string)
-
-	// Parse problemId
-	problemIdInt64, err := strconv.ParseInt(ctx.PostForm("problemId"), 10, 16)
-	if err != nil {
+	// Parse JSON body
+	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	problemId := int(problemIdInt64)
 
-	// Parse solution file
-	file, err := ctx.FormFile("file")
+	// Validate code length (<= 50000B)
+	if len(body.Code) > 50000 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Solution file exceeds 50000B"})
+		return
+	}
+
+	// Check if problemId exists
+	problem, err := problem2.FetchProblemById(body.ProblemId, "")
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if languageId exists
+	lang, err := language.FetchLanguageById(body.LanguageId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Create submission entry in database
-	submission, err := createSubmission(username, problemId)
+	submission, err := createSubmission(username, body.ProblemId, body.LanguageId, body.Code)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	submissionId := submission.Id
 
-	problem, err := problem2.FetchProblemById(problemId, "")
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
 	// Initialise judge channel for this particular submission
 	judges[submissionId] = make(chan interface{})
 	listenerList[submissionId] = &ListenerList{}
 	go submissionHandler(submissionId)
 
-	_ = judge(submissionId, problem, file)
+	_ = judge(submissionId, body.Code, problem, lang)
 	ctx.JSON(http.StatusOK, gin.H{
 		"submissionId": submissionId,
 	})
@@ -111,6 +114,26 @@ func getSubmission(ctx *gin.Context) {
 	}
 }
 
+func getSubmissionId(ctx *gin.Context) {
+	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission ID"})
+		return
+	}
+	submissionId := int(submissionId64)
+
+	submission, err := FetchSubmissionById(submissionId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Submission #%d does not exist", submissionId)})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+	} else {
+		ctx.JSON(http.StatusOK, submission)
+	}
+}
+
 func getSubmissionIdResult(ctx *gin.Context) {
 	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
 	if err != nil {
@@ -119,7 +142,7 @@ func getSubmissionIdResult(ctx *gin.Context) {
 	}
 	submissionId := int(submissionId64)
 
-	resultList, err := getSubmissionResults(submissionId)
+	resultList, err := result.GetResultsOfSubmission(submissionId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -127,10 +150,43 @@ func getSubmissionIdResult(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resultList)
 }
 
-func InitialiseSubmissionRoutes(app *gin.Engine) {
-	submissionCount = 0
+func getSubmissionIdCode(ctx *gin.Context) {
+	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission ID"})
+		return
+	}
+	submissionId := int(submissionId64)
 
+	code, err := fetchCode(submissionId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"code": code})
+	}
+}
+
+func getSubmissionIdCompile(ctx *gin.Context) {
+	submissionId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission ID"})
+		return
+	}
+	submissionId := int(submissionId64)
+
+	msg, err := fetchCompilationMessage(submissionId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"compileMessage": msg})
+	}
+}
+
+func InitialiseSubmissionRoutes(app *gin.Engine) {
 	app.GET("/api/submission", getSubmission)
+	app.GET("/api/submission/:id", getSubmissionId)
 	app.POST("/api/submission", token.RequireAuth(), postSubmission)
 	app.GET("/api/submission/:id/result", getSubmissionIdResult)
+	app.GET("/api/submission/:id/code", getSubmissionIdCode)
+	app.GET("/api/submission/:id/compile", getSubmissionIdCompile)
 }

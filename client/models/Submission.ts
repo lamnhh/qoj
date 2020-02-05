@@ -5,6 +5,10 @@ interface Submission {
   problemName: string;
   createdAt: Date;
   status: string;
+  executionTime: number;
+  memoryUsed: number;
+  languageId: number;
+  language: string;
 }
 
 export default Submission;

@@ -1,7 +1,8 @@
 let path = require("path");
 let webpack = require("webpack");
 
-let mode = process.env.NODE_ENV === "development" ? "development" : "production";
+let mode =
+  process.env.NODE_ENV === "development" ? "development" : "production";
 
 module.exports = {
   plugins: [
@@ -50,6 +51,7 @@ module.exports = {
   // dependencies, which allows browsers to cache those libraries between builds.
   externals: {
     react: "React",
-    "react-dom": "ReactDOM"
+    "react-dom": "ReactDOM",
+    codemirror: "CodeMirror"
   }
 };

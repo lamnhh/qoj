@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState, ReactElement } from "react";
+import React, { useEffect, useState, ReactElement } from "react";
 import moment from "moment";
 import Submission from "../models/Submission";
-import WSContext from "../contexts/WSContext";
 import WSMessage from "../models/WSMessage";
 import ScoreBar from "./ScoreBar";
 import { Link } from "react-router-dom";
 
 interface SubmissionListItemProps {
   submission: Submission;
+  socket?: WebSocket;
 }
 
 function parseSubmissionStatus(status: string): ReactElement {
@@ -23,23 +23,26 @@ function parseSubmissionStatus(status: string): ReactElement {
   return <span className="status status-running">{display}</span>;
 }
 
-function SubmissionListItem({ submission }: SubmissionListItemProps) {
-  let { socket } = useContext(WSContext);
-  let [status, setStatus] = useState<ReactElement>(<></>);
+function SubmissionListItem({ submission, socket }: SubmissionListItemProps) {
+  let [status, setStatus] = useState("");
 
   useEffect(
     function() {
-      setStatus(parseSubmissionStatus(submission.status));
+      setStatus(submission.status);
     },
     [submission.status]
   );
 
   useEffect(
     function() {
+      if (!socket) {
+        return;
+      }
+
       function updateStatus(event: MessageEvent) {
         let json: WSMessage = JSON.parse(event.data);
         if (json.submissionId === submission.id) {
-          setStatus(parseSubmissionStatus(json.message));
+          setStatus(json.message);
         }
       }
 
@@ -61,12 +64,20 @@ function SubmissionListItem({ submission }: SubmissionListItemProps) {
         socket.removeEventListener("message", updateStatus);
       };
     },
-    [submission.id]
+    [submission.id, socket]
   );
 
+  let isFinished =
+    status.split("/").length === 2 || status.split("|")[0] === "Compile Error";
   return (
     <tr>
-      <td className="id">{submission.id}</td>
+      <td className="id">
+        {isFinished ? (
+          <Link to={"/submission/" + submission.id}>{submission.id}</Link>
+        ) : (
+          submission.id
+        )}
+      </td>
       <td className="date">
         {moment(submission.createdAt).format("YYYY-MM-DD hh:mm:ss")}
       </td>
@@ -78,8 +89,10 @@ function SubmissionListItem({ submission }: SubmissionListItemProps) {
           {submission.problemId} - {submission.problemName}
         </Link>
       </td>
-      <td>C++17</td>
-      <td className="status-cell">{status}</td>
+      <td>{submission.language}</td>
+      <td className="status-cell">{parseSubmissionStatus(status)}</td>
+      <td>{isFinished ? Math.floor(submission.executionTime * 1000) : 0} ms</td>
+      <td>{isFinished ? submission.memoryUsed : 0} KB</td>
     </tr>
   );
 }

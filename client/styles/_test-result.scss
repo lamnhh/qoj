@@ -1,0 +1,53 @@
+.test-result {
+  border: 0.1rem solid #ccc;
+  border-radius: 0.5rem;
+  margin-top: 2rem;
+}
+
+.test-result__header {
+  border-bottom: 0.1rem solid #ccc;
+  color: $theme;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin: 0;
+  padding: 0.8rem;
+}
+
+.test-result__body {
+  padding: 0.8rem;
+  * {
+    font-family: monospace;
+  }
+}
+
+.test-result__metadata {
+  font-size: 1.6rem;
+  margin: 0;
+  h4 {
+    display: inline-block;
+    font-weight: normal;
+    margin: 0;
+  }
+}
+
+.test-result__verdict {
+  font-size: 1.6rem;
+  margin: 0.8rem 0;
+  &.green {
+    color: green;
+  }
+  &.red {
+    color: red;
+  }
+}
+
+.test-result__preview {
+  font-size: 1.6rem;
+  margin: 0.8rem 0 0;
+}
+
+.test-result pre {
+  background-color: #ddd;
+  font-size: 1.4rem;
+  margin: 0;
+}

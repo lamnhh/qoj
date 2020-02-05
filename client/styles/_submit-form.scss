@@ -2,32 +2,29 @@
   width: 80rem;
 }
 
-.submit-form label {
+.submit-form > label {
   display: block;
-  span {
-    display: block;
-  }
-  input,
-  textarea,
-  select {
-    display: block;
-    width: 100%;
-  }
 }
 
-.submit-form label + label {
-  margin-top: 1rem;
-}
-
-.submit-form span {
+.submit-form__field-name {
   color: #555;
+  display: block;
   font-size: 1.4rem;
   line-height: 1.5;
   padding: 0.8rem 0;
 }
 
-.submit-form textarea,
-.submit-form select {
+.submit-form__input {
+  display: block;
+  width: 100%;
+}
+
+.submit-form > label + label {
+  margin-top: 1rem;
+}
+
+textarea.submit-form__input,
+select.submit-form__input {
   background-color: #fff;
   border: 0.1rem solid #bbb;
   border-radius: 0.6rem;
@@ -40,16 +37,16 @@
   }
 }
 
-.submit-form select {
+select.submit-form__input {
   font-size: 1.6rem;
 }
 
-.submit-form textarea {
+textarea.submit-form__input {
   font-family: monospace;
   min-height: 32rem;
 }
 
-.submit-form button {
+.submit-form__submit-btn {
   background-color: #fff;
   border: 0.1rem solid #ccc;
   border-radius: 0.5rem;
@@ -63,4 +60,8 @@
   &:hover {
     background-color: #eee;
   }
+}
+
+.submit-form .CodeMirror-scroll {
+  min-height: 30rem;
 }
