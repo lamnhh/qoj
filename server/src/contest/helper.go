@@ -6,16 +6,8 @@ import (
 	"qoj/server/src/problem"
 )
 
-func int64toInt(a []int64) []int {
-	b := make([]int, 0)
-	for _, x := range a {
-		b = append(b, int(x))
-	}
-	return b
-}
-
-func parseSingleContest(row *sql.Row, username string) (SpecifiedContest, error) {
-	contest := SpecifiedContest{}
+func parseSingleContest(row *sql.Row, username string) (SingleContest, error) {
+	contest := SingleContest{}
 	ids64 := make([]int64, 0)
 	err := row.Scan(&contest.Id, &contest.Name, pq.Array(&ids64), &contest.StartDate, &contest.Duration)
 	if err != nil {
@@ -30,12 +22,15 @@ func parseSingleContest(row *sql.Row, username string) (SpecifiedContest, error)
 	return contest, err
 }
 
-func parseMultipleContests(rows *sql.Rows) (Contest, error) {
-	contest := Contest{}
-	ids := make([]int64, 0)
-	err := rows.Scan(&contest.Id, &contest.Name, pq.Array(&ids), &contest.StartDate, &contest.Duration)
-	if err == nil {
-		contest.ProblemList = int64toInt(ids)
-	}
+func parseMultipleContests(rows *sql.Rows) (MultipleContest, error) {
+	contest := MultipleContest{}
+	err := rows.Scan(
+		&contest.Id,
+		&contest.Name,
+		&contest.StartDate,
+		&contest.Duration,
+		&contest.NumberOfParticipants,
+		&contest.IsRegistered,
+	)
 	return contest, err
 }

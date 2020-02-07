@@ -17,6 +17,7 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
 import SubmissionPage from "./pages/SubmissionPage";
+import ContestPage from "./pages/ContestPage";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
@@ -128,6 +129,11 @@ function App() {
                           render={function(props) {
                             return <SettingsPage tab={1} {...props} />;
                           }}></Route>
+
+                        <Route
+                          path="/contest"
+                          exact
+                          component={ContestPage}></Route>
 
                         <Route
                           path="/submission/:submissionId"

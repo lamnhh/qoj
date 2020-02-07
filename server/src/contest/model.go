@@ -22,7 +22,13 @@ type Contest struct {
 	ProblemList []int     `json:"problemList" binding:"required"`
 }
 
-type SpecifiedContest struct {
+type MultipleContest struct {
+	BaseContest
+	NumberOfParticipants int  `json:"numberOfParticipants"`
+	IsRegistered         bool `json:"isRegistered"`
+}
+
+type SingleContest struct {
 	BaseContest
 	ProblemList []problem.Problem `json:"problemList" binding:"required"`
 }
@@ -37,28 +43,33 @@ func createContest(contest Contest) (Contest, error) {
 	return contest, err
 }
 
-func fetchAllContests() ([]Contest, error) {
+func fetchAllContests() ([]MultipleContest, error) {
 	cmd := `
 	SELECT 
 		contests.id,
 		RTRIM(contests.name),
-		array_agg(problems.id) as problem_list,
 		contests.start_date,
-		contests.duration
+		contests.duration,
+		COUNT(username) as participants,
+		MAX(CASE
+			WHEN username = 'lamnhh' THEN 1 ELSE 0
+		END) as is_registered
 	FROM
 		contests
-		JOIN problems ON contests.id = problems.contest_id
+		LEFT JOIN contest_registrations ON (contests.id = contest_registrations.contest_id)
 	GROUP BY
 		contests.id,
 		contests.name,
 		contests.start_date,
-		contests.duration`
+		contests.duration
+	ORDER BY
+		contests.start_date ASC;`
 	rows, err := config.DB.Query(cmd)
 	if err != nil {
 		return nil, err
 	}
 
-	contestList := make([]Contest, 0)
+	contestList := make([]MultipleContest, 0)
 	for rows.Next() {
 		contest, err := parseMultipleContests(rows)
 		if err == nil {
@@ -69,7 +80,7 @@ func fetchAllContests() ([]Contest, error) {
 	return contestList, nil
 }
 
-func fetchContestById(contestId int, username string) (SpecifiedContest, error) {
+func fetchContestById(contestId int, username string) (SingleContest, error) {
 	cmd := `
 	SELECT 
 		contests.id,

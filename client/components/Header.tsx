@@ -31,7 +31,7 @@ function Header() {
           <ul>
             <MainNavItem path="/" label="Problemset" />
             <MainNavItem path="/status" label="Submission" />
-            <MainNavItem path="/contests" label="Contests" />
+            <MainNavItem path="/contest" label="Contests" />
           </ul>
         </nav>
       </div>

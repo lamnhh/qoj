@@ -1,0 +1,40 @@
+.contest-page {
+  padding-top: 3rem;
+  .my-table {
+    width: 100%;
+  }
+  th,
+  td {
+    text-align: center;
+  }
+  tr {
+    height: 6rem !important;
+  }
+}
+
+.contest-page .contest-column {
+  width: 35%;
+}
+
+.contest-page td.contest-column {
+  color: $theme;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.contest-page .join-btn {
+  background-color: #d5d5d5;
+  border: 0.1rem #aaa;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 1.2rem 2rem;
+  &:focus,
+  &:hover {
+    background-color: lighten(#d5d5d5, 5%);
+  }
+}
+
+.contest-page .register-state {
+  color: $theme;
+  font-weight: bold;
+}
