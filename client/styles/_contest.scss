@@ -1,12 +1,14 @@
 .contest-page {
   padding-top: 3rem;
-  .my-table {
-    width: 100%;
-  }
+  text-align: center;
   th,
   td {
     text-align: center;
   }
+}
+
+.contest-page .contest-table {
+  width: 100%;
   tr {
     height: 6rem !important;
   }
@@ -37,4 +39,9 @@
 .contest-page .register-state {
   color: $theme;
   font-weight: bold;
+}
+
+.contest-page .participant-table {
+  display: inline-table;
+  width: 50%;
 }
