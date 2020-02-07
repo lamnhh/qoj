@@ -155,3 +155,39 @@ BEGIN
         s.id, s.code, s.name, s.tl, s.ml, s.max_score;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION create_contest(
+	_name 			CHARACTER(100),
+	_problem_ids 	INT[],
+	_start_date 	TIMESTAMP,
+	_duration		INT
+)
+RETURNS INT
+AS $$
+DECLARE
+	_contest_id		INT;
+BEGIN
+	INSERT INTO
+		contests(name, start_date, duration)
+	VALUES
+		(_name, _start_date, _duration)
+	RETURNING
+		id INTO _contest_id;
+
+	INSERT INTO
+		problems(code, name, tl, ml, original_id, contest_id)
+	SELECT
+		code,
+		name,
+		tl,
+		ml,
+		problems.id as original_id,
+		_contest_id as contest_id
+	FROM
+		problems
+	WHERE
+		problems.id = ANY(_problem_ids);
+
+	RETURN _contest_id;
+END;
+$$LANGUAGE plpgsql;
