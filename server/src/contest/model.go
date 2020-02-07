@@ -84,3 +84,25 @@ func fetchContestById(contestId int) (Contest, error) {
 	}
 	return contest, err
 }
+
+func joinContest(contestId int, username string) error {
+	_, err := config.DB.Exec("INSERT INTO contest_registrations VALUES ($1, $2)", contestId, username)
+	return err
+}
+
+func fetchParticipantList(contestId int) ([]string, error) {
+	cmd := "SELECT RTRIM(username) FROM contest_registrations WHERE contest_id = $1 ORDER BY username;"
+	rows, err := config.DB.Query(cmd, contestId)
+	if err != nil {
+		return []string{}, err
+	}
+
+	participantList := make([]string, 0)
+	for rows.Next() {
+		participant := ""
+		if err := rows.Scan(&participant); err == nil {
+			participantList = append(participantList, participant)
+		}
+	}
+	return participantList, nil
+}

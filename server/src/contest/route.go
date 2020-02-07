@@ -47,8 +47,42 @@ func postContest(ctx *gin.Context) {
 	}
 }
 
+func postContestIdRegister(ctx *gin.Context) {
+	username := ctx.GetString("username")
+	contestId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid contest ID"})
+		return
+	}
+	contestId := int(contestId64)
+
+	if err := joinContest(contestId, username); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{})
+	}
+}
+
+func getContestIdParticipant(ctx *gin.Context) {
+	contestId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid contest ID"})
+		return
+	}
+	contestId := int(contestId64)
+
+	participantList, err := fetchParticipantList(contestId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, participantList)
+	}
+}
+
 func InitialiseContestRoutes(app *gin.Engine) {
 	app.GET("/api/contest", getContest)
 	app.GET("/api/contest/:id", getContestId)
 	app.POST("/api/contest", token.RequireAuth(), postContest)
+	app.POST("/api/contest/:id/register", token.RequireAuth(), postContestIdRegister)
+	app.GET("/api/contest/:id/participant", getContestIdParticipant)
 }
