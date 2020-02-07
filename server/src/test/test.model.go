@@ -54,7 +54,18 @@ func CreateTests(problemId int, tmpInputPath []string, tmpOutputPath []string) (
 }
 
 func FetchAllTests(problemId int) ([]Test, error) {
-	rows, err := config.DB.Query("SELECT * FROM tests WHERE problem_id = $1 ORDER BY ord ASC", problemId)
+	// &test.Id, &test.ProblemId, &test.Order, &test.InputPreview, &test.OutputPreview
+	cmd := `
+	SELECT
+		tests.id, tests.problem_id, tests.ord, tests.inp_preview, tests.out_preview
+	FROM
+		tests
+		JOIN problems ON (tests.problem_id = problems.original_id)
+	WHERE
+		problems.id = $1
+	ORDER BY 
+		ord ASC`
+	rows, err := config.DB.Query(cmd, problemId)
 	if err != nil {
 		return []Test{}, err
 	}

@@ -12,7 +12,7 @@ interface SubmissionListQuery extends qs.ParsedUrlQuery {
 }
 
 interface SubmissionListProps extends RouteComponentProps {
-  params: Array<[string, string]>;
+  params: Array<[string, string | string[]]>;
 }
 
 interface SubmissionListState {

@@ -21,6 +21,11 @@ import ContestListPage from "./pages/ContestListPage";
 import ContestParticipantsPage from "./pages/ContestParticipantsPage";
 import ContestPage from "./pages/ContestPage";
 
+// Initialise moment-duration
+let moment = require("moment");
+let momentDuration = require("moment-duration-format");
+momentDuration(moment);
+
 function App() {
   let [user, setUser] = useState<User | null>(null);
   let [loading, setLoading] = useState(true);

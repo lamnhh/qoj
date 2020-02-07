@@ -135,7 +135,11 @@ func CountSubmission(filters map[string]interface{}) (int, error) {
 	count := 0
 	for k, v := range filters {
 		count++
-		keyList = append(keyList, fmt.Sprintf("%s = $%d", k, count))
+		if k != "problem_id" {
+			keyList = append(keyList, fmt.Sprintf("%s = ($%d)", k, count))
+		} else {
+			keyList = append(keyList, fmt.Sprintf("%s = ANY($%d)", k, count))
+		}
 		valList = append(valList, v)
 	}
 
@@ -165,7 +169,11 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 	count := 0
 	for k, v := range filters {
 		count++
-		keyList = append(keyList, fmt.Sprintf("%s = $%d", k, count))
+		if k != "problem_id" {
+			keyList = append(keyList, fmt.Sprintf("%s = ($%d)", k, count))
+		} else {
+			keyList = append(keyList, fmt.Sprintf("%s = ANY($%d)", k, count))
+		}
 		valList = append(valList, v)
 	}
 

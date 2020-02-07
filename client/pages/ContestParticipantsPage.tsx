@@ -30,7 +30,7 @@ function ContestParticipantsPage() {
       <header className="page-name align-left-right">
         <h1>Registrants for {contest?.name}</h1>
       </header>
-      <section className="contest-page align-left-right">
+      <section className="contest-list-page align-left-right">
         <table className="participant-table my-table full-border">
           <tr className="my-table__header">
             <th>#</th>

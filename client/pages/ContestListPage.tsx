@@ -15,7 +15,7 @@ function ContestListPage() {
       <header className="page-name align-left-right">
         <h1>Contests</h1>
       </header>
-      <section className="contest-page align-left-right">
+      <section className="contest-list-page align-left-right">
         <table className="contest-table my-table full-border">
           <tr className="my-table__header">
             <th className="contest-column">Contest</th>

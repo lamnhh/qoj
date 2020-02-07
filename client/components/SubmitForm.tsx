@@ -10,13 +10,15 @@ import { useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Language from "../models/Language";
 import CodeMirror, { EditorFromTextArea } from "codemirror";
+import Problem from "../models/Problem";
 
 interface FormElements extends HTMLFormElement {
   languageId: HTMLSelectElement;
+  problemId: HTMLSelectElement | HTMLInputElement;
   file: HTMLInputElement;
 }
 
-function SubmitForm({ problemId }: { problemId: string }) {
+function SubmitForm({ problemList }: { problemList: Array<Problem> }) {
   let history = useHistory();
   let codeRef = useRef<HTMLTextAreaElement>(null);
   let editor = useRef<EditorFromTextArea | null>(null);
@@ -33,27 +35,25 @@ function SubmitForm({ problemId }: { problemId: string }) {
     request("/api/language").then(setLanguagelist);
   }, []);
 
-  let handleSubmit = useCallback(
-    function(event: FormEvent<HTMLFormElement>) {
-      event.preventDefault();
-      let form = event.target as FormElements;
-      let code = editor.current!.getValue();
-      let languageId = parseInt(form.languageId.value);
+  let handleSubmit = useCallback(function(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    let form = event.target as FormElements;
+    let code = editor.current!.getValue();
+    let languageId = parseInt(form.languageId.value);
+    let problemId = parseInt(form.problemId.value);
 
-      request("/api/submission", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          problemId: parseInt(problemId),
-          languageId,
-          code
-        })
-      }).then(function() {
-        history.push("/status");
-      });
-    },
-    [problemId]
-  );
+    request("/api/submission", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        problemId,
+        languageId,
+        code
+      })
+    }).then(function() {
+      history.push("/status");
+    });
+  }, []);
 
   let onFileUpload = useCallback(function(e: ChangeEvent) {
     let element = e.target as HTMLInputElement;
@@ -91,6 +91,25 @@ function SubmitForm({ problemId }: { problemId: string }) {
           })}
         </select>
       </label>
+      {problemList.length === 1 ? (
+        <input type="hidden" name="problemId" value={problemList[0].id}></input>
+      ) : (
+        <label>
+          <span className="submit-form__field-name">Problem</span>
+          <select
+            className="submit-form__input"
+            name="problemId"
+            placeholder="Choose problem">
+            {problemList.map(function(problem, idx) {
+              return (
+                <option key={problem.id} value={problem.id}>
+                  {String.fromCharCode("A".charCodeAt(0) + idx)}. {problem.name}
+                </option>
+              );
+            })}
+          </select>
+        </label>
+      )}
       <label>
         <span className="submit-form__field-name">Source code</span>
         <textarea className="submit-form__input" ref={codeRef}></textarea>

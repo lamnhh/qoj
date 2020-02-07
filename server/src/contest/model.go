@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"qoj/server/config"
+	"qoj/server/src/problem"
 	"time"
 )
 
@@ -12,6 +14,7 @@ type Contest struct {
 	Id                   int       `json:"id"`
 	Name                 string    `json:"name" binding:"required"`
 	StartDate            time.Time `json:"startDate" binding:"required"`
+	ProblemList          []int     `json:"problemList,omitempty" binding:"required"`
 	Duration             int       `json:"duration" binding:"required"`
 	NumberOfParticipants int       `json:"numberOfParticipants"`
 	IsRegistered         bool      `json:"isRegistered"`
@@ -22,7 +25,7 @@ type Contest struct {
 func createContest(contest Contest) (Contest, error) {
 	cmd := `SELECT * FROM create_contest($1, $2, $3, $4)`
 	err := config.DB.
-		QueryRow(cmd, contest.Name, contest.StartDate, contest.Duration).
+		QueryRow(cmd, contest.Name, pq.Array(contest.ProblemList), contest.StartDate, contest.Duration).
 		Scan(&contest.Id)
 	return contest, err
 }
@@ -113,4 +116,21 @@ func fetchParticipantList(contestId int) ([]string, error) {
 		}
 	}
 	return participantList, nil
+}
+
+func fetchProblemList(contestId int, username string) ([]problem.Problem, error) {
+	rows, err := config.DB.Query("SELECT id FROM problems WHERE contest_id = $1 ORDER BY id ASC", contestId)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := make([]int, 0)
+	for rows.Next() {
+		id := 0
+		if err := rows.Scan(&id); err == nil {
+			ids = append(ids, id)
+		}
+	}
+
+	return problem.FetchProblemByIds(ids, username)
 }

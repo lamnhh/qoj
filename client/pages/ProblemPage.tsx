@@ -106,14 +106,14 @@ function ProblemPage({ tab }: ProblemPageProps) {
             </table>
           </TabPanel>
           <TabPanel>
-            <SubmitForm problemId={problemId}></SubmitForm>
+            <SubmitForm problemList={[problem]}></SubmitForm>
           </TabPanel>
           <TabPanel>
             {user && (
               <SubmissionList
                 params={[
                   ["problemId", String(problemId)],
-                  ["username", user!.username]
+                  ["username", user.username]
                 ]}
               />
             )}

@@ -80,10 +80,28 @@ func getContestIdParticipant(ctx *gin.Context) {
 	}
 }
 
+func getContestIdProblem(ctx *gin.Context) {
+	contestId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid contest ID"})
+		return
+	}
+	contestId := int(contestId64)
+	username := ctx.GetString("username")
+
+	problemList, err := fetchProblemList(contestId, username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, problemList)
+	}
+}
+
 func InitialiseContestRoutes(app *gin.Engine) {
 	app.GET("/api/contest", token.ParseAuth(), getContest)
 	app.GET("/api/contest/:id", token.ParseAuth(), getContestId)
 	app.POST("/api/contest", token.RequireAuth(), postContest)
 	app.POST("/api/contest/:id/register", token.RequireAuth(), postContestIdRegister)
 	app.GET("/api/contest/:id/participant", getContestIdParticipant)
+	app.GET("/api/contest/:id/problem", token.ParseAuth(), getContestIdProblem)
 }
