@@ -1,9 +1,9 @@
 package problem
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"qoj/server/config"
 	"strconv"
 	"strings"
@@ -58,20 +58,10 @@ func FetchAllProblems(username string, page int, size int) ([]Problem, int, erro
 
 	problemList := make([]Problem, 0)
 	for rows.Next() {
-		var problem Problem
-		if err := rows.Scan(
-			&problem.Id,
-			&problem.Code,
-			&problem.Name,
-			&problem.TimeLimit,
-			&problem.MemoryLimit,
-			&problem.MaxScore,
-			&problem.TestCount,
-		); err != nil {
-			return []Problem{}, 0, err
+		problem, err := parseProblemFromRows(rows)
+		if err == nil {
+			problemList = append(problemList, problem)
 		}
-		normaliseProblem(&problem)
-		problemList = append(problemList, problem)
 	}
 
 	problemCount := 0
@@ -81,28 +71,31 @@ func FetchAllProblems(username string, page int, size int) ([]Problem, int, erro
 }
 
 func FetchProblemById(problemId int, username string) (Problem, error) {
-	var problem Problem
-	err := config.DB.QueryRow("SELECT * FROM get_problem_by_id($1, $2)", problemId, username).
-		Scan(
-			&problem.Id,
-			&problem.Code,
-			&problem.Name,
-			&problem.TimeLimit,
-			&problem.MemoryLimit,
-			&problem.MaxScore,
-			&problem.TestCount,
-		)
+	problemList, err := FetchProblemByIds([]int{problemId}, username)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			// rows.Next() means no rows was returned. In other words, no problem with such ID exists
-			return Problem{}, errors.New(fmt.Sprintf("No problem with ID %d exists", problemId))
-		} else {
-			return Problem{}, err
+		return Problem{}, err
+	}
+	if len(problemList) == 0 {
+		return Problem{}, errors.New(fmt.Sprintf("Problem #%d does not exist", problemId))
+	}
+	return problemList[0], nil
+}
+
+func FetchProblemByIds(problemIds []int, username string) ([]Problem, error) {
+	rows, err := config.DB.Query("SELECT * FROM get_problem_by_ids($1, $2)", pq.Array(problemIds), username)
+	if err != nil {
+		return []Problem{}, err
+	}
+
+	problemList := make([]Problem, 0)
+	for rows.Next() {
+		problem, err := parseProblemFromRows(rows)
+		if err == nil {
+			problemList = append(problemList, problem)
 		}
 	}
 
-	normaliseProblem(&problem)
-	return problem, nil
+	return problemList, nil
 }
 
 func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, error) {
