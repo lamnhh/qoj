@@ -6,15 +6,25 @@ import (
 	"fmt"
 	"github.com/lib/pq"
 	"qoj/server/config"
+	"qoj/server/src/problem"
 	"time"
 )
 
-type Contest struct {
+type BaseContest struct {
 	Id          int       `json:"id"`
 	Name        string    `json:"name" binding:"required"`
-	ProblemList []int     `json:"problemList" binding:"required"`
 	StartDate   time.Time `json:"startDate" binding:"required"`
 	Duration    int       `json:"duration" binding:"required"`
+}
+
+type Contest struct {
+	BaseContest
+	ProblemList []int     `json:"problemList" binding:"required"`
+}
+
+type SpecifiedContest struct {
+	BaseContest
+	ProblemList []problem.Problem `json:"problemList" binding:"required"`
 }
 
 // createContest receives a `contest` which contains name, problemList, startDate and duration
@@ -50,7 +60,7 @@ func fetchAllContests() ([]Contest, error) {
 
 	contestList := make([]Contest, 0)
 	for rows.Next() {
-		contest, err := parseContestFromSqlRows(rows)
+		contest, err := parseMultipleContests(rows)
 		if err == nil {
 			contestList = append(contestList, contest)
 		}
@@ -59,7 +69,7 @@ func fetchAllContests() ([]Contest, error) {
 	return contestList, nil
 }
 
-func fetchContestById(contestId int) (Contest, error) {
+func fetchContestById(contestId int, username string) (SpecifiedContest, error) {
 	cmd := `
 	SELECT 
 		contests.id,
@@ -78,7 +88,7 @@ func fetchContestById(contestId int) (Contest, error) {
 		contests.start_date,
 		contests.duration`
 
-	contest, err := parseContestFromSqlRow(config.DB.QueryRow(cmd, contestId))
+	contest, err := parseSingleContest(config.DB.QueryRow(cmd, contestId), username)
 	if err == sql.ErrNoRows {
 		err = errors.New(fmt.Sprintf("Contest #%d does not exist", contestId))
 	}

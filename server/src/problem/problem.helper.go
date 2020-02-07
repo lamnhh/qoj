@@ -2,6 +2,7 @@ package problem
 
 import (
 	"archive/zip"
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -111,4 +112,21 @@ func unzip(src string, dest string) ([]string, error) {
 func normaliseProblem(problem *Problem) {
 	problem.Code = strings.TrimSpace(problem.Code)
 	problem.Name = strings.TrimSpace(problem.Name)
+}
+
+func parseProblemFromRows(rows *sql.Rows) (Problem, error) {
+	problem := Problem{}
+	if err := rows.Scan(
+		&problem.Id,
+		&problem.Code,
+		&problem.Name,
+		&problem.TimeLimit,
+		&problem.MemoryLimit,
+		&problem.MaxScore,
+		&problem.TestCount,
+	); err != nil {
+		return problem, err
+	}
+	normaliseProblem(&problem)
+	return problem, nil
 }
