@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from "react";
-import MultipleContest from "../models/MultipleContest";
+import { useParams } from "react-router-dom";
 import request from "../helpers/request";
-import ContestItem from "../components/ContestItem";
+import Contest from "../models/Contest";
+
+interface ContestPageRouterProps {
+  contestId: string;
+}
 
 function ContestPage() {
-  let [contestList, setContestList] = useState<Array<MultipleContest>>([]);
-
-  useEffect(function() {
-    request("/api/contest").then(setContestList);
-  }, []);
+  let contestId = useParams<ContestPageRouterProps>().contestId;
+  let [contest, setContest] = useState<Contest | null>(null);
+  useEffect(
+    function() {
+      request(`/api/contest/${contestId}`).then(setContest);
+    },
+    [contestId]
+  );
 
   return (
     <>
       <header className="page-name align-left-right">
-        <h1>Contests</h1>
+        <h1>Contest {contest?.name}</h1>
       </header>
-      <section className="contest-page align-left-right">
-        <table className="contest-table my-table full-border">
-          <tr className="my-table__header">
-            <th className="contest-column">Contest</th>
-            <th>Start</th>
-            <th>Duration</th>
-            <th>Participants</th>
-            <th></th>
-          </tr>
-          {contestList.map(function(contest) {
-            return <ContestItem key={contest.id} contest={contest} />;
-          })}
-        </table>
-      </section>
     </>
   );
 }

@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
-import MultipleContest from "../models/MultipleContest";
 import moment from "moment";
 import { Link, useHistory } from "react-router-dom";
 import request from "../helpers/request";
+import Contest from "../models/Contest";
 
-function ContestItem({ contest }: { contest: MultipleContest }) {
+function ContestItem({ contest }: { contest: Contest }) {
   let ms = moment.duration(contest.duration, "minutes").asMilliseconds();
   let duration = moment.utc(ms).format("HH:mm");
   let history = useHistory();
@@ -24,7 +24,9 @@ function ContestItem({ contest }: { contest: MultipleContest }) {
 
   return (
     <tr>
-      <td className="contest-column">{contest.name}</td>
+      <td className="contest-column">
+        <Link to={`/contest/${contest.id}`}>{contest.name}</Link>
+      </td>
       <td>{moment(contest.startDate).format("MMM/DD/YYYY, HH:mm")}</td>
       <td>{duration}</td>
       <td>

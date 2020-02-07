@@ -8,7 +8,7 @@ import (
 )
 
 func getContest(ctx *gin.Context) {
-	contestList, err := fetchAllContests()
+	contestList, err := fetchAllContests(ctx.GetString("username"))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
@@ -81,7 +81,7 @@ func getContestIdParticipant(ctx *gin.Context) {
 }
 
 func InitialiseContestRoutes(app *gin.Engine) {
-	app.GET("/api/contest", getContest)
+	app.GET("/api/contest", token.ParseAuth(), getContest)
 	app.GET("/api/contest/:id", token.ParseAuth(), getContestId)
 	app.POST("/api/contest", token.RequireAuth(), postContest)
 	app.POST("/api/contest/:id/register", token.RequireAuth(), postContestIdRegister)

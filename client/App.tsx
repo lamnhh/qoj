@@ -17,8 +17,9 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
 import SubmissionPage from "./pages/SubmissionPage";
-import ContestPage from "./pages/ContestPage";
+import ContestListPage from "./pages/ContestListPage";
 import ContestParticipantsPage from "./pages/ContestParticipantsPage";
+import ContestPage from "./pages/ContestPage";
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
@@ -133,6 +134,10 @@ function App() {
 
                         <Route
                           path="/contest"
+                          exact
+                          component={ContestListPage}></Route>
+                        <Route
+                          path="/contest/:contestId"
                           exact
                           component={ContestPage}></Route>
                         <Route
