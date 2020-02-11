@@ -10,7 +10,7 @@
 .contest-list-page .contest-table {
   width: 100%;
   tr {
-    height: 6rem !important;
+    height: 6rem;
   }
 }
 
@@ -44,4 +44,11 @@
 .contest-list-page .participant-table {
   display: inline-table;
   width: 50%;
+}
+
+.contest-list-page th,
+.contest-list-page td {
+  &.action {
+    width: 25rem;
+  }
 }

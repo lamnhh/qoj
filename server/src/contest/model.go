@@ -50,7 +50,7 @@ func fetchAllContests(username string) ([]Contest, error) {
 		contests.start_date,
 		contests.duration
 	ORDER BY
-		contests.start_date ASC;`
+		contests.start_date DESC;`
 	rows, err := config.DB.Query(cmd, username)
 	if err != nil {
 		return nil, err

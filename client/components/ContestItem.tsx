@@ -34,7 +34,7 @@ function ContestItem({ contest }: { contest: Contest }) {
           <i className="fa fa-user"></i> {contest.numberOfParticipants}
         </Link>
       </td>
-      <td>
+      <td className="action">
         {!contest.isRegistered ? (
           <button type="button" className="join-btn" onClick={onJoin}>
             Join Contest
