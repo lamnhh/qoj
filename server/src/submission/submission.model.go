@@ -223,8 +223,6 @@ func FetchSubmissionList(filters map[string]interface{}, allowInContest bool, pa
 		created_at DESC
 	OFFSET %d LIMIT %d`, whereClause, page * size, size)
 
-	fmt.Println(sql)
-
 	rows, err := config.DB.Query(sql, valList...)
 	if err != nil {
 		return []Submission{}, err

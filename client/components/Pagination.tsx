@@ -1,18 +1,12 @@
 import React from "react";
 import { range } from "../helpers/common-helper";
+import PaginationProps from "../models/PaginationProps";
 
 interface PaginationButtonProps {
   page: number | string;
   active: boolean;
   disabled?: boolean;
   onClick: () => void;
-}
-
-interface PaginationProps {
-  totalCount: number;
-  pageSize: number;
-  currentPage: number;
-  onPageChange: (page: number) => void;
 }
 
 function PaginationButton({

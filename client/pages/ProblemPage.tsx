@@ -2,11 +2,12 @@ import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useParams, RouteComponentProps, useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Problem, { emptyProblem } from "../models/Problem";
-import SubmissionList from "../components/SubmissionList";
+import SubmissionList from "../components/SubmissionListWrapper";
 import AppContext from "../contexts/AppContext";
 import ScoreBar from "../components/ScoreBar";
 import SubmitForm from "../components/SubmitForm";
 import { Tabs, TabList, TabPanel, Tab } from "react-tabs";
+import SubmissionListWrapper from "../components/SubmissionListWrapper";
 
 interface ProblemPageProps extends RouteComponentProps {
   tab: number;
@@ -119,7 +120,9 @@ function ProblemPage({ tab }: ProblemPageProps) {
             )}
           </TabPanel>
           <TabPanel>
-            <SubmissionList params={[["problemId", String(problemId)]]} />
+            <SubmissionListWrapper
+              params={[["problemId", String(problemId)]]}
+            />
           </TabPanel>
         </Tabs>
       </section>

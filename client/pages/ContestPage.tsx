@@ -8,8 +8,8 @@ import moment from "moment";
 import Problem from "../models/Problem";
 import ContestProblemList from "../components/ContestProblemList";
 import SubmitForm from "../components/SubmitForm";
-import SubmissionList from "../components/SubmissionList";
 import AppContext from "../contexts/AppContext";
+import SubmissionListWrapper from "../components/SubmissionListWrapper";
 
 interface ContestPageProps extends RouteComponentProps {
   tab: number;
@@ -108,7 +108,7 @@ function ContestPage({ tab }: ContestPageProps) {
           </TabPanel>
           <TabPanel>
             {user && (
-              <SubmissionList
+              <SubmissionListWrapper
                 params={[
                   ["problemId", problemList.map(({ id }) => String(id))],
                   ["username", user.username]
@@ -117,7 +117,7 @@ function ContestPage({ tab }: ContestPageProps) {
             )}
           </TabPanel>
           <TabPanel>
-            <SubmissionList
+            <SubmissionListWrapper
               params={[["problemId", problemList.map(({ id }) => String(id))]]}
             />
           </TabPanel>
