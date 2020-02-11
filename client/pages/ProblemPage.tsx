@@ -106,7 +106,7 @@ function ProblemPage({ tab }: ProblemPageProps) {
             </table>
           </TabPanel>
           <TabPanel>
-            <SubmitForm problemList={[problem]}></SubmitForm>
+            <SubmitForm problemList={[problem]} redirectUrl="/status" />
           </TabPanel>
           <TabPanel>
             {user && (

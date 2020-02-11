@@ -101,7 +101,10 @@ function ContestPage({ tab }: ContestPageProps) {
             <ContestProblemList problemList={problemList}></ContestProblemList>
           </TabPanel>
           <TabPanel>
-            <SubmitForm problemList={problemList}></SubmitForm>
+            <SubmitForm
+              problemList={problemList}
+              redirectUrl={`/contest/${contestId}/my`}
+            />
           </TabPanel>
           <TabPanel>
             {user && (

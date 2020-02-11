@@ -18,7 +18,13 @@ interface FormElements extends HTMLFormElement {
   file: HTMLInputElement;
 }
 
-function SubmitForm({ problemList }: { problemList: Array<Problem> }) {
+function SubmitForm({
+  problemList,
+  redirectUrl
+}: {
+  problemList: Array<Problem>;
+  redirectUrl: string;
+}) {
   let history = useHistory();
   let codeRef = useRef<HTMLTextAreaElement>(null);
   let editor = useRef<EditorFromTextArea | null>(null);
@@ -35,25 +41,28 @@ function SubmitForm({ problemList }: { problemList: Array<Problem> }) {
     request("/api/language").then(setLanguagelist);
   }, []);
 
-  let handleSubmit = useCallback(function(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    let form = event.target as FormElements;
-    let code = editor.current!.getValue();
-    let languageId = parseInt(form.languageId.value);
-    let problemId = parseInt(form.problemId.value);
+  let handleSubmit = useCallback(
+    function(event: FormEvent<HTMLFormElement>) {
+      event.preventDefault();
+      let form = event.target as FormElements;
+      let code = editor.current!.getValue();
+      let languageId = parseInt(form.languageId.value);
+      let problemId = parseInt(form.problemId.value);
 
-    request("/api/submission", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        problemId,
-        languageId,
-        code
-      })
-    }).then(function() {
-      history.push("/status");
-    });
-  }, []);
+      request("/api/submission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          problemId,
+          languageId,
+          code
+        })
+      }).then(function() {
+        history.push(redirectUrl);
+      });
+    },
+    [redirectUrl]
+  );
 
   let onFileUpload = useCallback(function(e: ChangeEvent) {
     let element = e.target as HTMLInputElement;
