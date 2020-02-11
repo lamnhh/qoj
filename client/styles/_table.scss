@@ -53,6 +53,10 @@
   td + td {
     border-left: 0.1rem solid #ddd;
   }
+  th,
+  td {
+    padding-left: 1rem;
+  }
 }
 
 .my-table + .my-table {

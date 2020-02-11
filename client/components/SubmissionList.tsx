@@ -5,19 +5,28 @@ import PaginationProps from "../models/PaginationProps";
 import Pagination from "./Pagination";
 
 interface SubmissionListProps {
+  title?: string;
+  borderStyle?: string;
   socket: WebSocket;
   submissionList: Array<Submission>;
-  paginationProps: PaginationProps;
+  paginationProps: PaginationProps | null;
 }
 
 function SubmissionList({
+  title,
+  borderStyle = "striped",
   socket,
   paginationProps,
   submissionList
 }: SubmissionListProps) {
   return (
     <div className="submission-list--wrapper">
-      <table className="submission-list my-table striped">
+      <table className={`submission-list my-table ${borderStyle}`}>
+        {typeof title !== "undefined" && (
+          <tr className="my-table__title">
+            <th colSpan={8}>{title}</th>
+          </tr>
+        )}
         <tr className="my-table__header">
           <th className="id">#</th>
           <th className="date">Submission time</th>
@@ -38,7 +47,7 @@ function SubmissionList({
           );
         })}
       </table>
-      <Pagination {...paginationProps} />
+      {paginationProps !== null && <Pagination {...paginationProps} />}
     </div>
   );
 }

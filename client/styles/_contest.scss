@@ -5,3 +5,8 @@
 .contest-page .problem-list {
   width: 100%;
 }
+
+.contest-page .submission-list--wrapper:first-child .submission-list {
+  margin-top: 3rem;
+  margin-bottom: 3rem !important;
+}

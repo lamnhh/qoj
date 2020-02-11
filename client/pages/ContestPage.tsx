@@ -10,6 +10,7 @@ import ContestProblemList from "../components/ContestProblemList";
 import SubmitForm from "../components/SubmitForm";
 import AppContext from "../contexts/AppContext";
 import SubmissionListWrapper from "../components/SubmissionListWrapper";
+import ContestMySubmission from "../components/ContestMySubmission";
 
 interface ContestPageProps extends RouteComponentProps {
   tab: number;
@@ -30,7 +31,7 @@ function ContestPage({ tab }: ContestPageProps) {
     [contestId]
   );
 
-  let [problemList, setProblemList] = useState<Array<Problem>>([]);
+  let [problemList, setProblemList] = useState<Array<Problem> | null>(null);
   useEffect(
     function() {
       request(`/api/contest/${contestId}/problem`).then(setProblemList);
@@ -68,7 +69,7 @@ function ContestPage({ tab }: ContestPageProps) {
     [contestId, history, tab]
   );
 
-  if (contest === null) {
+  if (contest === null || problemList === null) {
     return null;
   }
 
@@ -108,11 +109,10 @@ function ContestPage({ tab }: ContestPageProps) {
           </TabPanel>
           <TabPanel>
             {user && (
-              <SubmissionListWrapper
-                params={[
-                  ["problemId", problemList.map(({ id }) => String(id))],
-                  ["username", user.username]
-                ]}
+              <ContestMySubmission
+                problemList={problemList}
+                username={user.username}
+                contest={contest}
               />
             )}
           </TabPanel>

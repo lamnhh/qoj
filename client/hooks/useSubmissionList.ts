@@ -4,19 +4,32 @@ import { useLocation, useHistory } from "react-router-dom";
 import qs from "querystring";
 import Submission from "../models/Submission";
 import { requestWithHeaders } from "../helpers/request";
+import PaginationProps from "../models/PaginationProps";
 
 interface HookProps {
   params: Array<[string, string | string[]]>;
+  pageSize?: number;
+}
+
+interface HookResult {
+  submissionList: Array<Submission>;
+  paginationProps: PaginationProps | null;
+  socket: WebSocket;
+  loading: boolean;
 }
 
 interface SubmissionListQuery extends qs.ParsedUrlQuery {
   page: string;
 }
 
-const PAGE_SIZE = 15;
-
-function useSubmissionList({ params }: HookProps) {
-  let [socket] = useState<WebSocket>(new WebSocket("ws://localhost:3000/ws"));
+/**
+ * Use pageSize = -1 to fetch all submissions
+ * @param param0
+ */
+function useSubmissionList({ params, pageSize = 15 }: HookProps): HookResult {
+  let [socket] = useState<WebSocket>(function() {
+    return new WebSocket("ws://localhost:3000/ws");
+  });
   let [loading, setLoading] = useState(true);
   useEffect(function() {
     socket.onopen = function() {
@@ -49,7 +62,7 @@ function useSubmissionList({ params }: HookProps) {
         "/api/submission",
         params.concat([
           ["page", String(page)],
-          ["size", String(PAGE_SIZE)]
+          ["size", String(pageSize)]
         ])
       );
       requestWithHeaders(url).then(
@@ -75,12 +88,15 @@ function useSubmissionList({ params }: HookProps) {
 
   return {
     submissionList,
-    paginationProps: {
-      onPageChange,
-      currentPage: page,
-      totalCount: submissionCount,
-      pageSize: PAGE_SIZE
-    },
+    paginationProps:
+      pageSize === -1
+        ? null
+        : {
+            onPageChange,
+            currentPage: page,
+            totalCount: submissionCount,
+            pageSize
+          },
     socket,
     loading
   };
