@@ -8,7 +8,7 @@ function StatusPage() {
         <h1>Submission Status</h1>
       </header>
       <section className="align-left-right status-page">
-        <SubmissionList params={[]}></SubmissionList>
+        <SubmissionList params={[["allowInContest", "false"]]}></SubmissionList>
       </section>
     </>
   );

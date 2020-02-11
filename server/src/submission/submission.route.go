@@ -101,15 +101,20 @@ func getSubmission(ctx *gin.Context) {
 		filters["username"] = val
 	}
 
+	allowInContest := true
+	if val := ctx.Query("allowInContest"); val == "false" {
+		allowInContest = false
+	}
+
 	page := common.ParseQueryInt(ctx, "page", 1) - 1
 	size := common.ParseQueryInt(ctx, "size", 20)
-	submissionList, err := FetchSubmissionList(filters, page, size)
+	submissionList, err := FetchSubmissionList(filters, allowInContest, page, size)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	count, err := CountSubmission(filters)
+	count, err := CountSubmission(filters, allowInContest)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

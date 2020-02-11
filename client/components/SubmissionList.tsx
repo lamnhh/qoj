@@ -88,6 +88,9 @@ class SubmissionList extends React.Component<
     if (prevState.page !== this.state.page) {
       this.fetchSubmissionList();
     }
+    if (prevProps.params !== this.props.params) {
+      this.fetchSubmissionList();
+    }
   }
 
   componentWillUnmount() {

@@ -129,7 +129,7 @@ func FetchSubmissionById(submissionId int) (Submission, error) {
 	return ans, nil
 }
 
-func CountSubmission(filters map[string]interface{}) (int, error) {
+func CountSubmission(filters map[string]interface{}, allowInContest bool) (int, error) {
 	keyList := make([]string, 0)
 	valList := make([]interface{}, 0)
 	count := 0
@@ -141,6 +141,10 @@ func CountSubmission(filters map[string]interface{}) (int, error) {
 			keyList = append(keyList, fmt.Sprintf("%s = ANY($%d)", k, count))
 		}
 		valList = append(valList, v)
+	}
+
+	if allowInContest == false {
+		keyList = append(keyList, "problems.contest_id IS NULL")
 	}
 
 	var whereClause string
@@ -163,7 +167,7 @@ func CountSubmission(filters map[string]interface{}) (int, error) {
 	return ans, err
 }
 
-func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]Submission, error) {
+func FetchSubmissionList(filters map[string]interface{}, allowInContest bool, page int, size int) ([]Submission, error) {
 	keyList := make([]string, 0)
 	valList := make([]interface{}, 0)
 	count := 0
@@ -175,6 +179,10 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 			keyList = append(keyList, fmt.Sprintf("%s = ANY($%d)", k, count))
 		}
 		valList = append(valList, v)
+	}
+
+	if allowInContest == false {
+		keyList = append(keyList, "problems.contest_id IS NULL")
 	}
 
 	var whereClause string
@@ -214,6 +222,8 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 	ORDER BY
 		created_at DESC
 	OFFSET %d LIMIT %d`, whereClause, page * size, size)
+
+	fmt.Println(sql)
 
 	rows, err := config.DB.Query(sql, valList...)
 	if err != nil {
