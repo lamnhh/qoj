@@ -3,6 +3,7 @@ package submission
 import (
 	"database/sql"
 	"fmt"
+	"github.com/lib/pq"
 	"net/http"
 	"qoj/server/src/common"
 	"qoj/server/src/language"
@@ -83,28 +84,37 @@ func postSubmission(ctx *gin.Context) {
 func getSubmission(ctx *gin.Context) {
 	filters := make(map[string]interface{})
 
-	if val := ctx.Query("problemId"); val != "" {
-		problemId, err := strconv.ParseInt(val, 10, 16)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
-			return
+	if val := ctx.QueryArray("problemId"); len(val) != 0 {
+		problemIds := make([]int, 0)
+		for _, id := range val {
+			problemId, err := strconv.ParseInt(id, 10, 16)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid problem ID"})
+				return
+			}
+			problemIds = append(problemIds, int(problemId))
 		}
-		filters["problem_id"] = int(problemId)
+		filters["problem_id"] = pq.Array(problemIds)
 	}
 
 	if val := ctx.Query("username"); val != "" {
 		filters["username"] = val
 	}
 
+	allowInContest := true
+	if val := ctx.Query("allowInContest"); val == "false" {
+		allowInContest = false
+	}
+
 	page := common.ParseQueryInt(ctx, "page", 1) - 1
 	size := common.ParseQueryInt(ctx, "size", 20)
-	submissionList, err := FetchSubmissionList(filters, page, size)
+	submissionList, err := FetchSubmissionList(filters, allowInContest, page, size)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	count, err := CountSubmission(filters)
+	count, err := CountSubmission(filters, allowInContest)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

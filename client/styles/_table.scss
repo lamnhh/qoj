@@ -46,3 +46,35 @@
     background-color: lighten(#f5f5f5, 1%);
   }
 }
+
+.my-table.full-border {
+  border: 0.1rem solid #ddd;
+  th + th,
+  td + td {
+    border-left: 0.1rem solid #ddd;
+  }
+  th,
+  td {
+    padding-left: 1rem;
+  }
+}
+
+.my-table + .my-table {
+  margin-top: 6rem;
+}
+
+.my-table__title {
+  background-color: #eee;
+  color: #666;
+  height: unset !important;
+}
+
+.my-table__title td,
+.my-table__title th {
+  border-bottom: 0.2rem solid #ddd;
+  font-size: 1.8rem;
+  font-weight: bold;
+  height: 4rem;
+  padding-left: 1.4rem;
+  text-align: left !important;
+}

@@ -10,21 +10,14 @@ import (
 	"time"
 )
 
-type BaseContest struct {
-	Id          int       `json:"id"`
-	Name        string    `json:"name" binding:"required"`
-	StartDate   time.Time `json:"startDate" binding:"required"`
-	Duration    int       `json:"duration" binding:"required"`
-}
-
 type Contest struct {
-	BaseContest
-	ProblemList []int     `json:"problemList" binding:"required"`
-}
-
-type SpecifiedContest struct {
-	BaseContest
-	ProblemList []problem.Problem `json:"problemList" binding:"required"`
+	Id                   int       `json:"id"`
+	Name                 string    `json:"name" binding:"required"`
+	StartDate            time.Time `json:"startDate" binding:"required"`
+	ProblemList          []int     `json:"problemList,omitempty" binding:"required"`
+	Duration             int       `json:"duration" binding:"required"`
+	NumberOfParticipants int       `json:"numberOfParticipants"`
+	IsRegistered         bool      `json:"isRegistered"`
 }
 
 // createContest receives a `contest` which contains name, problemList, startDate and duration
@@ -37,30 +30,35 @@ func createContest(contest Contest) (Contest, error) {
 	return contest, err
 }
 
-func fetchAllContests() ([]Contest, error) {
+func fetchAllContests(username string) ([]Contest, error) {
 	cmd := `
 	SELECT 
 		contests.id,
 		RTRIM(contests.name),
-		array_agg(problems.id) as problem_list,
 		contests.start_date,
-		contests.duration
+		contests.duration,
+		COUNT(username) as participants,
+		MAX(CASE
+			WHEN username = $1 THEN 1 ELSE 0
+		END) as is_registered
 	FROM
 		contests
-		JOIN problems ON contests.id = problems.contest_id
+		LEFT JOIN contest_registrations ON (contests.id = contest_registrations.contest_id)
 	GROUP BY
 		contests.id,
 		contests.name,
 		contests.start_date,
-		contests.duration`
-	rows, err := config.DB.Query(cmd)
+		contests.duration
+	ORDER BY
+		contests.start_date DESC;`
+	rows, err := config.DB.Query(cmd, username)
 	if err != nil {
 		return nil, err
 	}
 
 	contestList := make([]Contest, 0)
 	for rows.Next() {
-		contest, err := parseMultipleContests(rows)
+		contest, err := parseContestFromRows(rows)
 		if err == nil {
 			contestList = append(contestList, contest)
 		}
@@ -69,17 +67,20 @@ func fetchAllContests() ([]Contest, error) {
 	return contestList, nil
 }
 
-func fetchContestById(contestId int, username string) (SpecifiedContest, error) {
+func fetchContestById(contestId int, username string) (Contest, error) {
 	cmd := `
 	SELECT 
 		contests.id,
 		RTRIM(contests.name),
-		array_agg(problems.id) as problem_list,
 		contests.start_date,
-		contests.duration
+		contests.duration,
+		COUNT(username) as participants,
+		MAX(CASE
+			WHEN username = $2 THEN 1 ELSE 0
+		END) as is_registered
 	FROM
 		contests
-		JOIN problems ON contests.id = problems.contest_id
+		LEFT JOIN contest_registrations ON (contests.id = contest_registrations.contest_id)
 	WHERE
 		contests.id = $1
 	GROUP BY
@@ -88,7 +89,7 @@ func fetchContestById(contestId int, username string) (SpecifiedContest, error) 
 		contests.start_date,
 		contests.duration`
 
-	contest, err := parseSingleContest(config.DB.QueryRow(cmd, contestId), username)
+	contest, err := parseContestFromRow(config.DB.QueryRow(cmd, contestId, username))
 	if err == sql.ErrNoRows {
 		err = errors.New(fmt.Sprintf("Contest #%d does not exist", contestId))
 	}
@@ -115,4 +116,21 @@ func fetchParticipantList(contestId int) ([]string, error) {
 		}
 	}
 	return participantList, nil
+}
+
+func fetchProblemList(contestId int, username string) ([]problem.Problem, error) {
+	rows, err := config.DB.Query("SELECT id FROM problems WHERE contest_id = $1 ORDER BY id ASC", contestId)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := make([]int, 0)
+	for rows.Next() {
+		id := 0
+		if err := rows.Scan(&id); err == nil {
+			ids = append(ids, id)
+		}
+	}
+
+	return problem.FetchProblemByIds(ids, username)
 }

@@ -129,14 +129,22 @@ func FetchSubmissionById(submissionId int) (Submission, error) {
 	return ans, nil
 }
 
-func CountSubmission(filters map[string]interface{}) (int, error) {
+func CountSubmission(filters map[string]interface{}, allowInContest bool) (int, error) {
 	keyList := make([]string, 0)
 	valList := make([]interface{}, 0)
 	count := 0
 	for k, v := range filters {
 		count++
-		keyList = append(keyList, fmt.Sprintf("%s = $%d", k, count))
+		if k != "problem_id" {
+			keyList = append(keyList, fmt.Sprintf("%s = ($%d)", k, count))
+		} else {
+			keyList = append(keyList, fmt.Sprintf("%s = ANY($%d)", k, count))
+		}
 		valList = append(valList, v)
+	}
+
+	if allowInContest == false {
+		keyList = append(keyList, "problems.contest_id IS NULL")
 	}
 
 	var whereClause string
@@ -159,14 +167,22 @@ func CountSubmission(filters map[string]interface{}) (int, error) {
 	return ans, err
 }
 
-func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]Submission, error) {
+func FetchSubmissionList(filters map[string]interface{}, allowInContest bool, page int, size int) ([]Submission, error) {
 	keyList := make([]string, 0)
 	valList := make([]interface{}, 0)
 	count := 0
 	for k, v := range filters {
 		count++
-		keyList = append(keyList, fmt.Sprintf("%s = $%d", k, count))
+		if k != "problem_id" {
+			keyList = append(keyList, fmt.Sprintf("%s = ($%d)", k, count))
+		} else {
+			keyList = append(keyList, fmt.Sprintf("%s = ANY($%d)", k, count))
+		}
 		valList = append(valList, v)
+	}
+
+	if allowInContest == false {
+		keyList = append(keyList, "problems.contest_id IS NULL")
 	}
 
 	var whereClause string
@@ -176,7 +192,7 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 		whereClause = "WHERE " + strings.Join(keyList, " AND ")
 	}
 
-	sql := fmt.Sprintf(`
+	cmd := fmt.Sprintf(`
 	SELECT
 		submissions.id,
 		submissions.username,
@@ -187,7 +203,7 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 		COALESCE(MAX(execution_time), 0) as execution_time,
 		COALESCE(MAX(memory_used), 0) as memory_used,
 		languages.id,
-		languages.name
+		RTRIM(languages.name)
 	FROM
 		submissions
 		JOIN problems ON (submissions.problem_id = problems.id)
@@ -204,10 +220,13 @@ func FetchSubmissionList(filters map[string]interface{}, page int, size int) ([]
 		languages.id,
 		languages.name
 	ORDER BY
-		created_at DESC
-	OFFSET %d LIMIT %d`, whereClause, page * size, size)
+		created_at DESC`, whereClause)
 
-	rows, err := config.DB.Query(sql, valList...)
+	if size != -1 {
+		cmd = cmd + fmt.Sprintf(` OFFSET %d LIMIT %d`, page*size, size)
+	}
+
+	rows, err := config.DB.Query(cmd, valList...)
 	if err != nil {
 		return []Submission{}, err
 	}

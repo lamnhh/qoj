@@ -1,0 +1,54 @@
+.contest-list-page {
+  padding-top: 3rem;
+  text-align: center;
+  th,
+  td {
+    text-align: center;
+  }
+}
+
+.contest-list-page .contest-table {
+  width: 100%;
+  tr {
+    height: 6rem;
+  }
+}
+
+.contest-list-page .contest-column {
+  width: 35%;
+}
+
+.contest-list-page td.contest-column {
+  color: $theme;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.contest-list-page .join-btn {
+  background-color: #d5d5d5;
+  border: 0.1rem #aaa;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 1.2rem 2rem;
+  &:focus,
+  &:hover {
+    background-color: lighten(#d5d5d5, 5%);
+  }
+}
+
+.contest-list-page .register-state {
+  color: $theme;
+  font-weight: bold;
+}
+
+.contest-list-page .participant-table {
+  display: inline-table;
+  width: 50%;
+}
+
+.contest-list-page th,
+.contest-list-page td {
+  &.action {
+    width: 25rem;
+  }
+}

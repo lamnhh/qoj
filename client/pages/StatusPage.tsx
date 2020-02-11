@@ -1,5 +1,5 @@
 import React from "react";
-import SubmissionList from "../components/SubmissionList";
+import SubmissionListWrapper from "../components/SubmissionListWrapper";
 
 function StatusPage() {
   return (
@@ -8,7 +8,7 @@ function StatusPage() {
         <h1>Submission Status</h1>
       </header>
       <section className="align-left-right status-page">
-        <SubmissionList params={[]}></SubmissionList>
+        <SubmissionListWrapper params={[["allowInContest", "false"]]} />
       </section>
     </>
   );

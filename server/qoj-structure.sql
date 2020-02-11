@@ -29,7 +29,7 @@ CREATE TABLE submissions (
     id          SERIAL,
     username    CHARACTER(16),
     problem_id  INT,
-    created_at  TIMESTAMP DEFAULT NOW(),
+    created_at  TIMESTAMP DEFAULT (NOW() AT TIME ZONE 'utc'),
     status		TEXT DEFAULT 'In queue...',
     code        TEXT,
     compile_msg TEXT,

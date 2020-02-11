@@ -50,3 +50,14 @@
 .my-tab + .my-tab {
   margin-left: 0.4rem;
 }
+
+.my-tab.react-tabs__tab--disabled {
+  background-color: #ccc;
+  color: #000;
+  cursor: not-allowed;
+  &:focus,
+  &:hover {
+    background-color: #ccc !important;
+    color: #000 !important;
+  }
+}

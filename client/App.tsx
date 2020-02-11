@@ -17,6 +17,14 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
 import SubmissionPage from "./pages/SubmissionPage";
+import ContestListPage from "./pages/ContestListPage";
+import ContestParticipantsPage from "./pages/ContestParticipantsPage";
+import ContestPage from "./pages/ContestPage";
+
+// Initialise moment-duration
+let moment = require("moment");
+let momentDuration = require("moment-duration-format");
+momentDuration(moment);
 
 function App() {
   let [user, setUser] = useState<User | null>(null);
@@ -128,6 +136,48 @@ function App() {
                           render={function(props) {
                             return <SettingsPage tab={1} {...props} />;
                           }}></Route>
+
+                        <Route
+                          path="/contest"
+                          exact
+                          component={ContestListPage}></Route>
+                        <Route
+                          path="/contest/:contestId/participants"
+                          component={ContestParticipantsPage}></Route>
+
+                        <Route
+                          path="/contest/:contestId"
+                          exact
+                          render={props => (
+                            <ContestPage {...props} tab={0} />
+                          )}></Route>
+                        <Route
+                          path="/contest/:contestId/submit"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return <ContestPage {...props} tab={1} />;
+                          }}></Route>
+                        <Route
+                          path="/contest/:contestId/my"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return <ContestPage {...props} tab={2} />;
+                          }}></Route>
+                        <Route
+                          path="/contest/:contestId/status"
+                          render={props => (
+                            <ContestPage {...props} tab={3} />
+                          )}></Route>
+
+                        <Route
+                          path="/contest/:contestId/ranking"
+                          render={props => (
+                            <ContestPage {...props} tab={4} />
+                          )}></Route>
 
                         <Route
                           path="/submission/:submissionId"

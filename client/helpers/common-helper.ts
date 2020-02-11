@@ -14,8 +14,18 @@ function parsePage(page: string): number {
   return ans;
 }
 
-function buildURL(url: string, params: Array<[string, string]>) {
-  let paramString = params.map(([key, value]) => `${key}=${value}`).join("&");
+function buildURL(
+  url: string,
+  params: Array<[string, string | Array<string>]>
+) {
+  let paramString = params
+    .map(function([key, value]) {
+      if (Array.isArray(value)) {
+        return value.map(v => `${key}=${v}`).join("&");
+      }
+      return `${key}=${value}`;
+    })
+    .join("&");
   return url + "?" + paramString;
 }
 
