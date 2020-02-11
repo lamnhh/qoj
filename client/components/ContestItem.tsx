@@ -4,7 +4,13 @@ import { Link, useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Contest from "../models/Contest";
 
-function ContestItem({ contest }: { contest: Contest }) {
+function ContestItem({
+  contest,
+  showAction = true
+}: {
+  contest: Contest;
+  showAction?: boolean;
+}) {
   let ms = moment.duration(contest.duration, "minutes").asMilliseconds();
   let duration = moment.utc(ms).format("HH:mm");
   let history = useHistory();
@@ -35,13 +41,14 @@ function ContestItem({ contest }: { contest: Contest }) {
         </Link>
       </td>
       <td className="action">
-        {!contest.isRegistered ? (
-          <button type="button" className="join-btn" onClick={onJoin}>
-            Join Contest
-          </button>
-        ) : (
-          <span className="register-state">Registration completed</span>
-        )}
+        {showAction &&
+          (!contest.isRegistered ? (
+            <button type="button" className="join-btn" onClick={onJoin}>
+              Join Contest
+            </button>
+          ) : (
+            <span className="register-state">Registration completed</span>
+          ))}
       </td>
     </tr>
   );

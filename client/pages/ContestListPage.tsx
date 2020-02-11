@@ -51,7 +51,13 @@ function ContestListPage() {
             <th className="action"></th>
           </tr>
           {pastList.map(function(contest) {
-            return <ContestItem key={contest.id} contest={contest} />;
+            return (
+              <ContestItem
+                key={contest.id}
+                contest={contest}
+                showAction={false}
+              />
+            );
           })}
         </table>
       </section>

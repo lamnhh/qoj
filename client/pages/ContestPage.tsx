@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { useParams, RouteComponentProps, useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Contest from "../models/Contest";
 import ContestCountDown from "../components/ContestCountDown";
@@ -11,11 +11,15 @@ import SubmitForm from "../components/SubmitForm";
 import SubmissionList from "../components/SubmissionList";
 import AppContext from "../contexts/AppContext";
 
+interface ContestPageProps extends RouteComponentProps {
+  tab: number;
+}
+
 interface ContestPageRouterProps {
   contestId: string;
 }
 
-function ContestPage() {
+function ContestPage({ tab }: ContestPageProps) {
   let contestId = useParams<ContestPageRouterProps>().contestId;
 
   let [contest, setContest] = useState<Contest | null>(null);
@@ -35,6 +39,34 @@ function ContestPage() {
   );
 
   let user = useContext(AppContext).user;
+  let history = useHistory();
+  let onTabChange = useCallback(
+    function(newTab) {
+      if (tab === newTab) {
+        return;
+      }
+      let url = "/contest/" + contestId;
+      switch (newTab) {
+        case 0:
+          url += "";
+          break;
+        case 1:
+          url += "/submit";
+          break;
+        case 2:
+          url += "/my";
+          break;
+        case 3:
+          url += "/status";
+          break;
+        case 4:
+          url += "/ranking";
+          break;
+      }
+      history.push(url);
+    },
+    [contestId, history, tab]
+  );
 
   if (contest === null) {
     return null;
@@ -50,7 +82,10 @@ function ContestPage() {
       {!hasStarted ? (
         <ContestCountDown contest={contest}></ContestCountDown>
       ) : (
-        <Tabs className="contest-page align-left-right">
+        <Tabs
+          className="contest-page align-left-right"
+          selectedIndex={tab}
+          onSelect={onTabChange}>
           <TabList className="my-tablist">
             <Tab className="my-tab">Problems</Tab>
             <Tab className="my-tab" disabled={!isLoggedIn}>

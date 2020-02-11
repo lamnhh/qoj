@@ -142,12 +142,42 @@ function App() {
                           exact
                           component={ContestListPage}></Route>
                         <Route
-                          path="/contest/:contestId"
-                          exact
-                          component={ContestPage}></Route>
-                        <Route
                           path="/contest/:contestId/participants"
                           component={ContestParticipantsPage}></Route>
+
+                        <Route
+                          path="/contest/:contestId"
+                          exact
+                          render={props => (
+                            <ContestPage {...props} tab={0} />
+                          )}></Route>
+                        <Route
+                          path="/contest/:contestId/submit"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return <ContestPage {...props} tab={1} />;
+                          }}></Route>
+                        <Route
+                          path="/contest/:contestId/my"
+                          render={props => {
+                            if (!user) {
+                              return <Redirect to="/login" />;
+                            }
+                            return <ContestPage {...props} tab={2} />;
+                          }}></Route>
+                        <Route
+                          path="/contest/:contestId/status"
+                          render={props => (
+                            <ContestPage {...props} tab={3} />
+                          )}></Route>
+
+                        <Route
+                          path="/contest/:contestId/ranking"
+                          render={props => (
+                            <ContestPage {...props} tab={4} />
+                          )}></Route>
 
                         <Route
                           path="/submission/:submissionId"
