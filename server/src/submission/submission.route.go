@@ -6,6 +6,7 @@ import (
 	"github.com/lib/pq"
 	"net/http"
 	"qoj/server/src/common"
+	"qoj/server/src/contest"
 	"qoj/server/src/language"
 	"qoj/server/src/listener"
 	"qoj/server/src/problem"
@@ -15,10 +16,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-func sendResultToRanking(submissionId int, res map[string]interface{}) {
-
-}
 
 func submissionHandler(submissionId int) {
 	for {
@@ -31,7 +28,9 @@ func submissionHandler(submissionId int) {
 				_ = conn.WriteJSON(res)
 			}
 			if res["type"] == "compile-error" || res["type"] == "finish" {
-
+				if score, err := GetResult(submissionId); err == nil {
+					contest.SendResult(score)
+				}
 				return
 			}
 		}
@@ -205,4 +204,6 @@ func InitialiseSubmissionRoutes(app *gin.Engine) {
 	app.GET("/api/submission/:id/result", getSubmissionIdResult)
 	app.GET("/api/submission/:id/code", getSubmissionIdCode)
 	app.GET("/api/submission/:id/compile", getSubmissionIdCompile)
+
+	initialiseSocket(app)
 }

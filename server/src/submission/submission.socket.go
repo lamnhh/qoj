@@ -11,7 +11,7 @@ import (
 
 var listenerList map[int]*listener.List
 
-func InitialiseSubmissionSocket(app *gin.Engine) {
+func initialiseSocket(app *gin.Engine) {
 	judges = make(map[int]chan interface{})
 	listenerList = make(map[int]*listener.List)
 

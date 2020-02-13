@@ -267,7 +267,7 @@ func GetResult(submissionId int) (map[string]interface{}, error) {
 	FROM		submissions
 				JOIN problems ON (submissions.problem_id = problems.id)
 				LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
-	WHERE		submissions.id = $1
+	WHERE		submissions.id = $1 AND problems.contest_id IS NOT NULL
 	GROUP BY	submissions.username,
 				problems.id,
 				problems.contest_id;`

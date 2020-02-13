@@ -34,6 +34,7 @@ func judgeFunc(done chan interface{}, metadata interface{}) {
 		_ = os.Remove(srcPath)
 		_ = os.Remove(fmt.Sprintf("%d.out", submissionId))
 		done <- map[string]interface{}{
+			"type":         "finish",
 			"submissionId": submissionId,
 			"message":      status,
 		}
@@ -108,6 +109,7 @@ func compileFunc(done chan interface{}, metadata interface{}) {
 	if err != nil {
 		// Compile error
 		done <- map[string]interface{}{
+			"type":         "compile-error",
 			"submissionId": submissionId,
 			"message":      "Compile Error|" + string(compileOutput),
 		}
