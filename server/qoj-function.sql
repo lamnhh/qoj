@@ -202,3 +202,48 @@ BEGIN
 	RETURN _contest_id;
 END;
 $$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_contest_scores(_contest_id INT)
+    RETURNS TABLE (
+                      username	CHARACTER(16),
+                      score_list	JSON[]
+                  )
+AS $$
+BEGIN
+    RETURN QUERY
+        SELECT
+            subs.username,
+            array_agg(subs.score)
+        FROM (
+                 SELECT
+                     subs.username,
+                     json_build_object(
+                             'problem_id', subs.problem_id,
+                             'score', MAX(subs.score)
+                         ) as score
+                 FROM (
+                          SELECT
+                              submissions.id,
+                              submissions.problem_id,
+                              submissions.username,
+                              COALESCE(SUM(score), 0) AS score
+                          FROM
+                              submissions
+                                  JOIN problems ON (submissions.problem_id = problems.id)
+                                  LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
+                          WHERE
+                                  problems.contest_id = _contest_id
+                          GROUP BY
+                              submissions.id,
+                              submissions.problem_id,
+                              submissions.username
+                      ) subs
+                 GROUP BY
+                     subs.username,
+                     subs.problem_id) subs
+        GROUP BY
+            subs.username
+        ORDER BY
+            subs.username;
+END;
+$$ LANGUAGE plpgsql;
