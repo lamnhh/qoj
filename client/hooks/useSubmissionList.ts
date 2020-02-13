@@ -28,7 +28,7 @@ interface SubmissionListQuery extends qs.ParsedUrlQuery {
  */
 function useSubmissionList({ params, pageSize = 15 }: HookProps): HookResult {
   let [socket] = useState<WebSocket>(function() {
-    return new WebSocket("ws://localhost:3000/ws");
+    return new WebSocket("ws://localhost:3000/ws/status");
   });
   let [loading, setLoading] = useState(true);
   useEffect(function() {

@@ -257,3 +257,35 @@ func getSubmissionScore(submissionId int) float32 {
 	}
 	return score
 }
+
+func GetResult(submissionId int) (map[string]interface{}, error) {
+	cmd := `
+	SELECT		submissions.username,
+				problems.id as problem_id,
+				problems.contest_id,
+				COALESCE(SUM(submission_results.score), 0) as score
+	FROM		submissions
+				JOIN problems ON (submissions.problem_id = problems.id)
+				LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
+	WHERE		submissions.id = $1
+	GROUP BY	submissions.username,
+				problems.id,
+				problems.contest_id;`
+
+	var (
+		username  string
+		problemId int
+		contestId int
+		score     float32
+	)
+	err := config.DB.QueryRow(cmd, submissionId).Scan(&username, &problemId, &contestId, &score)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"username":  username,
+		"problemId": problemId,
+		"contestId": contestId,
+		"score":     score,
+	}, nil
+}
