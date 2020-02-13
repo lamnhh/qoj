@@ -10,3 +10,37 @@
   margin-top: 3rem;
   margin-bottom: 3rem !important;
 }
+
+.contest-ranking {
+  padding-top: 3rem;
+}
+
+.contest-ranking .my-table {
+  width: 100%;
+}
+
+.contest-ranking .my-table__header th {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+}
+
+.contest-ranking .index,
+.contest-ranking .score {
+  padding: 0 !important;
+  text-align: center;
+  width: 10rem;
+}
+
+.contest-ranking .index {
+  width: 6rem;
+}
+
+.contest-ranking .score-header span {
+  display: block;
+  padding: 0.2rem 0;
+}
+
+.contest-ranking .max-score {
+  font-size: 1.2rem;
+  font-weight: normal;
+}

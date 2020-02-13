@@ -2,11 +2,13 @@ package contest
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/lib/pq"
 	"qoj/server/config"
 	"qoj/server/src/problem"
+	"strings"
 	"time"
 )
 
@@ -18,6 +20,25 @@ type Contest struct {
 	Duration             int       `json:"duration" binding:"required"`
 	NumberOfParticipants int       `json:"numberOfParticipants"`
 	IsRegistered         bool      `json:"isRegistered"`
+}
+
+type ContestScore struct {
+	ProblemId int     `json:"problemId"`
+	Score     float32 `json:"score"`
+}
+
+type ContestScoreList struct {
+	Username  string         `json:"username"`
+	ScoreSum  float32        `json:"scoreSum"`
+	ScoreList []ContestScore `json:"scoreList"`
+}
+
+func (s *ContestScore) Scan(src interface{}) error {
+	bs, ok := src.([]byte)
+	if ok == false {
+		return errors.New("Not a []byte")
+	}
+	return json.Unmarshal(bs, s)
 }
 
 // createContest receives a `contest` which contains name, problemList, startDate and duration
@@ -133,4 +154,25 @@ func fetchProblemList(contestId int, username string) ([]problem.Problem, error)
 	}
 
 	return problem.FetchProblemByIds(ids, username)
+}
+
+func fetchContestScore(contestId int) ([]ContestScoreList, error) {
+	rows, err := config.DB.Query("SELECT * FROM get_contest_scores($1)", contestId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New(fmt.Sprintf("Contest with ID `%d` does not exist", contestId))
+		}
+		return nil, err
+	}
+
+	scoreList := make([]ContestScoreList, 0)
+	for rows.Next() {
+		score := ContestScoreList{}
+		if err := rows.Scan(&score.Username, &score.ScoreSum, pq.Array(&score.ScoreList)); err == nil {
+			score.Username = strings.TrimSpace(score.Username)
+			scoreList = append(scoreList, score)
+		}
+	}
+
+	return scoreList, nil
 }
