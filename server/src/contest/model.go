@@ -23,12 +23,13 @@ type Contest struct {
 }
 
 type ContestScore struct {
-	ProblemId int     `json:"problem_id"`
+	ProblemId int     `json:"problemId"`
 	Score     float32 `json:"score"`
 }
 
 type ContestScoreList struct {
 	Username  string         `json:"username"`
+	ScoreSum  float32        `json:"scoreSum"`
 	ScoreList []ContestScore `json:"scoreList"`
 }
 
@@ -167,7 +168,7 @@ func fetchContestScore(contestId int) ([]ContestScoreList, error) {
 	scoreList := make([]ContestScoreList, 0)
 	for rows.Next() {
 		score := ContestScoreList{}
-		if err := rows.Scan(&score.Username, pq.Array(&score.ScoreList)); err == nil {
+		if err := rows.Scan(&score.Username, &score.ScoreSum, pq.Array(&score.ScoreList)); err == nil {
 			score.Username = strings.TrimSpace(score.Username)
 			scoreList = append(scoreList, score)
 		}

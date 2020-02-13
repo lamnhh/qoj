@@ -11,6 +11,7 @@ import SubmitForm from "../components/SubmitForm";
 import AppContext from "../contexts/AppContext";
 import SubmissionListWrapper from "../components/SubmissionListWrapper";
 import ContestMySubmission from "../components/ContestMySubmission";
+import ContestRanking from "../components/ContestRanking";
 
 interface ContestPageProps extends RouteComponentProps {
   tab: number;
@@ -121,7 +122,9 @@ function ContestPage({ tab }: ContestPageProps) {
               params={[["problemId", problemList.map(({ id }) => String(id))]]}
             />
           </TabPanel>
-          <TabPanel>Ranking</TabPanel>
+          <TabPanel>
+            <ContestRanking contestId={contestId} problemList={problemList} />
+          </TabPanel>
         </Tabs>
       )}
     </>
