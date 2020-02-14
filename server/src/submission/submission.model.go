@@ -266,8 +266,10 @@ func GetResult(submissionId int) (map[string]interface{}, error) {
 				COALESCE(SUM(submission_results.score), 0) as score
 	FROM		submissions
 				JOIN problems ON (submissions.problem_id = problems.id)
+				JOIN contests ON (problems.contest_id = contests.id)
 				LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
-	WHERE		submissions.id = $1 AND problems.contest_id IS NOT NULL
+	WHERE		submissions.id = $1 AND problems.contest_id IS NOT NULL AND
+				submissions.created_at <= contests.start_date + (contests.duration || 'minutes') :: interval
 	GROUP BY	submissions.username,
 				problems.id,
 				problems.contest_id;`

@@ -21,6 +21,9 @@ func initialiseSocket(app *gin.Engine) {
 	subscriptionList := make(map[*websocket.Conn]map[int]int)
 
 	server := socket.NewSocket("/ws/status")
+	server.On("start", func(conn *websocket.Conn, s string) {
+		subscriptionList[conn] = make(map[int]int)
+	})
 	server.On("subscribe", func(conn *websocket.Conn, message string) {
 		submissionId64, err := strconv.ParseInt(message, 10, 16)
 		if err != nil {

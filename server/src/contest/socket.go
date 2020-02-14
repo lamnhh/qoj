@@ -1,7 +1,6 @@
 package contest
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"qoj/server/src/listener"
@@ -51,8 +50,6 @@ func initialiseContestSocket(app *gin.Engine) {
 			// Already subscribed, ignore
 			return
 		}
-
-		fmt.Println("Subscribed", contestId)
 
 		subscriptionList[conn][contestId] = 1
 		createListenerList(contestId)

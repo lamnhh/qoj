@@ -165,7 +165,8 @@ BEGIN
                  ORDER BY s.id ASC
              ) s
                  LEFT JOIN tests ON (s.original_id = tests.problem_id)
-        GROUP BY s.id, s.code, s.name, s.tl, s.ml, s.max_score;
+        GROUP BY s.id, s.code, s.name, s.tl, s.ml, s.max_score
+        ORDER BY s.id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -226,8 +227,11 @@ BEGIN
                                  COALESCE(SUM(score), 0) AS score
                           FROM submissions
                                    JOIN problems ON (submissions.problem_id = problems.id)
+                                   JOIN contests ON (problems.contest_id = contests.id)
                                    LEFT JOIN submission_results ON (submissions.id = submission_results.submission_id)
                           WHERE problems.contest_id = _contest_id
+                            AND submissions.created_at <=
+                                contests.start_date + (contests.duration || 'minutes') :: interval
                           GROUP BY submissions.id,
                                    submissions.problem_id,
                                    submissions.username
