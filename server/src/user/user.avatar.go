@@ -50,6 +50,6 @@ func updateProfilePicture(username string, header *multipart.FileHeader) (string
 	return "/profile-picture/" + username, err
 }
 
-func InitialiseAvatarLocks() {
+func initialiseAvatarLocks() {
 	locks = make(map[string]*sync.Mutex)
 }

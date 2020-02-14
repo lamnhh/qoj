@@ -22,10 +22,8 @@ func InitialiseApp() *gin.Engine {
 	// Routing
 	auth.InitialiseAuthRoutes(app)
 	problem.InitialiseProblemRoutes(app)
-	submission.InitialiseSubmissionSocket(app)
 	submission.InitialiseSubmissionRoutes(app)
 	user.InitialiseUserRoutes(app)
-	user.InitialiseAvatarLocks()
 	language.InitialiseLanguageRoutes(app)
 	contest.InitialiseContestRoutes(app)
 

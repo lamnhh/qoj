@@ -121,4 +121,5 @@ func InitialiseContestRoutes(app *gin.Engine) {
 	app.GET("/api/contest/:id/participant", getContestIdParticipant)
 	app.GET("/api/contest/:id/problem", token.ParseAuth(), getContestIdProblem)
 	app.GET("/api/contest/:id/score", getContestIdScore)
+	initialiseContestSocket(app)
 }

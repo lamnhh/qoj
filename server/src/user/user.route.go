@@ -151,6 +151,8 @@ func putUserPassword(ctx *gin.Context) {
 }
 
 func InitialiseUserRoutes(app *gin.Engine) {
+	initialiseAvatarLocks()
+
 	app.GET("/api/user", token.RequireAuth(), getUser)
 	app.GET("/api/user/:username/public", getUserPublic)
 	app.GET("/api/user/:username/solved", getUserSolved)

@@ -1,16 +1,16 @@
-package submission
+package listener
 
 import (
 	"github.com/gorilla/websocket"
 	"sync"
 )
 
-type ListenerList struct {
+type List struct {
 	list map[*websocket.Conn]int
 	mux  sync.Mutex
 }
 
-func (l *ListenerList) Subscribe(conn *websocket.Conn) {
+func (l *List) Subscribe(conn *websocket.Conn) {
 	l.mux.Lock()
 	if l.list == nil {
 		l.list = make(map[*websocket.Conn]int)
@@ -19,7 +19,7 @@ func (l *ListenerList) Subscribe(conn *websocket.Conn) {
 	l.mux.Unlock()
 }
 
-func (l *ListenerList) HasSubscribed(conn *websocket.Conn) bool {
+func (l *List) HasSubscribed(conn *websocket.Conn) bool {
 	l.mux.Lock()
 	var ans bool
 	if _, ok := l.list[conn]; ok {
@@ -31,13 +31,13 @@ func (l *ListenerList) HasSubscribed(conn *websocket.Conn) bool {
 	return ans
 }
 
-func (l *ListenerList) Unsubscribe(conn *websocket.Conn) {
+func (l *List) Unsubscribe(conn *websocket.Conn) {
 	l.mux.Lock()
 	delete(l.list, conn)
 	l.mux.Unlock()
 }
 
-func (l *ListenerList) GetSubscriptionList() []*websocket.Conn {
+func (l *List) GetSubscriptionList() []*websocket.Conn {
 	list := make([]*websocket.Conn, 0)
 	l.mux.Lock()
 	for k := range l.list {

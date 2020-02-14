@@ -6,8 +6,10 @@ import (
 	"github.com/lib/pq"
 	"net/http"
 	"qoj/server/src/common"
+	"qoj/server/src/contest"
 	"qoj/server/src/language"
-	problem2 "qoj/server/src/problem"
+	"qoj/server/src/listener"
+	"qoj/server/src/problem"
 	"qoj/server/src/result"
 	"qoj/server/src/token"
 	"strconv"
@@ -26,6 +28,9 @@ func submissionHandler(submissionId int) {
 				_ = conn.WriteJSON(res)
 			}
 			if res["type"] == "compile-error" || res["type"] == "finish" {
+				if score, err := GetResult(submissionId); err == nil {
+					contest.SendResult(score)
+				}
 				return
 			}
 		}
@@ -49,7 +54,7 @@ func postSubmission(ctx *gin.Context) {
 	}
 
 	// Check if problemId exists
-	problem, err := problem2.FetchProblemById(body.ProblemId, "")
+	prob, err := problem.FetchProblemById(body.ProblemId, "")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -72,10 +77,10 @@ func postSubmission(ctx *gin.Context) {
 
 	// Initialise judge channel for this particular submission
 	judges[submissionId] = make(chan interface{})
-	listenerList[submissionId] = &ListenerList{}
+	listenerList[submissionId] = &listener.List{}
 	go submissionHandler(submissionId)
 
-	_ = judge(submissionId, body.Code, problem, lang)
+	_ = judge(submissionId, body.Code, prob, lang)
 	ctx.JSON(http.StatusOK, gin.H{
 		"submissionId": submissionId,
 	})
@@ -199,4 +204,6 @@ func InitialiseSubmissionRoutes(app *gin.Engine) {
 	app.GET("/api/submission/:id/result", getSubmissionIdResult)
 	app.GET("/api/submission/:id/code", getSubmissionIdCode)
 	app.GET("/api/submission/:id/compile", getSubmissionIdCompile)
+
+	initialiseSocket(app)
 }
