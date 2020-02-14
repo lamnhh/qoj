@@ -1,6 +1,7 @@
 package contest
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"qoj/server/src/listener"
@@ -23,11 +24,22 @@ func SendResult(res map[string]interface{}) {
 	}
 }
 
+func createListenerList(contestId int) {
+	listLock.Lock()
+	if _, exists := listenerList[contestId]; exists == false {
+		listenerList[contestId] = &listener.List{}
+	}
+	listLock.Unlock()
+}
+
 func initialiseContestSocket(app *gin.Engine) {
 	listenerList = make(map[int]*listener.List)
-	subscriptionList := make(map[int]int)
+	subscriptionList := make(map[*websocket.Conn]map[int]int)
 
 	server := socket.NewSocket("/ws/contest")
+	server.On("start", func(conn *websocket.Conn, s string) {
+		subscriptionList[conn] = make(map[int]int)
+	})
 	server.On("subscribe", func(conn *websocket.Conn, data string) {
 		contestId64, ok := strconv.ParseInt(data, 10, 16)
 		if ok != nil {
@@ -35,18 +47,15 @@ func initialiseContestSocket(app *gin.Engine) {
 		}
 		contestId := int(contestId64)
 
-		if _, subscribed := subscriptionList[contestId]; subscribed {
+		if _, subscribed := subscriptionList[conn][contestId]; subscribed {
 			// Already subscribed, ignore
 			return
 		}
-		subscriptionList[contestId] = 1
 
-		// Add listener
-		listLock.Lock()
-		if listenerList[contestId] == nil {
-			listenerList[contestId] = &listener.List{}
-		}
-		listLock.Unlock()
+		fmt.Println("Subscribed", contestId)
+
+		subscriptionList[conn][contestId] = 1
+		createListenerList(contestId)
 		listenerList[contestId].Subscribe(conn)
 	})
 	server.On("unsubscribe", func(conn *websocket.Conn, data string) {
@@ -56,28 +65,27 @@ func initialiseContestSocket(app *gin.Engine) {
 		}
 		contestId := int(contestId64)
 
-		if _, subscribed := subscriptionList[contestId]; subscribed == false {
-			// Haven't subscribed, ignore
+		if listenerList[contestId] == nil {
 			return
 		}
-		delete(subscriptionList, contestId)
+
+		if _, subscribed := subscriptionList[conn][contestId]; subscribed == false {
+			// Has not subscribed, ignore
+			return
+		}
+		delete(subscriptionList[conn], contestId)
 
 		// Remove listener
-		listLock.Lock()
 		if listenerList[contestId] != nil {
 			listenerList[contestId].Unsubscribe(conn)
 		}
-		listLock.Unlock()
 	})
 	server.On("destroy", func(conn *websocket.Conn, _ string) {
 		// After connection closes, remove all subscriptions
-		listLock.Lock()
-		for id := range subscriptionList {
-			if listenerList[id] != nil {
-				listenerList[id].Unsubscribe(conn)
-			}
+		for id := range subscriptionList[conn] {
+			listenerList[id].Unsubscribe(conn)
 		}
-		listLock.Unlock()
+		delete(subscriptionList, conn)
 	})
 
 	server.Deploy(app)

@@ -61,6 +61,12 @@ func (socket *Socket) Deploy(app *gin.Engine) {
 			return
 		}
 
+		for _, eventListener := range socket.listenerList {
+			if eventListener.EventName == "start" {
+				eventListener.Callback(conn, "")
+			}
+		}
+
 		for {
 			message := Message{}
 			if err := conn.ReadJSON(&message); err != nil {

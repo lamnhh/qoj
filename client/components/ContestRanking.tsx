@@ -20,8 +20,9 @@ function updateNewSubmission(
   scoreList: Array<Score>,
   submission: WSContestMessage
 ) {
-  return scoreList
-    .map(function(score) {
+  let newList;
+  if (scoreList.find(score => score.username === submission.username)) {
+    newList = scoreList.map(function(score) {
       if (score.username !== submission.username) {
         return score;
       }
@@ -39,19 +40,31 @@ function updateNewSubmission(
         scoreList: newScoreList,
         scoreSum: newScoreList.reduce((acc, cur) => acc + cur.score, 0)
       };
-    })
-    .sort(function(a, b) {
-      if (a.scoreSum === b.scoreSum) {
-        if (a.username < b.username) {
-          return -1;
-        }
-        if (a.username > b.username) {
-          return 1;
-        }
-        return 0;
-      }
-      return -a.scoreSum + b.scoreSum;
     });
+  } else {
+    newList = scoreList.concat({
+      username: submission.username,
+      scoreSum: submission.score,
+      scoreList: [
+        {
+          problemId: submission.problemId,
+          score: submission.score
+        }
+      ]
+    });
+  }
+  return newList.sort(function(a, b) {
+    if (a.scoreSum === b.scoreSum) {
+      if (a.username < b.username) {
+        return -1;
+      }
+      if (a.username > b.username) {
+        return 1;
+      }
+      return 0;
+    }
+    return -a.scoreSum + b.scoreSum;
+  });
 }
 
 function ContestRanking({ contestId, problemList }: ContestRankingProps) {

@@ -13,41 +13,56 @@ var listenerList map[int]*listener.List
 
 func initialiseSocket(app *gin.Engine) {
 	judges = make(map[int]chan interface{})
+
+	// listenerList[submissionId] is a list of connection, waiting to receive results from this submission
 	listenerList = make(map[int]*listener.List)
 
-	subscriptionList := make(map[int]int)
+	// subscriptionList[conn] is a list of submission IDs that this connection has subscribed to
+	subscriptionList := make(map[*websocket.Conn]map[int]int)
 
 	server := socket.NewSocket("/ws/status")
 	server.On("subscribe", func(conn *websocket.Conn, message string) {
-		submissionId, _ := strconv.ParseInt(message, 10, 16)
-		if _, ok := subscriptionList[int(submissionId)]; ok || listenerList[int(submissionId)] == nil {
-			// Already subscribed
-		} else {
-			// Subscribe
-			subscriptionList[int(submissionId)] = 1
+		submissionId64, err := strconv.ParseInt(message, 10, 16)
+		if err != nil {
+			return
+		}
+		submissionId := int(submissionId64)
 
-			// Add listener
-			listenerList[int(submissionId)].Subscribe(conn)
+		if listenerList[submissionId] == nil {
+			// Submission is judged completely, no need to subscribe
+			return
+		}
+
+		// Subscribe if hasn't
+		if listenerList[submissionId].HasSubscribed(conn) == false {
+			listenerList[submissionId].Subscribe(conn)
+			subscriptionList[conn][submissionId] = 1
 		}
 	})
 	server.On("unsubscribe", func(conn *websocket.Conn, message string) {
-		submissionId, _ := strconv.ParseInt(message, 10, 16)
-		if _, ok := subscriptionList[int(submissionId)]; ok && listenerList[int(submissionId)] != nil {
-			// Unsubscribe
-			delete(subscriptionList, int(submissionId))
+		submissionId64, err := strconv.ParseInt(message, 10, 16)
+		if err != nil {
+			return
+		}
+		submissionId := int(submissionId64)
 
-			// Remove listener
-			listenerList[int(submissionId)].Unsubscribe(conn)
-		} else {
-			// Haven't subscribed, ignore
+		if listenerList[submissionId] == nil {
+			// Submission is judged completely, unsubscription is not allowed
+			return
 		}
 
+		// Unsubscribe
+		if listenerList[submissionId].HasSubscribed(conn) {
+			listenerList[submissionId].Unsubscribe(conn)
+			delete(subscriptionList[conn], submissionId)
+		}
 	})
 	server.On("destroy", func(conn *websocket.Conn, _ string) {
 		// After connection closes, remove all subscriptions
-		for id := range subscriptionList {
+		for id := range subscriptionList[conn] {
 			listenerList[id].Unsubscribe(conn)
 		}
+		delete(subscriptionList, conn)
 	})
 
 	server.Deploy(app)
