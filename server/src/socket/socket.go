@@ -14,7 +14,7 @@ type Message struct {
 
 type Listener struct {
 	EventName string
-	Callback  func(conn *websocket.Conn, data string)
+	Callback  func(*websocket.Conn, string)
 }
 
 type Socket struct {
@@ -35,7 +35,7 @@ func NewSocket(url string) Socket {
 	}
 }
 
-func (socket *Socket) On(event string, callback func(conn *websocket.Conn, data string)) {
+func (socket *Socket) On(event string, callback func(*websocket.Conn, string)) {
 	socket.listenerList = append(socket.listenerList, Listener{
 		EventName: event,
 		Callback:  callback,

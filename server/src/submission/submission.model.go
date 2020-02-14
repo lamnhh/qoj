@@ -283,7 +283,7 @@ func GetResult(submissionId int) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return map[string]interface{}{
-		"username":  username,
+		"username":  strings.TrimSpace(username),
 		"problemId": problemId,
 		"contestId": contestId,
 		"score":     score,

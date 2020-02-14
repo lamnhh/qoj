@@ -1,7 +1,7 @@
 import React, { useEffect, useState, ReactElement } from "react";
 import moment from "moment";
 import Submission from "../models/Submission";
-import WSMessage from "../models/WSMessage";
+import WSSubmissionMessage from "../models/WSSubmissionMessage";
 import ScoreBar from "./ScoreBar";
 import { Link } from "react-router-dom";
 
@@ -40,7 +40,7 @@ function SubmissionListItem({ submission, socket }: SubmissionListItemProps) {
       }
 
       function updateStatus(event: MessageEvent) {
-        let json: WSMessage = JSON.parse(event.data);
+        let json: WSSubmissionMessage = JSON.parse(event.data);
         if (json.submissionId === submission.id) {
           setStatus(json.message);
         }
