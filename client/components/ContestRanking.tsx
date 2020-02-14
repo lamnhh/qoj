@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Problem from "../models/Problem";
 import request from "../helpers/request";
 import { Link } from "react-router-dom";
+import FlipMove from "react-flip-move";
 import ContestRankingCell from "./ContestRankingCell";
 import WSContestMessage from "../models/WSContestMessage";
 
@@ -35,6 +36,16 @@ function updateNewSubmission(
           score: Math.max(a.score, submission.score)
         };
       });
+      if (
+        !newScoreList.find(
+          ({ problemId }) => problemId === submission.problemId
+        )
+      ) {
+        newScoreList.push({
+          problemId: submission.problemId,
+          score: submission.score
+        });
+      }
       return {
         username: score.username,
         scoreList: newScoreList,
@@ -121,45 +132,47 @@ function ContestRanking({ contestId, problemList }: ContestRankingProps) {
   return (
     <div className="contest-ranking">
       <table className="my-table full-border">
-        <tr className="my-table__header">
-          <th className="index">#</th>
-          <th>Username</th>
-          {problemList.map(function(problem, idx) {
+        <FlipMove className="contest-ranking__flip">
+          <tr className="my-table__header">
+            <th className="index">#</th>
+            <th>Username</th>
+            {problemList.map(function(problem, idx) {
+              return (
+                <th key={idx} className="score score-header">
+                  <span>{String.fromCharCode("A".charCodeAt(0) + idx)}</span>
+                  <span className="max-score">{problem.testCount}</span>
+                </th>
+              );
+            })}
+            <th className="score score-header">
+              <span>Total</span>
+              <span className="max-score">{maxTotalScore}</span>
+            </th>
+          </tr>
+          {scoreList.map(function(score, index) {
+            let scoreMap: { [id: number]: number } = {};
+            score.scoreList.forEach(function({ problemId, score }) {
+              scoreMap[problemId] = score;
+            });
             return (
-              <th key={idx} className="score score-header">
-                <span>{String.fromCharCode("A".charCodeAt(0) + idx)}</span>
-                <span className="max-score">{problem.testCount}</span>
-              </th>
+              <tr key={score.username}>
+                <td className="index">{index + 1}</td>
+                <td>
+                  <Link to={`/user/${score.username}`}>{score.username}</Link>
+                </td>
+                {problemList.map(function(problem) {
+                  return (
+                    <ContestRankingCell
+                      score={scoreMap[problem.id]}
+                      maxScore={problem.maxScore}
+                    />
+                  );
+                })}
+                <td className="score">{score.scoreSum}</td>
+              </tr>
             );
           })}
-          <th className="score score-header">
-            <span>Total</span>
-            <span className="max-score">{maxTotalScore}</span>
-          </th>
-        </tr>
-        {scoreList.map(function(score, index) {
-          let scoreMap: { [id: number]: number } = {};
-          score.scoreList.forEach(function({ problemId, score }) {
-            scoreMap[problemId] = score;
-          });
-          return (
-            <tr key={score.username}>
-              <td className="index">{index + 1}</td>
-              <td>
-                <Link to={`/user/${score.username}`}>{score.username}</Link>
-              </td>
-              {problemList.map(function(problem) {
-                return (
-                  <ContestRankingCell
-                    score={scoreMap[problem.id]}
-                    maxScore={problem.maxScore}
-                  />
-                );
-              })}
-              <td className="score">{score.scoreSum}</td>
-            </tr>
-          );
-        })}
+        </FlipMove>
       </table>
     </div>
   );
