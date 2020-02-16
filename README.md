@@ -5,6 +5,25 @@ A Codeforces clone (or rip-off), with simpler problem structure (problems should
 # Requirement
 
 - `go >= 1.11` (any version that support Go Modules)
+- `node`
+- `yarn`
+
+# Usage
+
+- `yarn install`.
+- `yarn build`.
+- `go run main.go`
+
+The server will be hosted at `localhost:3000`
+
+For now, uploading problem can only be done using a placeholder page at `/static/test-upload-problem.html`.
+
+# To-Do
+
+- [ ] Admin dashboard (for managing problems, contests, test data).
+- [ ] Add responsive CSS.
+- [ ] Improve judger (`./timeout`).
+- [ ] Docker for deployment.
 
 # License
 
