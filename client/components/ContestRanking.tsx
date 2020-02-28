@@ -88,7 +88,7 @@ function ContestRanking({ contestId, problemList }: ContestRankingProps) {
   );
 
   let [socket] = useState(function() {
-    return new WebSocket("ws://localhost:3000/ws/contest");
+    return new WebSocket(`ws://${location.host}/ws/contest`);
   });
   let [loading, setLoading] = useState(true);
 
