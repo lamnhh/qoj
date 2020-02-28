@@ -68,6 +68,7 @@
   transition: border-color 0.15s linear;
   &:focus {
     border-color: #aaa;
+    color: #555;
     outline: none;
   }
 }
@@ -94,4 +95,16 @@
 
 .auth-form input[type="password"] {
   font-family: monospace;
+}
+
+@media screen and (max-width: 767px) {
+  .auth-page .auth-form {
+    margin-left: 7%;
+    margin-right: 7%;
+    width: 100%;
+  }
+
+  .auth-form__header h1 {
+    font-size: 2.8rem;
+  }
 }

@@ -86,25 +86,54 @@ function ProblemPage({ tab }: ProblemPageProps) {
             </Tab>
           </TabList>
           <TabPanel>
-            <table className="my-table problem-page__constraints">
-              <tr className="my-table__header">
-                <th>Time limit</th>
-                <th>Memory limit</th>
-                <th className="score">Your score</th>
-              </tr>
-              <tr>
-                <td>
-                  {problem.timeLimit} second{problem.timeLimit !== 1 ? "s" : ""}
-                </td>
-                <td>{problem.memoryLimit} MB</td>
-                <td className="score">
-                  <ScoreBar
-                    maxScore={problem.maxScore}
-                    testCount={problem.testCount}
-                  />
-                </td>
-              </tr>
-            </table>
+            <div>
+              <table className="my-table problem-page__constraints horizontal">
+                <tr className="my-table__header">
+                  <th>Time limit</th>
+                  <th>Memory limit</th>
+                  <th className="score">Your score</th>
+                </tr>
+                <tr>
+                  <td>
+                    {problem.timeLimit} second
+                    {problem.timeLimit !== 1 ? "s" : ""}
+                  </td>
+                  <td>{problem.memoryLimit} MB</td>
+                  <td className="score">
+                    <ScoreBar
+                      maxScore={problem.maxScore}
+                      testCount={problem.testCount}
+                    />
+                  </td>
+                </tr>
+              </table>
+              <table className="my-table problem-page__constraints vertical">
+                <tr className="my-table__header">
+                  <th>Time limit</th>
+                  <th>Memory limit</th>
+                </tr>
+                <tr>
+                  <td>
+                    {problem.timeLimit} second
+                    {problem.timeLimit !== 1 ? "s" : ""}
+                  </td>
+                  <td>{problem.memoryLimit} MB</td>
+                </tr>
+                <tr className="my-table__header">
+                  <th className="score" colSpan={2}>
+                    Your score
+                  </th>
+                </tr>
+                <tr>
+                  <td className="score" colSpan={2}>
+                    <ScoreBar
+                      maxScore={problem.maxScore}
+                      testCount={problem.testCount}
+                    />
+                  </td>
+                </tr>
+              </table>
+            </div>
           </TabPanel>
           <TabPanel>
             <SubmitForm problemList={[problem]} redirectUrl="/status" />

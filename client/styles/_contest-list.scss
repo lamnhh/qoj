@@ -16,6 +16,7 @@
 
 .contest-list-page .contest-column {
   width: 35%;
+  min-width: 20rem;
 }
 
 .contest-list-page td.contest-column {
@@ -29,7 +30,7 @@
   border: 0.1rem #aaa;
   cursor: pointer;
   font-weight: bold;
-  padding: 1.2rem 2rem;
+  padding: 1.2rem 1.6rem;
   &:focus,
   &:hover {
     background-color: lighten(#d5d5d5, 5%);
@@ -46,9 +47,28 @@
   width: 50%;
 }
 
-.contest-list-page th,
-.contest-list-page td {
-  &.action {
-    width: 25rem;
+.contest-list-page tr:not(.my-table__title) {
+  th,
+  td {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    &.action {
+      min-width: 16rem;
+    }
+  }
+}
+
+.contest-table--wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.contest-table--wrapper + .contest-table--wrapper {
+  margin-top: 6rem;
+}
+
+@media screen and (max-width: 767px) {
+  .contest-table--wrapper + .contest-table--wrapper {
+    margin-top: 3rem;
   }
 }

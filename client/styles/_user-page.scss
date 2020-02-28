@@ -66,3 +66,9 @@
     }
   }
 }
+
+@media screen and (max-width: 767px) {
+  .user-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

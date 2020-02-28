@@ -15,4 +15,37 @@
   .score {
     width: 30rem;
   }
+  &.vertical {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .problem-page__constraints {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .problem-page__constraints {
+    text-align: center;
+    &.horizontal {
+      display: none;
+    }
+    &.vertical {
+      display: table;
+      margin: 0 !important;
+      width: 100%;
+    }
+    th,
+    td {
+      text-align: center;
+    }
+    .score {
+      width: 100%;
+    }
+    .problemset-score--wrapper {
+      padding-right: 0.4rem;
+    }
+  }
 }

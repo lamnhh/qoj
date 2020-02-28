@@ -33,8 +33,10 @@ function UserPage() {
             src={user.profilePicture + "?" + nocache} // Disable cache for this particular image
             alt={`${username}'s profile picture`}
           />
-          <h1>{user.fullname}</h1>
-          <h2>{user.username}</h2>
+          <div>
+            <h1>{user.fullname}</h1>
+            <h2>{user.username}</h2>
+          </div>
         </div>
         <div className="user-page__prob-list--wrapper">
           <UserPageProblemList
