@@ -21,7 +21,7 @@ For now, uploading problem can only be done using a placeholder page at `/static
 # To-Do
 
 - [ ] Admin dashboard (for managing problems, contests, test data).
-- [ ] Add responsive CSS.
+- [x] Add responsive CSS.
 - [ ] Improve judger (`./timeout`).
 - [ ] Docker for deployment.
 
