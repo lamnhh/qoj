@@ -1,8 +1,22 @@
-import React, { useContext, useState } from "react";
+import React, {
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef
+} from "react";
 import { Link, matchPath, useLocation } from "react-router-dom";
 import AppContext from "../contexts/AppContext";
 
-function MainNavItem({ path, label }: { path: string; label: string }) {
+function MainNavItem({
+  path,
+  label,
+  onClick
+}: {
+  path: string;
+  label: string;
+  onClick: () => void;
+}) {
   let pathname = useLocation().pathname;
   let [isFocussed, setIsFocussed] = useState(false);
   let match = matchPath(pathname, { path, exact: true });
@@ -11,6 +25,7 @@ function MainNavItem({ path, label }: { path: string; label: string }) {
     <li className={(isFocussed ? "active " : "") + (match ? "match" : "")}>
       <Link
         to={path}
+        onClick={onClick}
         onFocus={() => setIsFocussed(true)}
         onBlur={() => setIsFocussed(false)}>
         {label}
@@ -21,17 +36,58 @@ function MainNavItem({ path, label }: { path: string; label: string }) {
 
 function Header() {
   let { user } = useContext(AppContext);
+
+  let [active, setActive] = useState(false);
+  let disableNavbar = useCallback(function() {
+    setActive(false);
+  }, []);
+
+  let navbarRef = useRef<HTMLElement | null>(null);
+  useEffect(
+    function() {
+      function handleClick(e: Event) {
+        let el = e.target as Node;
+        if (active && !navbarRef.current!!.contains(el)) {
+          setActive(false);
+        }
+      }
+      window.addEventListener("click", handleClick);
+      return function() {
+        window.removeEventListener("click", handleClick);
+      };
+    },
+    [active]
+  );
+
   return (
     <header className="header">
       <div className="align-left-right header__main-nav--wrapper">
         <Link to="/" className="header__logo-wrapper">
           <h1 className="header__logo">QHH Online Judge</h1>
         </Link>
-        <nav className="header__main-nav">
+        <button
+          type="button"
+          id="navbar-toggler"
+          onClick={() => setActive(p => !p)}>
+          <img
+            src="/static/images/navbar-toggler.svg"
+            alt="Toggle navigation bar"></img>
+        </button>
+        <nav
+          className={"header__main-nav " + (active ? "active" : "inactive")}
+          ref={navbarRef}>
           <ul>
-            <MainNavItem path="/" label="Problemset" />
-            <MainNavItem path="/status" label="Submission" />
-            <MainNavItem path="/contest" label="Contests" />
+            <MainNavItem path="/" label="Problemset" onClick={disableNavbar} />
+            <MainNavItem
+              path="/status"
+              label="Submission"
+              onClick={disableNavbar}
+            />
+            <MainNavItem
+              path="/contest"
+              label="Contests"
+              onClick={disableNavbar}
+            />
           </ul>
         </nav>
       </div>
