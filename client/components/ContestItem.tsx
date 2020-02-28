@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import moment from "moment";
 import { Link, useHistory } from "react-router-dom";
 import request from "../helpers/request";
 import Contest from "../models/Contest";
+import AppContext from "../contexts/AppContext";
 
 function ContestItem({
   contest,
@@ -14,6 +15,8 @@ function ContestItem({
   let ms = moment.duration(contest.duration, "minutes").asMilliseconds();
   let duration = moment.utc(ms).format("HH:mm");
   let history = useHistory();
+
+  let { user } = useContext(AppContext);
 
   let onJoin = useCallback(
     function() {
@@ -40,16 +43,18 @@ function ContestItem({
           <i className="fa fa-user"></i> {contest.numberOfParticipants}
         </Link>
       </td>
-      <td className="action">
-        {showAction &&
-          (!contest.isRegistered ? (
-            <button type="button" className="join-btn" onClick={onJoin}>
-              Join Contest
-            </button>
-          ) : (
-            <span className="register-state">Registration completed</span>
-          ))}
-      </td>
+      {!!user && (
+        <td className="action">
+          {showAction &&
+            (!contest.isRegistered ? (
+              <button type="button" className="join-btn" onClick={onJoin}>
+                Join Contest
+              </button>
+            ) : (
+              <span className="register-state">Registration completed</span>
+            ))}
+        </td>
+      )}
     </tr>
   );
 }

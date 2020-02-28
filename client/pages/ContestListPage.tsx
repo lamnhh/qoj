@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import request from "../helpers/request";
 import ContestItem from "../components/ContestItem";
 import Contest from "../models/Contest";
 import moment from "moment";
+import AppContext from "../contexts/AppContext";
 
 function isPastContest(contest: Contest) {
   let contestEnd = moment(contest.startDate).add(contest.duration, "minutes");
@@ -11,6 +12,7 @@ function isPastContest(contest: Contest) {
 
 function ContestListPage() {
   let [contestList, setContestList] = useState<Array<Contest>>([]);
+  let { user } = useContext(AppContext);
 
   useEffect(function() {
     request("/api/contest").then(setContestList);
@@ -35,7 +37,7 @@ function ContestListPage() {
                 <th>Start</th>
                 <th>Duration</th>
                 <th>Participants</th>
-                <th className="action"></th>
+                {!!user && <th className="action"></th>}
               </tr>
               {upcomingList.map(function(contest) {
                 return <ContestItem key={contest.id} contest={contest} />;
@@ -53,7 +55,7 @@ function ContestListPage() {
               <th>Start</th>
               <th>Duration</th>
               <th>Participants</th>
-              <th className="action"></th>
+              {!!user && <th className="action"></th>}
             </tr>
             {pastList.map(function(contest) {
               return (

@@ -50,6 +50,9 @@ function UserPageProblemList({ title, url }: { title: string; url: string }) {
     [url]
   );
 
+  if (problemList.length === 0) {
+    return null;
+  }
   return (
     <div className="user-page__prob-list">
       <div className="user-page__prob-list__title">
