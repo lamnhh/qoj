@@ -24,42 +24,48 @@ function ContestListPage() {
         <h1>Contests</h1>
       </header>
       <section className="contest-list-page align-left-right">
-        <table className="contest-table my-table full-border">
-          <tr className="my-table__title">
-            <th colSpan={5}>Running and Upcoming Contests</th>
-          </tr>
-          <tr className="my-table__header">
-            <th className="contest-column">Contest</th>
-            <th>Start</th>
-            <th>Duration</th>
-            <th>Participants</th>
-            <th className="action"></th>
-          </tr>
-          {upcomingList.map(function(contest) {
-            return <ContestItem key={contest.id} contest={contest} />;
-          })}
-        </table>
-        <table className="contest-table my-table full-border">
-          <tr className="my-table__title">
-            <th colSpan={5}>Past Contests</th>
-          </tr>
-          <tr className="my-table__header">
-            <th className="contest-column">Contest</th>
-            <th>Start</th>
-            <th>Duration</th>
-            <th>Participants</th>
-            <th className="action"></th>
-          </tr>
-          {pastList.map(function(contest) {
-            return (
-              <ContestItem
-                key={contest.id}
-                contest={contest}
-                showAction={false}
-              />
-            );
-          })}
-        </table>
+        {upcomingList.length > 0 && (
+          <div className="contest-table--wrapper">
+            <table className="contest-table my-table full-border">
+              <tr className="my-table__title">
+                <th colSpan={5}>Running and Upcoming Contests</th>
+              </tr>
+              <tr className="my-table__header">
+                <th className="contest-column">Contest</th>
+                <th>Start</th>
+                <th>Duration</th>
+                <th>Participants</th>
+                <th className="action"></th>
+              </tr>
+              {upcomingList.map(function(contest) {
+                return <ContestItem key={contest.id} contest={contest} />;
+              })}
+            </table>
+          </div>
+        )}
+        <div className="contest-table--wrapper">
+          <table className="contest-table my-table full-border">
+            <tr className="my-table__title">
+              <th colSpan={5}>Past Contests</th>
+            </tr>
+            <tr className="my-table__header">
+              <th className="contest-column">Contest</th>
+              <th>Start</th>
+              <th>Duration</th>
+              <th>Participants</th>
+              <th className="action"></th>
+            </tr>
+            {pastList.map(function(contest) {
+              return (
+                <ContestItem
+                  key={contest.id}
+                  contest={contest}
+                  showAction={false}
+                />
+              );
+            })}
+          </table>
+        </div>
       </section>
     </>
   );

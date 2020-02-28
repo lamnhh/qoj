@@ -59,10 +59,6 @@
   }
 }
 
-.my-table + .my-table {
-  margin-top: 6rem;
-}
-
 .my-table__title {
   background-color: #eee;
   color: #666;
@@ -75,6 +71,6 @@
   font-size: 1.8rem;
   font-weight: bold;
   height: 4rem;
-  padding-left: 1.4rem;
+  padding-left: 1rem !important;
   text-align: left !important;
 }
