@@ -95,3 +95,11 @@
 .auth-form input[type="password"] {
   font-family: monospace;
 }
+
+@media screen and (max-width: 767px) {
+  .auth-form {
+    margin-left: 7%;
+    margin-right: 7%;
+    width: 100%;
+  }
+}
