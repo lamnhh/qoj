@@ -6,6 +6,9 @@
   margin: 0;
   padding: 0;
   position: relative;
+  white-space: nowrap;
+  width: 100%;
+  overflow-x: auto;
   &::after {
     background-color: #ccc;
     content: "";
