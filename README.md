@@ -1,6 +1,6 @@
 # QHH Online Judge
 
-A Codeforces clone (or rip-off), with simpler problem structure (problems should have the same simple structure as in Themis).
+An online judge that uses problem structure similar to that of Themis
 
 # Requirement
 
