@@ -23,7 +23,7 @@ function ContestCountDown({ contest }: { contest: Contest }) {
         clearInterval(timer);
       };
     },
-    [contest.startDate, contest.id]
+    [contest.startDate, contest.id, history]
   );
 
   return (

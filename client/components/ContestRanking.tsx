@@ -92,35 +92,38 @@ function ContestRanking({ contestId, problemList }: ContestRankingProps) {
   });
   let [loading, setLoading] = useState(true);
 
-  useEffect(function() {
-    function updateScoreList(event: MessageEvent) {
-      let json: WSContestMessage = JSON.parse(event.data);
-      setScoreList(function(scoreList) {
-        return updateNewSubmission(scoreList, json);
-      });
-    }
+  useEffect(
+    function() {
+      function updateScoreList(event: MessageEvent) {
+        let json: WSContestMessage = JSON.parse(event.data);
+        setScoreList(function(scoreList) {
+          return updateNewSubmission(scoreList, json);
+        });
+      }
 
-    socket.onopen = function() {
-      setLoading(false);
-      socket.send(
-        JSON.stringify({
-          type: "subscribe",
-          message: contestId
-        })
-      );
-      socket.addEventListener("message", updateScoreList);
-    };
+      socket.onopen = function() {
+        setLoading(false);
+        socket.send(
+          JSON.stringify({
+            type: "subscribe",
+            message: contestId
+          })
+        );
+        socket.addEventListener("message", updateScoreList);
+      };
 
-    return function() {
-      socket.send(
-        JSON.stringify({
-          type: "unsubscribe",
-          message: contestId
-        })
-      );
-      socket.removeEventListener("message", updateScoreList);
-    };
-  }, []);
+      return function() {
+        socket.send(
+          JSON.stringify({
+            type: "unsubscribe",
+            message: contestId
+          })
+        );
+        socket.removeEventListener("message", updateScoreList);
+      };
+    },
+    [contestId, socket]
+  );
 
   if (loading) {
     return null;
@@ -163,6 +166,7 @@ function ContestRanking({ contestId, problemList }: ContestRankingProps) {
                 {problemList.map(function(problem) {
                   return (
                     <ContestRankingCell
+                      key={problem.id}
                       score={scoreMap[problem.id]}
                       maxScore={problem.maxScore}
                     />

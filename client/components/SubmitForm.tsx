@@ -26,7 +26,7 @@ function SubmitForm({
   redirectUrl: string;
 }) {
   let history = useHistory();
-  let codeRef = useRef<HTMLTextAreaElement>(null);
+  let codeRef = useRef<HTMLTextAreaElement | null>(null);
   let editor = useRef<EditorFromTextArea | null>(null);
 
   useEffect(function() {
@@ -61,7 +61,7 @@ function SubmitForm({
         history.push(redirectUrl);
       });
     },
-    [redirectUrl]
+    [redirectUrl, history]
   );
 
   let onFileUpload = useCallback(function(e: ChangeEvent) {

@@ -16,7 +16,7 @@ function SubmissionPage() {
   let [code, setCode] = useState("");
   let [compileMessage, setCompileMessage] = useState("");
 
-  let codeRef = useRef(null);
+  let codeRef = useRef<HTMLTextAreaElement | null>(null);
   let editor = useRef<EditorFromTextArea | null>(null);
 
   useEffect(
@@ -33,11 +33,13 @@ function SubmissionPage() {
   );
 
   useEffect(function() {
-    editor.current = CodeMirror.fromTextArea(codeRef.current!, {
-      lineNumbers: true,
-      readOnly: "nocursor",
-      mode: "text/x-c++src"
-    });
+    if (codeRef.current) {
+      editor.current = CodeMirror.fromTextArea(codeRef.current, {
+        lineNumbers: true,
+        readOnly: "nocursor",
+        mode: "text/x-c++src"
+      });
+    }
   }, []);
 
   useEffect(
@@ -46,7 +48,7 @@ function SubmissionPage() {
         editor.current.setValue(code);
       }
     },
-    [code, editor.current]
+    [code]
   );
 
   return (

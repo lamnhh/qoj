@@ -33,10 +33,14 @@ function GeneralSettingsForm({ user }: { user: User }) {
           body: JSON.stringify({ fullname })
         }).then(function(user: User) {
           delete user.profilePicture;
-          setUser((prev: User | null) => ({
-            ...prev!,
-            ...user
-          }));
+          setUser((prev: User | null) =>
+            prev
+              ? {
+                  ...prev,
+                  ...user
+                }
+              : null
+          );
         })
       );
 
@@ -50,10 +54,14 @@ function GeneralSettingsForm({ user }: { user: User }) {
             body
           })
             .then(function({ path }: { path: string }) {
-              setUser((user: User | null) => ({
-                ...user!,
-                profilePicture: path
-              }));
+              setUser((user: User | null) =>
+                user
+                  ? {
+                      ...user,
+                      profilePicture: path
+                    }
+                  : null
+              );
             })
             .catch(console.log)
         );

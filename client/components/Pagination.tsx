@@ -50,6 +50,7 @@ function Pagination({
       {range(1, pageCount).map(function(idx) {
         return (
           <PaginationButton
+            key={idx}
             page={idx}
             active={currentPage === idx}
             onClick={function() {

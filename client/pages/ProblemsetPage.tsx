@@ -24,7 +24,7 @@ function ProblemsetPage() {
       let url = `/api/problem?page=${currentPage}&size=${pageSize}`;
       requestWithHeaders(url).then(function([problemList, headers]) {
         setProblemList(problemList);
-        setProblemCount(parseInt(headers.get("x-count")!));
+        setProblemCount(parseInt(headers.get("x-count") ?? "0"));
       });
     },
     [currentPage]

@@ -3,7 +3,7 @@ import React from "react";
 function Footer() {
   return (
     <footer className="footer align-left-right">
-      <h1>© 2019-2020 Lam "lamnhh" Nguyen</h1>
+      <h1>© 2019-2020 Lam &quot;lamnhh&quot; Nguyen</h1>
       <div className="footer__contact">
         <a
           href="https://github.com/lamnhh"

@@ -5,10 +5,10 @@ export function hasToken(): boolean {
 }
 
 export function getAccessToken(): string {
-  if (!hasToken()) {
+  if (!hasToken() || !accessToken) {
     throw new Error("No token available");
   }
-  return accessToken!;
+  return accessToken;
 }
 
 export function setAccessToken(tkn: string): void {

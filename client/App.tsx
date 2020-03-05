@@ -41,17 +41,19 @@ function App() {
   }, []);
 
   // Get access token upon start
-  useEffect(function() {
-    request("/api/refresh")
-      .then(function({ accessToken }) {
-        setAccessToken(accessToken);
-        return fetchUserInformation();
-      })
-      .catch(function() {})
-      .then(function() {
-        setLoading(false);
-      });
-  }, []);
+  useEffect(
+    function() {
+      request("/api/refresh")
+        .then(function({ accessToken }) {
+          setAccessToken(accessToken);
+          return fetchUserInformation();
+        })
+        .finally(function() {
+          setLoading(false);
+        });
+    },
+    [fetchUserInformation]
+  );
 
   if (loading) {
     return null;

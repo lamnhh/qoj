@@ -45,7 +45,7 @@ function RegisterForm() {
           alert(error);
         });
     },
-    [history]
+    [history, fetchUserInformation]
   );
 
   return (

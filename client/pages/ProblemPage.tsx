@@ -50,7 +50,7 @@ function ProblemPage({ tab }: ProblemPageProps) {
       }
       history.push(url);
     },
-    [problemId]
+    [problemId, history]
   );
 
   return (
