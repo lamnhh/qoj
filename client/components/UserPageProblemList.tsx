@@ -24,7 +24,7 @@ function UserPageProblemList({ title, url }: { title: string; url: string }) {
   useEffect(
     function() {
       request(url)
-        .then(function(problemList: Array<any>) {
+        .then(function(problemList) {
           return problemList.map(function(
             problem: PartialProblem
           ): PartialProblem {

@@ -47,7 +47,7 @@ function Header() {
     function() {
       function handleClick(e: Event) {
         let el = e.target as Node;
-        if (active && !navbarRef.current!!.contains(el)) {
+        if (active && !navbarRef.current?.contains(el)) {
           setActive(false);
         }
       }

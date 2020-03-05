@@ -27,18 +27,23 @@ interface SubmissionListQuery extends qs.ParsedUrlQuery {
  * @param param0
  */
 function useSubmissionList({ params, pageSize = 15 }: HookProps): HookResult {
-  let [socket] = useState<WebSocket>(function() {
-    return new WebSocket(`ws://${location.host}/ws/status`);
-  });
   let [loading, setLoading] = useState(true);
-  useEffect(function() {
+  let [socket] = useState<WebSocket>(function() {
+    let socket = new WebSocket(`ws://${location.host}/ws/status`);
     socket.onopen = function() {
       setLoading(false);
     };
-    return function() {
-      socket.close();
-    };
-  }, []);
+    return socket;
+  });
+
+  useEffect(
+    function() {
+      return function() {
+        socket.close();
+      };
+    },
+    [socket]
+  );
 
   let [page, setPage] = useState(1);
   let { pathname, search } = useLocation();
@@ -68,11 +73,11 @@ function useSubmissionList({ params, pageSize = 15 }: HookProps): HookResult {
       requestWithHeaders(url).then(
         ([submissionList, headers]: [Array<Submission>, Headers]) => {
           setSubmissionList(submissionList);
-          setSubmissionCount(parseInt(headers.get("x-count")!));
+          setSubmissionCount(parseInt(headers.get("x-count") ?? "0"));
         }
       );
     },
-    [page, params]
+    [page, params, pageSize]
   );
 
   let history = useHistory();

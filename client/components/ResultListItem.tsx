@@ -26,9 +26,9 @@ function ResultListItem({ result, index }: { result: Result; index: number }) {
         </h4>
         <h4 className="test-result__preview">Input</h4>
         <pre>{result.inputPreview}</pre>
-        <h4 className="test-result__preview">Participant's output</h4>
+        <h4 className="test-result__preview">Participant&apos;s output</h4>
         <pre>{result.answerPreview}</pre>
-        <h4 className="test-result__preview">Jury's output</h4>
+        <h4 className="test-result__preview">Jury&apos;s output</h4>
         <pre>{result.outputPreview}</pre>
       </div>
     </div>

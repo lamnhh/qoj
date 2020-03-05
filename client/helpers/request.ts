@@ -47,9 +47,11 @@ async function request(url: RequestInfo, init: RequestInit = {}) {
   });
 }
 
+// eslint-disable
 async function requestWithHeaders(
   url: RequestInfo,
   init: RequestInit = {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<[any, Headers]> {
   parseInit(init);
   return await fetch(url, init).then(function(res) {
