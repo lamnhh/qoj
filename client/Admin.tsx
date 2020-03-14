@@ -9,6 +9,7 @@ import request from "./helpers/request";
 import { setAccessToken } from "./helpers/auth";
 import AppContext from "./contexts/AppContext";
 import Logout from "./components/Logout";
+import AdminCreateProblemPage from "./pages/AdminCreateProblemPage";
 
 function Admin() {
   let [user, setUser] = useState<User | null>(null);
@@ -64,7 +65,9 @@ function Admin() {
             <AdminLayout title="Search">Search</AdminLayout>
           </Route>
           <Route path="/problem/new">
-            <AdminLayout title="Create Problem">Create problem</AdminLayout>
+            <AdminLayout title="Create Problem">
+              <AdminCreateProblemPage />
+            </AdminLayout>
           </Route>
           <Route path="/problem" exact>
             <AdminLayout title="Problems">View problems</AdminLayout>

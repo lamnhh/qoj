@@ -1,0 +1,62 @@
+.problem-form--wrapper {
+  text-align: center;
+}
+
+.problem-form {
+  display: inline-block;
+  padding-top: 2rem;
+  width: 42rem;
+}
+
+.problem-form__title {
+  font-size: 2rem;
+  font-weight: normal;
+  margin-bottom: 2.8rem;
+}
+
+.problem-form label {
+  display: block;
+  width: 100%;
+}
+
+.problem-form__field-name {
+  display: inline-block;
+  font-size: 1.4rem;
+  padding-top: 0.5rem;
+  padding-right: 1.2rem;
+  text-align: right;
+  vertical-align: top;
+  width: 33%;
+}
+
+.problem-form__field-value {
+  display: inline-block;
+  font-size: 1.4rem;
+  width: 67%;
+  input[type="text"] {
+    padding: 0.4rem 0.8rem;
+    width: 100%;
+  }
+  input[type="file"] {
+    padding: 0.4rem 0;
+    width: 100%;
+  }
+}
+
+.problem-form__field-desc {
+  color: #888;
+  font-size: 1rem;
+  font-style: italic;
+  margin: 0;
+  padding: 0.6rem 0 1.2rem;
+  text-align: left;
+  &.not-show {
+    color: transparent;
+  }
+}
+
+.problem-form button {
+  cursor: pointer;
+  padding: 0.2rem 1.6rem;
+  margin-top: 2rem;
+}
