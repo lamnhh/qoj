@@ -82,7 +82,7 @@ function ContestRanking({ contestId, problemList }: ContestRankingProps) {
   let [scoreList, setScoreList] = useState<Array<Score>>([]);
   useEffect(
     function() {
-      request(`/api/contest/${contestId}/score`).then(setScoreList);
+      request(`/api/c/contest/${contestId}/score`).then(setScoreList);
     },
     [contestId]
   );

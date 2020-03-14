@@ -38,7 +38,7 @@ function SubmitForm({
 
   let [languageList, setLanguagelist] = useState<Array<Language>>([]);
   useEffect(function() {
-    request("/api/language").then(setLanguagelist);
+    request("/api/c/language").then(setLanguagelist);
   }, []);
 
   let handleSubmit = useCallback(
@@ -49,7 +49,7 @@ function SubmitForm({
       let languageId = parseInt(form.languageId.value);
       let problemId = parseInt(form.problemId.value);
 
-      request("/api/submission", {
+      request("/api/c/submission", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

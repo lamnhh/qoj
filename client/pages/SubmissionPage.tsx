@@ -21,11 +21,11 @@ function SubmissionPage() {
 
   useEffect(
     function() {
-      request("/api/submission/" + submissionId).then(setSubmission);
-      request("/api/submission/" + submissionId + "/code")
+      request("/api/c/submission/" + submissionId).then(setSubmission);
+      request("/api/c/submission/" + submissionId + "/code")
         .then(({ code }) => code)
         .then(setCode);
-      request("/api/submission/" + submissionId + "/compile")
+      request("/api/c/submission/" + submissionId + "/compile")
         .then(({ compileMessage }) => compileMessage)
         .then(setCompileMessage);
     },

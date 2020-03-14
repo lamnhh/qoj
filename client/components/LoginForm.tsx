@@ -20,7 +20,7 @@ function LoginForm() {
       let username = form.username.value;
       let password = form.password.value;
 
-      fetch("/api/login", {
+      fetch("/api/c/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

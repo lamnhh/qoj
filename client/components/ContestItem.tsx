@@ -20,7 +20,7 @@ function ContestItem({
 
   let onJoin = useCallback(
     function() {
-      request(`/api/contest/${contest.id}/register`, { method: "POST" })
+      request(`/api/c/contest/${contest.id}/register`, { method: "POST" })
         .then(function() {
           history.push("/contest/" + contest.id);
         })

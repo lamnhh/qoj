@@ -31,7 +31,7 @@ function App() {
   let [loading, setLoading] = useState(true);
 
   let fetchUserInformation = useCallback(function() {
-    return request("/api/user")
+    return request("/api/c/user")
       .then(function(user: User) {
         setUser(user);
       })
@@ -43,7 +43,7 @@ function App() {
   // Get access token upon start
   useEffect(
     function() {
-      request("/api/refresh")
+      request("/api/c/refresh")
         .then(function({ accessToken }) {
           setAccessToken(accessToken);
           return fetchUserInformation();

@@ -20,7 +20,7 @@ func InitialiseApp() *gin.Engine {
 	app.LoadHTMLGlob("./static/*.html")
 
 	// Routing
-	client := app.Group("/api")
+	client := app.Group("/api/c")
 	{
 		auth.InitialiseRoutes(client)
 		problem.InitialiseRoutes(client)
@@ -31,6 +31,13 @@ func InitialiseApp() *gin.Engine {
 	}
 	submission.InitialiseSocket(app)
 	contest.InitialiseSocket(app)
+
+	// Admin routing
+	admin := app.Group("/api/a")
+	{
+		problem.InitialiseAdminRoutes(admin)
+		contest.InitialiseAdminRoutes(admin)
+	}
 
 	app.Use(func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)

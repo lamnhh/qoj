@@ -15,7 +15,7 @@ function ContestListPage() {
   let { user } = useContext(AppContext);
 
   useEffect(function() {
-    request("/api/contest").then(setContestList);
+    request("/api/c/contest").then(setContestList);
   }, []);
 
   let upcomingList = contestList.filter(contest => !isPastContest(contest));

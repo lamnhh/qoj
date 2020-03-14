@@ -13,7 +13,7 @@ function UserPage() {
   let [user, setUser] = useState<User>(emptyUser);
   useEffect(
     function() {
-      request(`/api/user/${username}/public`)
+      request(`/api/c/user/${username}/public`)
         .then(setUser)
         .catch(console.log);
     },
@@ -40,11 +40,11 @@ function UserPage() {
         </div>
         <div className="user-page__prob-list--wrapper">
           <UserPageProblemList
-            url={`/api/user/${username}/solved`}
+            url={`/api/c/user/${username}/solved`}
             title="Solved problems"
           />
           <UserPageProblemList
-            url={`/api/user/${username}/partial`}
+            url={`/api/c/user/${username}/partial`}
             title="Partially solved problems"
           />
         </div>

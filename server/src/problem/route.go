@@ -200,6 +200,9 @@ func putProblemIdTest(ctx *gin.Context) {
 func InitialiseRoutes(app *gin.RouterGroup) {
 	app.GET("/problem", token.ParseAuth(), getProblem)
 	app.GET("/problem/:id", token.ParseAuth(), getProblemId)
+}
+
+func InitialiseAdminRoutes(app *gin.RouterGroup) {
 	app.POST("/problem", postProblem)
 	app.DELETE("/problem/:id", deleteProblemId)
 	app.PATCH("/problem/:id", patchProblemId)

@@ -8,7 +8,7 @@ function ResultList({ submissionId }: { submissionId: string }) {
 
   useEffect(
     function() {
-      request(`/api/submission/${submissionId}/result`).then(setResultList);
+      request(`/api/c/submission/${submissionId}/result`).then(setResultList);
     },
     [submissionId]
   );

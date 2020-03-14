@@ -21,7 +21,7 @@ function ChangePasswordForm() {
       return;
     }
 
-    request("/api/user/password", {
+    request("/api/c/user/password", {
       method: "PUT",
       body: JSON.stringify({ oldPassword, newPassword }),
       headers: { "Content-Type": "application/json" }
