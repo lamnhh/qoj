@@ -123,5 +123,7 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 }
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
+	app.GET("/contest", token.RequireAuth(), getContest)
+	app.GET("/contest/:id", token.RequireAuth(), getContestId)
 	app.POST("/contest", token.RequireAuth(), postContest)
 }

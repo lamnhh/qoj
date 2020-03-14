@@ -13,6 +13,12 @@ import AdminCreateProblemPage from "./pages/AdminCreateProblemPage";
 import AdminProblemPage from "./pages/AdminProblemPage";
 import AdminEditProblemPage from "./pages/AdminEditProblemPage";
 import AdminSearchPage from "./pages/AdminSearchPage";
+import AdminContestPage from "./pages/AdminContestPage";
+
+// Initialise moment-duration
+let moment = require("moment");
+let momentDuration = require("moment-duration-format");
+momentDuration(moment);
 
 function Admin() {
   let [user, setUser] = useState<User | null>(null);
@@ -88,7 +94,9 @@ function Admin() {
             <AdminLayout title="Create Contest">Create contest</AdminLayout>
           </Route>
           <Route path="/contest" exact>
-            <AdminLayout title="Contests">View contests</AdminLayout>
+            <AdminLayout title="Contests">
+              <AdminContestPage />
+            </AdminLayout>
           </Route>
         </Switch>
       </BrowserRouter>
