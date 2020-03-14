@@ -1,0 +1,42 @@
+.login-page--wrapper {
+  text-align: center;
+}
+
+.login-page {
+  display: inline-block;
+  padding-top: 2rem;
+  width: 36rem;
+}
+
+.login-page h2 {
+  font-size: 2rem;
+  font-weight: normal;
+}
+
+.login-page label {
+  display: block;
+  margin-top: 1.2rem;
+}
+
+.login-page button {
+  margin-top: 2.4rem;
+  width: 8rem;
+}
+
+.login-page label {
+  input,
+  span {
+    display: inline-block;
+    font-size: 1.4rem;
+  }
+
+  span {
+    padding-right: 1.2rem;
+    text-align: right;
+    width: 33%;
+  }
+
+  input {
+    width: 67%;
+  }
+}

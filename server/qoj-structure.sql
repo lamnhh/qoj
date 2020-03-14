@@ -3,6 +3,7 @@ CREATE TABLE users (
 	password            CHARACTER(60),
 	fullname            CHARACTER(100),
 	profile_picture     TEXT DEFAULT '/static/images/profile-picture-placeholder.png',
+	is_admin            BOOLEAN DEFAULT FALSE,
 	primary key (username)
 );
 

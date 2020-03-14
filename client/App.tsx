@@ -20,6 +20,7 @@ import SubmissionPage from "./pages/SubmissionPage";
 import ContestListPage from "./pages/ContestListPage";
 import ContestParticipantsPage from "./pages/ContestParticipantsPage";
 import ContestPage from "./pages/ContestPage";
+import Logout from "./components/Logout";
 
 // Initialise moment-duration
 let moment = require("moment");
@@ -185,13 +186,9 @@ function App() {
                           path="/submission/:submissionId"
                           component={SubmissionPage}></Route>
 
-                        <Route
-                          path="/logout"
-                          render={() => {
-                            setUser(null);
-                            clearToken();
-                            return <Redirect to="/"></Redirect>;
-                          }}></Route>
+                        <Route path="/logout">
+                          <Logout logoutUrl="/api/logout" returnUrl="/" />
+                        </Route>
                       </Switch>
                     </div>
                   </CSSTransition>

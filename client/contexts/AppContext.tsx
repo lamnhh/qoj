@@ -1,13 +1,10 @@
-import React, { Dispatch } from "react";
+import React from "react";
 import User from "../models/User";
-
-type UserNull = User | null;
-
-type UserAction = UserNull | ((prevState: UserNull) => UserNull);
+import DispatchWrapper from "../models/DispatchWrapper";
 
 interface AppContextInterface {
   user: User | null;
-  setUser: Dispatch<UserAction>;
+  setUser: DispatchWrapper<User | null>;
   fetchUserInformation: () => void;
 }
 
