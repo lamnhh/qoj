@@ -26,6 +26,7 @@ func getProblem(ctx *gin.Context) {
 }
 
 func postProblem(ctx *gin.Context) {
+	setter := ctx.GetString("username")
 	var problem Problem
 
 	// Parse problem code
@@ -81,7 +82,7 @@ func postProblem(ctx *gin.Context) {
 		ctx.JSON(code, gin.H{"error": err.Error()})
 	} else {
 		// Add problem to database to get problem ID
-		problem.Id, err = CreateProblem(problem)
+		problem.Id, err = CreateProblem(problem, setter)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		} else {
@@ -130,7 +131,7 @@ func patchProblemId(ctx *gin.Context) {
 		return
 	}
 
-	var patch map[string]string
+	var patch map[string]interface{}
 	if err := ctx.ShouldBindJSON(&patch); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -157,7 +158,7 @@ func putProblemIdTest(ctx *gin.Context) {
 		return
 	}
 
-	replace := ctx.Param("replace")
+	replace := ctx.Query("replace")
 	if replace != "1" && replace != "0" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid `replace` param"})
 		return
@@ -203,7 +204,9 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 }
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
-	app.POST("/problem", postProblem)
+	app.GET("/problem", token.RequireAuth(), getProblemAdmin)
+	app.GET("/problem/:id", token.RequireAuth(), getProblemIdAdmin)
+	app.POST("/problem", token.RequireAuth(), postProblem)
 	app.DELETE("/problem/:id", deleteProblemId)
 	app.PATCH("/problem/:id", patchProblemId)
 	app.PUT("/problem/:id/test", putProblemIdTest)

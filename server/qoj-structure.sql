@@ -23,6 +23,7 @@ CREATE TABLE problems (
 	ml          INT,
 	contest_id  INT,
 	original_id INT,
+	setter      CHARACTER(16),
 	primary key (id)
 );
 
@@ -85,7 +86,8 @@ ALTER TABLE submission_results
 	ADD FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE;
 
 ALTER TABLE problems
-	ADD FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE;
+	ADD FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE,
+    ADD FOREIGN KEY (setter) REFERENCES users(username) ON DELETE CASCADE;
 
 ALTER TABLE contest_registrations
 	ADD FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE,

@@ -18,5 +18,11 @@ const emptyProblem: Problem = {
   testCount: 0
 };
 
+const defaultProblem: Problem = {
+  ...emptyProblem,
+  timeLimit: 1000,
+  memoryLimit: 256
+};
+
 export default Problem;
-export { emptyProblem };
+export { emptyProblem, defaultProblem };
