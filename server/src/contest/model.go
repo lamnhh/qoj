@@ -210,3 +210,19 @@ func fetchContestByIdAdmin(contestId int) (Contest, error) {
 
 	return contest, nil
 }
+
+func updateContest(contestId int, patch Contest) error {
+	_, err := config.DB.Exec("SELECT update_contest($1, $2, $3, $4, $5)",
+		contestId,
+		patch.Name,
+		patch.StartDate,
+		patch.Duration,
+		pq.Array(patch.ProblemList),
+	)
+	return err
+}
+
+func deleteContest(contestId int) error {
+	_, err := config.DB.Exec("DELETE FROM contests WHERE id = $1", contestId)
+	return err
+}

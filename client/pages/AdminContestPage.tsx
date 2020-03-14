@@ -8,6 +8,20 @@ import { Link } from "react-router-dom";
 function AdminContestPage() {
   let { data, error } = useSWR("/api/contest", request);
 
+  function deleteContest(contestId: number) {
+    if (!confirm("Are you sure you want to discard this contest?")) {
+      return;
+    }
+
+    request("/api/contest/" + contestId, { method: "DELETE" })
+      .then(function() {
+        location.reload();
+      })
+      .catch(function({ error }) {
+        alert(error);
+      });
+  }
+
   if (error) {
     return <section className="error-msg">Server Error</section>;
   }
@@ -23,7 +37,6 @@ function AdminContestPage() {
             <th>Contest Name</th>
             <th>Start</th>
             <th>Duration</th>
-            <th>Ready</th>
             <th></th>
           </tr>
         </thead>
@@ -39,12 +52,15 @@ function AdminContestPage() {
                     .duration(contest.duration, "minutes")
                     .format("HH[:]mm")}
                 </td>
-                <td style={{ color: "red", fontWeight: "bold" }}>Yes</td>
                 <td className="contest-page__row-action">
                   <Link to={`/contest/edit/${contest.id}`}>
                     <button type="button">Edit</button>
                   </Link>
-                  <button type="button">Discard</button>
+                  <button
+                    type="button"
+                    onClick={() => deleteContest(contest.id)}>
+                    Discard
+                  </button>
                 </td>
               </tr>
             );

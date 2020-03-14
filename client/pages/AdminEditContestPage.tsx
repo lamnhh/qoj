@@ -1,6 +1,6 @@
 import React from "react";
 import AdminContestForm from "../components/AdminContestForm";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import useSWR from "swr";
 import request from "../helpers/request";
 import AdminContest from "../models/AdminContest";
@@ -13,6 +13,22 @@ interface AdminEditContestPageRouterProps {
 function AdminEditContestPage() {
   let contestId = parseInt(useParams<AdminEditContestPageRouterProps>().id);
   let { data, error } = useSWR("/api/contest/" + contestId, request);
+
+  let history = useHistory();
+
+  function onUpdate(contest: AdminContest) {
+    request("/api/contest/" + contestId, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(contest)
+    })
+      .then(function() {
+        history.push("/contest");
+      })
+      .catch(function({ error }) {
+        alert(error);
+      });
+  }
 
   if (error) {
     return <section className="error-msg">Server Error</section>;
@@ -29,9 +45,7 @@ function AdminEditContestPage() {
       action="Update"
       defaultContest={contest}
       defaultSelected={selected}
-      handleSubmit={() => {
-        console.log("H");
-      }}
+      handleSubmit={onUpdate}
     />
   );
 }
