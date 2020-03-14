@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./styles/admin.scss";
+import "../node_modules/react-datetime/css/react-datetime.css";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import AdminLoginPage from "./pages/AdminLoginPage";
@@ -13,6 +14,14 @@ import AdminCreateProblemPage from "./pages/AdminCreateProblemPage";
 import AdminProblemPage from "./pages/AdminProblemPage";
 import AdminEditProblemPage from "./pages/AdminEditProblemPage";
 import AdminSearchPage from "./pages/AdminSearchPage";
+import AdminContestPage from "./pages/AdminContestPage";
+import AdminCreateContestPage from "./pages/AdminCreateContestPage";
+import AdminEditContestPage from "./pages/AdminEditContestPage";
+
+// Initialise moment-duration
+let moment = require("moment");
+let momentDuration = require("moment-duration-format");
+momentDuration(moment);
 
 function Admin() {
   let [user, setUser] = useState<User | null>(null);
@@ -85,10 +94,19 @@ function Admin() {
             </AdminLayout>
           </Route>
           <Route path="/contest/new">
-            <AdminLayout title="Create Contest">Create contest</AdminLayout>
+            <AdminLayout title="Create Contest">
+              <AdminCreateContestPage />
+            </AdminLayout>
           </Route>
           <Route path="/contest" exact>
-            <AdminLayout title="Contests">View contests</AdminLayout>
+            <AdminLayout title="Contests">
+              <AdminContestPage />
+            </AdminLayout>
+          </Route>
+          <Route path="/contest/edit/:id">
+            <AdminLayout title="Edit contest">
+              <AdminEditContestPage />
+            </AdminLayout>
           </Route>
         </Switch>
       </BrowserRouter>

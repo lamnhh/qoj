@@ -113,6 +113,58 @@ func getContestIdScore(ctx *gin.Context) {
 	}
 }
 
+func getContestIdAdmin(ctx *gin.Context) {
+	contestId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid contest ID"})
+		return
+	}
+	contestId := int(contestId64)
+
+	contest, err := fetchContestByIdAdmin(contestId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, contest)
+	}
+}
+
+func patchContestId(ctx *gin.Context) {
+	contestId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid contest ID"})
+		return
+	}
+	contestId := int(contestId64)
+
+	patch := Contest{}
+	if err := ctx.ShouldBindJSON(&patch); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := updateContest(contestId, patch); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{})
+	}
+}
+
+func deleteContestId(ctx *gin.Context) {
+	contestId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid contest ID"})
+		return
+	}
+	contestId := int(contestId64)
+
+	if err := deleteContest(contestId); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{})
+	}
+}
+
 func InitialiseRoutes(app *gin.RouterGroup) {
 	app.GET("/contest", token.ParseAuth(), getContest)
 	app.GET("/contest/:id", token.ParseAuth(), getContestId)
@@ -123,5 +175,9 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 }
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
+	app.GET("/contest", token.RequireAuth(), getContest)
+	app.GET("/contest/:id", token.RequireAuth(), getContestIdAdmin)
 	app.POST("/contest", token.RequireAuth(), postContest)
+	app.PATCH("/contest/:id", token.RequireAuth(), patchContestId)
+	app.DELETE("/contest/:id", token.RequireAuth(), deleteContestId)
 }

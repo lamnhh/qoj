@@ -7,4 +7,14 @@ interface Contest {
   isRegistered: boolean;
 }
 
+const defaultContest: Contest = {
+  id: 0,
+  name: "",
+  startDate: new Date(),
+  duration: 150,
+  numberOfParticipants: 0,
+  isRegistered: false
+};
+
 export default Contest;
+export { defaultContest };

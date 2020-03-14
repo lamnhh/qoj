@@ -36,7 +36,7 @@ function AdminProblemPage() {
   return (
     <section className="problem-page">
       <h2 className="problem-page__count">Problems: {problemList.length}</h2>
-      <table className="problem-page__table">
+      <table className="admin-table">
         <thead>
           <tr>
             <th>#</th>

@@ -242,3 +242,30 @@ BEGIN
         ORDER BY SUM(subs.score1) DESC;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_contest(_contest_id INT, _name CHARACTER(100), _start_date TIMESTAMP, _duration INT,
+                                          _problem_list INT[])
+    RETURNS VOID
+AS
+$$
+BEGIN
+    DELETE FROM problems WHERE contest_id = _contest_id;
+
+    UPDATE
+        contests
+    SET name       = _name,
+        start_date = _start_date,
+        duration   = _duration
+    WHERE id = _contest_id;
+
+    INSERT INTO problems(code, name, tl, ml, original_id, contest_id)
+    SELECT code,
+           name,
+           tl,
+           ml,
+           problems.id as original_id,
+           _contest_id as contest_id
+    FROM problems
+    WHERE problems.id = ANY (_problem_list);
+END
+$$ LANGUAGE plpgsql;
