@@ -131,7 +131,7 @@ func patchProblemId(ctx *gin.Context) {
 		return
 	}
 
-	var patch map[string]string
+	var patch map[string]interface{}
 	if err := ctx.ShouldBindJSON(&patch); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -158,7 +158,7 @@ func putProblemIdTest(ctx *gin.Context) {
 		return
 	}
 
-	replace := ctx.Param("replace")
+	replace := ctx.Query("replace")
 	if replace != "1" && replace != "0" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid `replace` param"})
 		return
@@ -205,6 +205,7 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
 	app.GET("/problem", token.RequireAuth(), getProblemAdmin)
+	app.GET("/problem/:id", token.RequireAuth(), getProblemIdAdmin)
 	app.POST("/problem", token.RequireAuth(), postProblem)
 	app.DELETE("/problem/:id", deleteProblemId)
 	app.PATCH("/problem/:id", patchProblemId)

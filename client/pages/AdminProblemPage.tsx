@@ -52,7 +52,7 @@ function AdminProblemPage() {
                     : problem.code + " - " + problem.name}
                 </td>
                 <td>{user!.username}</td>
-                <td>{problem.timeLimit * 1000} ms</td>
+                <td>{Math.round(problem.timeLimit * 1000)} ms</td>
                 <td>{problem.memoryLimit} MB</td>
                 <td className="problem-page__row-action">
                   <Link to={"/problem/edit/" + problem.id}>

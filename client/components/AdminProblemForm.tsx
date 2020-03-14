@@ -1,18 +1,21 @@
 import React, { useRef, useCallback, FormEvent, ChangeEvent } from "react";
 import useProblemForm from "../hooks/useProblemForm";
 import Problem from "../models/Problem";
+import AdminProblem from "../models/AdminProblem";
 
 interface AdminProblemFormProps {
   title: string;
   action: string;
   defaultProblem: Problem;
-  handleSubmit: (body: FormData) => void;
+  requireFile: boolean;
+  handleSubmit: (problem: AdminProblem) => void;
 }
 
 function AdminProblemForm({
   title,
   action,
   defaultProblem,
+  requireFile,
   handleSubmit
 }: AdminProblemFormProps) {
   let { problem, inputProps, setDefaultCodeName } = useProblemForm(
@@ -24,14 +27,13 @@ function AdminProblemForm({
     function(e: FormEvent) {
       e.preventDefault();
 
-      let body = new FormData();
-      body.append("code", problem.code);
-      body.append("name", problem.name);
-      body.append("timeLimit", (problem.timeLimit / 1000).toString());
-      body.append("memoryLimit", problem.memoryLimit.toString());
-      body.append("file", testRef.current!.files![0]);
-
-      handleSubmit(body);
+      handleSubmit({
+        code: problem.code,
+        name: problem.name,
+        timeLimit: problem.timeLimit / 1000,
+        memoryLimit: problem.memoryLimit,
+        file: testRef.current?.files?.[0]
+      });
     },
     [problem, handleSubmit]
   );
@@ -94,7 +96,7 @@ function AdminProblemForm({
               <input
                 type="file"
                 name="test"
-                required
+                required={requireFile}
                 ref={testRef}
                 onChange={onUpload}
                 accept=".zip"></input>

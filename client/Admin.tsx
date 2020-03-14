@@ -11,6 +11,7 @@ import AppContext from "./contexts/AppContext";
 import Logout from "./components/Logout";
 import AdminCreateProblemPage from "./pages/AdminCreateProblemPage";
 import AdminProblemPage from "./pages/AdminProblemPage";
+import AdminEditProblemPage from "./pages/AdminEditProblemPage";
 
 function Admin() {
   let [user, setUser] = useState<User | null>(null);
@@ -73,6 +74,11 @@ function Admin() {
           <Route path="/problem" exact>
             <AdminLayout title="Problems">
               <AdminProblemPage />
+            </AdminLayout>
+          </Route>
+          <Route path="/problem/edit/:id">
+            <AdminLayout title="Edit problem">
+              <AdminEditProblemPage />
             </AdminLayout>
           </Route>
           <Route path="/contest/new">

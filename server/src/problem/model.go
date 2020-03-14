@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/lib/pq"
 	"qoj/server/config"
-	"strconv"
 	"strings"
 )
 
@@ -99,7 +98,7 @@ func FetchProblemByIds(problemIds []int, username string) ([]Problem, error) {
 	return problemList, nil
 }
 
-func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, error) {
+func UpdateProblemMetadata(problemId int, patch map[string]interface{}) (Problem, error) {
 	// Fetch old problem metadata
 	problem, err := FetchProblemById(problemId, "")
 	if err != nil {
@@ -108,23 +107,21 @@ func UpdateProblemMetadata(problemId int, patch map[string]string) (Problem, err
 
 	// Update according to `patch`
 	if val, ok := patch["code"]; ok {
-		problem.Code = val
+		problem.Code = val.(string)
 	}
 	if val, ok := patch["name"]; ok {
-		problem.Name = val
+		problem.Name = val.(string)
 	}
 	if val, ok := patch["timeLimit"]; ok {
-		tl, _ := strconv.ParseFloat(val, 32)
-		problem.TimeLimit = float32(tl)
+		problem.TimeLimit = float32(val.(float64))
 	}
 	if val, ok := patch["memoryLimit"]; ok {
-		ml, _ := strconv.ParseInt(val, 10, 16)
-		problem.MemoryLimit = int(ml)
+		problem.MemoryLimit = int(val.(float64))
 	}
 
 	// Update corresponding row in database
 	err = config.DB.
-		QueryRow("UPDATE problems SET code = $1, name = $2, tl = $3, ml = $4 WHERE id = $3 RETURNING *",
+		QueryRow("UPDATE problems SET code = $1, name = $2, tl = $3, ml = $4 WHERE id = $5 RETURNING id, RTRIM(code), RTRIM(name), tl, ml",
 			problem.Code,
 			problem.Name,
 			problem.TimeLimit,
