@@ -16,6 +16,7 @@ import AdminEditProblemPage from "./pages/AdminEditProblemPage";
 import AdminSearchPage from "./pages/AdminSearchPage";
 import AdminContestPage from "./pages/AdminContestPage";
 import AdminCreateContestPage from "./pages/AdminCreateContestPage";
+import AdminEditContestPage from "./pages/AdminEditContestPage";
 
 // Initialise moment-duration
 let moment = require("moment");
@@ -100,6 +101,11 @@ function Admin() {
           <Route path="/contest" exact>
             <AdminLayout title="Contests">
               <AdminContestPage />
+            </AdminLayout>
+          </Route>
+          <Route path="/contest/edit/:id">
+            <AdminLayout title="Edit contest">
+              <AdminEditContestPage />
             </AdminLayout>
           </Route>
         </Switch>

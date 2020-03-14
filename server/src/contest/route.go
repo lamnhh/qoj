@@ -113,6 +113,22 @@ func getContestIdScore(ctx *gin.Context) {
 	}
 }
 
+func getContestIdAdmin(ctx *gin.Context) {
+	contestId64, err := strconv.ParseInt(ctx.Param("id"), 10, 16)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid contest ID"})
+		return
+	}
+	contestId := int(contestId64)
+
+	contest, err := fetchContestByIdAdmin(contestId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, contest)
+	}
+}
+
 func InitialiseRoutes(app *gin.RouterGroup) {
 	app.GET("/contest", token.ParseAuth(), getContest)
 	app.GET("/contest/:id", token.ParseAuth(), getContestId)
@@ -124,6 +140,6 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
 	app.GET("/contest", token.RequireAuth(), getContest)
-	app.GET("/contest/:id", token.RequireAuth(), getContestId)
+	app.GET("/contest/:id", token.RequireAuth(), getContestIdAdmin)
 	app.POST("/contest", token.RequireAuth(), postContest)
 }

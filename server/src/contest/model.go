@@ -176,3 +176,37 @@ func fetchContestScore(contestId int) ([]ContestScoreList, error) {
 
 	return scoreList, nil
 }
+
+func fetchContestByIdAdmin(contestId int) (Contest, error) {
+	cmd := `SELECT
+		contests.id,
+		RTRIM(contests.name),
+		contests.start_date,
+		contests.duration,
+		ARRAY_AGG(problems.original_id) as problem_list
+	FROM
+		contests
+		LEFT JOIN problems ON (contests.id = problems.contest_id)
+	WHERE
+		contests.id = $1
+	GROUP BY
+		contests.id,
+		contests.name,
+		contests.start_date,
+		contests.duration`
+
+	var pid []int64
+	contest := Contest{}
+	err := config.DB.QueryRow(cmd, contestId).
+		Scan(&contest.Id, &contest.Name, &contest.StartDate, &contest.Duration, pq.Array(&pid))
+	if err != nil {
+		return contest, err
+	}
+
+	contest.ProblemList = make([]int, 0)
+	for _, x := range pid {
+		contest.ProblemList = append(contest.ProblemList, int(x))
+	}
+
+	return contest, nil
+}

@@ -31,7 +31,6 @@ function AdminContestForm({
   handleSubmit
 }: AdminContestFormProps) {
   let { data } = useSWR("/api/problem", request);
-  let problemList: Problem[] = data ?? [];
 
   // prettier-ignore
   let { selectedValues, isSelected, select, unselect } = useSelectedProblemList<number>(defaultSelected);
@@ -86,6 +85,11 @@ function AdminContestForm({
     [date, selectedValues, handleSubmit]
   );
 
+  if (!data) {
+    return <section className="loading-msg">Loading</section>;
+  }
+
+  let problemList: Problem[] = data;
   return (
     <section className="contest-form--wrapper">
       <div className="contest-form">
@@ -123,7 +127,7 @@ function AdminContestForm({
               <input
                 type="text"
                 name="duration"
-                defaultValue="150"
+                defaultValue={defaultContest.duration}
                 inputMode="numeric"
                 pattern="[0-9]*"
                 required

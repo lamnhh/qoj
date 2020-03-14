@@ -71,7 +71,6 @@ CREATE TABLE contests
     name         CHARACTER(100),
     start_date   TIMESTAMP,
     duration     INT, -- duration in minutes
-    is_published BOOLEAN DEFAULT FALSE,
     primary key (id)
 );
 
