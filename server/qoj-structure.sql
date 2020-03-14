@@ -2,7 +2,7 @@ CREATE TABLE users (
 	username            CHARACTER(16),
 	password            CHARACTER(60),
 	fullname            CHARACTER(100),
-	profile_picture     TEXT DEFAULT '/static/profile-picture-placeholder.png',
+	profile_picture     TEXT DEFAULT '/static/images/profile-picture-placeholder.png',
 	primary key (username)
 );
 

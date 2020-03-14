@@ -11,7 +11,7 @@ import (
 
 var listenerList map[int]*listener.List
 
-func initialiseSocket(app *gin.Engine) {
+func InitialiseSocket(app *gin.Engine) {
 	judges = make(map[int]chan interface{})
 
 	// listenerList[submissionId] is a list of connection, waiting to receive results from this submission

@@ -197,11 +197,14 @@ func putProblemIdTest(ctx *gin.Context) {
 	clearTemporaryData(uuid)
 }
 
-func InitialiseProblemRoutes(app *gin.Engine) {
-	app.GET("/api/problem", token.ParseAuth(), getProblem)
-	app.GET("/api/problem/:id", token.ParseAuth(), getProblemId)
-	app.POST("/api/problem", postProblem)
-	app.DELETE("/api/problem/:id", deleteProblemId)
-	app.PATCH("/api/problem/:id", patchProblemId)
-	app.PUT("/api/problem/:id/test", putProblemIdTest)
+func InitialiseRoutes(app *gin.RouterGroup) {
+	app.GET("/problem", token.ParseAuth(), getProblem)
+	app.GET("/problem/:id", token.ParseAuth(), getProblemId)
+}
+
+func InitialiseAdminRoutes(app *gin.RouterGroup) {
+	app.POST("/problem", postProblem)
+	app.DELETE("/problem/:id", deleteProblemId)
+	app.PATCH("/problem/:id", patchProblemId)
+	app.PUT("/problem/:id/test", putProblemIdTest)
 }

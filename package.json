@@ -6,7 +6,7 @@
   "author": "Lam Nguyen <lam.nguyen.hy.hoai@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start-dev": "webpack --watch",
+    "start-dev": "webpack --watch --mode=development",
     "build": "webpack --mode=production"
   },
   "devDependencies": {

@@ -20,15 +20,49 @@ func InitialiseApp() *gin.Engine {
 	app.LoadHTMLGlob("./static/*.html")
 
 	// Routing
-	auth.InitialiseAuthRoutes(app)
-	problem.InitialiseProblemRoutes(app)
-	submission.InitialiseSubmissionRoutes(app)
-	user.InitialiseUserRoutes(app)
-	language.InitialiseLanguageRoutes(app)
-	contest.InitialiseContestRoutes(app)
+	client := app.Group("/api")
+	{
+		auth.InitialiseRoutes(client)
+		problem.InitialiseRoutes(client)
+		submission.InitialiseRoutes(client)
+		user.InitialiseRoutes(client)
+		language.InitialiseRoutes(client)
+		contest.InitialiseRoutes(client)
+	}
+	submission.InitialiseSocket(app)
+	contest.InitialiseSocket(app)
 
+	// Serve client js
 	app.Use(func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "index.html", nil)
+		ctx.HTML(http.StatusOK, "index.html", []string{
+			"/node_modules/codemirror/lib/codemirror.js",
+			"/node_modules/codemirror/mode/clike/clike.js",
+			"/static/index.js",
+		})
+	})
+
+	return app
+}
+
+func InitialiseAdminApp() *gin.Engine {
+	app := gin.Default()
+
+	app.Static("/static", "./static")
+	app.Static("/node_modules", "./node_modules")
+	app.LoadHTMLGlob("./static/*.html")
+
+	// Admin routing
+	admin := app.Group("/api")
+	{
+		problem.InitialiseAdminRoutes(admin)
+		contest.InitialiseAdminRoutes(admin)
+	}
+
+	// Serve admin js
+	app.Use(func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", []string{
+			"/static/admin.js",
+		})
 	})
 
 	return app

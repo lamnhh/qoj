@@ -42,9 +42,12 @@ module.exports = {
     ]
   },
 
-  entry: "./client/App.tsx",
+  entry: {
+    index: "./client/App.tsx",
+    admin: "./client/Admin.tsx"
+  },
   output: {
-    filename: "index.js",
+    filename: "[name].js",
     path: path.join(__dirname, "static")
   },
 

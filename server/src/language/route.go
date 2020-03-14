@@ -30,7 +30,7 @@ func getLanguageId(ctx *gin.Context) {
 	}
 }
 
-func InitialiseLanguageRoutes(app *gin.Engine) {
-	app.GET("/api/language", getLanguage)
-	app.GET("/api/language/:id", getLanguageId)
+func InitialiseRoutes(app *gin.RouterGroup) {
+	app.GET("/language", getLanguage)
+	app.GET("/language/:id", getLanguageId)
 }
