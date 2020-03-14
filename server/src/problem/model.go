@@ -19,13 +19,14 @@ type Problem struct {
 	TestCount   int     `json:"testCount"`
 }
 
-func CreateProblem(problem Problem) (int, error) {
+func CreateProblem(problem Problem, setter string) (int, error) {
 	rows, err := config.DB.Query(
-		"INSERT INTO problems(code, name, tl, ml) VALUES ($1, $2, $3, $4) RETURNING id",
+		"INSERT INTO problems(code, name, tl, ml, setter) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		problem.Code,
 		problem.Name,
 		problem.TimeLimit,
 		problem.MemoryLimit,
+		setter,
 	)
 	if err != nil {
 		return 0, err
