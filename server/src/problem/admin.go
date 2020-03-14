@@ -7,9 +7,14 @@ import (
 	"strconv"
 )
 
-func fetchProblemsSetBy(setter string) ([]Problem, error) {
-	cmd := "SELECT id, RTRIM(code), RTRIM(name), tl, ml FROM problems WHERE setter = $1 ORDER BY id DESC"
-	rows, err := config.DB.Query(cmd, setter)
+func fetchProblemsSetBy(setter string, search string) ([]Problem, error) {
+	cmd := `SELECT 
+       	id, RTRIM(code), RTRIM(name), tl, ml
+	FROM
+		problems
+	WHERE
+	    setter = $1 AND (code ILIKE '%' || $2 || '%' or name ILIKE '%' || $2 || '%') ORDER BY id DESC`
+	rows, err := config.DB.Query(cmd, setter, search)
 	if err != nil {
 		return []Problem{}, err
 	}
@@ -35,7 +40,8 @@ func fetchProblemAdmin(problemId int) (Problem, error) {
 
 func getProblemAdmin(ctx *gin.Context) {
 	setter := ctx.GetString("username")
-	problemList, err := fetchProblemsSetBy(setter)
+	search := ctx.Query("search")
+	problemList, err := fetchProblemsSetBy(setter, search)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {

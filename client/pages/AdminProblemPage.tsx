@@ -1,13 +1,19 @@
 import React, { useContext, useCallback } from "react";
 import useSWR from "swr";
+import qs from "querystring";
 import request from "../helpers/request";
 import Problem from "../models/Problem";
 import AppContext from "../contexts/AppContext";
-import { useHistory, Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function AdminProblemPage() {
+  let search = qs.parse(useLocation().search.slice(1)).search ?? "";
+
   let { user } = useContext(AppContext);
-  let { data, error } = useSWR("/api/problem", request);
+  let { data, error } = useSWR(
+    "/api/problem" + (search ? "?search=" + search : ""),
+    request
+  );
   let problemList: Problem[] = data ?? [];
 
   let deleteProblem = useCallback(function(problemId: number) {

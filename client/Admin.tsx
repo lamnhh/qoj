@@ -12,6 +12,7 @@ import Logout from "./components/Logout";
 import AdminCreateProblemPage from "./pages/AdminCreateProblemPage";
 import AdminProblemPage from "./pages/AdminProblemPage";
 import AdminEditProblemPage from "./pages/AdminEditProblemPage";
+import AdminSearchPage from "./pages/AdminSearchPage";
 
 function Admin() {
   let [user, setUser] = useState<User | null>(null);
@@ -64,7 +65,9 @@ function Admin() {
             <Logout logoutUrl="/api/logout" returnUrl="/" />
           </Route>
           <Route path="/search">
-            <AdminLayout title="Search">Search</AdminLayout>
+            <AdminLayout title="Search">
+              <AdminSearchPage />
+            </AdminLayout>
           </Route>
           <Route path="/problem/new">
             <AdminLayout title="Create Problem">

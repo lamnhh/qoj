@@ -1,0 +1,22 @@
+.search-form {
+  text-align: center;
+}
+
+.search-form input {
+  font-size: 1.4rem;
+  width: 32rem;
+}
+
+.search-form__desc {
+  color: #888;
+  font-size: 1.2rem;
+  font-style: italic;
+  margin: 0;
+  padding-bottom: 1.2rem;
+  padding-top: 0.6rem;
+}
+
+.search-form button {
+  cursor: pointer;
+  padding: 0 2rem;
+}
