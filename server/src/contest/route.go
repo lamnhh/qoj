@@ -113,13 +113,12 @@ func getContestIdScore(ctx *gin.Context) {
 	}
 }
 
-func InitialiseContestRoutes(app *gin.Engine) {
-	app.GET("/api/contest", token.ParseAuth(), getContest)
-	app.GET("/api/contest/:id", token.ParseAuth(), getContestId)
-	app.POST("/api/contest", token.RequireAuth(), postContest)
-	app.POST("/api/contest/:id/register", token.RequireAuth(), postContestIdRegister)
-	app.GET("/api/contest/:id/participant", getContestIdParticipant)
-	app.GET("/api/contest/:id/problem", token.ParseAuth(), getContestIdProblem)
-	app.GET("/api/contest/:id/score", getContestIdScore)
-	initialiseContestSocket(app)
+func InitialiseRoutes(app *gin.RouterGroup) {
+	app.GET("/contest", token.ParseAuth(), getContest)
+	app.GET("/contest/:id", token.ParseAuth(), getContestId)
+	app.POST("/contest", token.RequireAuth(), postContest)
+	app.POST("/contest/:id/register", token.RequireAuth(), postContestIdRegister)
+	app.GET("/contest/:id/participant", getContestIdParticipant)
+	app.GET("/contest/:id/problem", token.ParseAuth(), getContestIdProblem)
+	app.GET("/contest/:id/score", getContestIdScore)
 }

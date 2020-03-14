@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"qoj/server/config"
 	"qoj/server/src/problem"
 	"qoj/server/src/token"
 )
@@ -141,8 +140,7 @@ func putUserPassword(ctx *gin.Context) {
 		return
 	}
 
-	hashedPassword := hashPassword(body.NewPassword)
-	_, err = config.DB.Exec("UPDATE users SET password = $1 WHERE username = $2", hashedPassword, username)
+	err = updatePassword(username, body.NewPassword)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
@@ -150,20 +148,20 @@ func putUserPassword(ctx *gin.Context) {
 	}
 }
 
-func InitialiseUserRoutes(app *gin.Engine) {
+func InitialiseRoutes(app *gin.RouterGroup) {
 	initialiseAvatarLocks()
 
-	app.GET("/api/user", token.RequireAuth(), getUser)
-	app.GET("/api/user/:username/public", getUserPublic)
-	app.GET("/api/user/:username/solved", getUserSolved)
-	app.GET("/api/user/:username/partial", getUserPartial)
+	app.GET("/user", token.RequireAuth(), getUser)
+	app.GET("/user/:username/public", getUserPublic)
+	app.GET("/user/:username/solved", getUserSolved)
+	app.GET("/user/:username/partial", getUserPartial)
 
 	// Endpoint to upload profile picture
-	app.POST("/api/user/profile-picture", token.RequireAuth(), postUserProfilePicture)
+	app.POST("/user/profile-picture", token.RequireAuth(), postUserProfilePicture)
 
 	// Update current user's information
-	app.PATCH("/api/user", token.RequireAuth(), patchUser)
+	app.PATCH("/user", token.RequireAuth(), patchUser)
 
 	// Update password
-	app.PUT("/api/user/password", token.RequireAuth(), putUserPassword)
+	app.PUT("/user/password", token.RequireAuth(), putUserPassword)
 }

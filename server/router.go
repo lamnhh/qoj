@@ -20,12 +20,17 @@ func InitialiseApp() *gin.Engine {
 	app.LoadHTMLGlob("./static/*.html")
 
 	// Routing
-	auth.InitialiseAuthRoutes(app)
-	problem.InitialiseProblemRoutes(app)
-	submission.InitialiseSubmissionRoutes(app)
-	user.InitialiseUserRoutes(app)
-	language.InitialiseLanguageRoutes(app)
-	contest.InitialiseContestRoutes(app)
+	client := app.Group("/api")
+	{
+		auth.InitialiseRoutes(client)
+		problem.InitialiseRoutes(client)
+		submission.InitialiseRoutes(client)
+		user.InitialiseRoutes(client)
+		language.InitialiseRoutes(client)
+		contest.InitialiseRoutes(client)
+	}
+	submission.InitialiseSocket(app)
+	contest.InitialiseSocket(app)
 
 	app.Use(func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)

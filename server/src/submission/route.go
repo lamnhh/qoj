@@ -197,13 +197,11 @@ func getSubmissionIdCompile(ctx *gin.Context) {
 	}
 }
 
-func InitialiseSubmissionRoutes(app *gin.Engine) {
-	app.GET("/api/submission", getSubmission)
-	app.GET("/api/submission/:id", getSubmissionId)
-	app.POST("/api/submission", token.RequireAuth(), postSubmission)
-	app.GET("/api/submission/:id/result", getSubmissionIdResult)
-	app.GET("/api/submission/:id/code", getSubmissionIdCode)
-	app.GET("/api/submission/:id/compile", getSubmissionIdCompile)
-
-	initialiseSocket(app)
+func InitialiseRoutes(app *gin.RouterGroup) {
+	app.GET("/submission", getSubmission)
+	app.GET("/submission/:id", getSubmissionId)
+	app.POST("/submission", token.RequireAuth(), postSubmission)
+	app.GET("/submission/:id/result", getSubmissionIdResult)
+	app.GET("/submission/:id/code", getSubmissionIdCode)
+	app.GET("/submission/:id/compile", getSubmissionIdCompile)
 }

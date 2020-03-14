@@ -31,7 +31,7 @@ func createListenerList(contestId int) {
 	listLock.Unlock()
 }
 
-func initialiseContestSocket(app *gin.Engine) {
+func InitialiseSocket(app *gin.Engine) {
 	listenerList = make(map[int]*listener.List)
 	subscriptionList := make(map[*websocket.Conn]map[int]int)
 

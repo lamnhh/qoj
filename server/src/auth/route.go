@@ -114,9 +114,9 @@ func getLogout(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{})
 }
 
-func InitialiseAuthRoutes(app *gin.Engine) {
-	app.POST("/api/register", postRegister)
-	app.POST("/api/login", postLogin)
-	app.GET("/api/refresh", getRefresh)
-	app.GET("/api/logout", getLogout)
+func InitialiseRoutes(app *gin.RouterGroup) {
+	app.POST("/register", postRegister)
+	app.POST("/login", postLogin)
+	app.GET("/refresh", getRefresh)
+	app.GET("/logout", getLogout)
 }

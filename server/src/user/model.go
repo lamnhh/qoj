@@ -92,3 +92,9 @@ func UpdateUserProfile(username string, modifier map[string]interface{}) (User, 
 	}
 	return user, nil
 }
+
+func updatePassword(username string, newPassword string) error {
+	hashedPassword := hashPassword(newPassword)
+	_, err := config.DB.Exec("UPDATE users SET password = $1 WHERE username = $2", hashedPassword, username)
+	return err
+}
