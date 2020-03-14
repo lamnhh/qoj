@@ -20,7 +20,7 @@ func InitialiseApp() *gin.Engine {
 	app.LoadHTMLGlob("./static/*.html")
 
 	// Routing
-	client := app.Group("/api/c")
+	client := app.Group("/api")
 	{
 		auth.InitialiseRoutes(client)
 		problem.InitialiseRoutes(client)
@@ -32,15 +32,37 @@ func InitialiseApp() *gin.Engine {
 	submission.InitialiseSocket(app)
 	contest.InitialiseSocket(app)
 
+	// Serve client js
+	app.Use(func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", []string{
+			"/node_modules/codemirror/lib/codemirror.js",
+			"/node_modules/codemirror/mode/clike/clike.js",
+			"/static/index.js",
+		})
+	})
+
+	return app
+}
+
+func InitialiseAdminApp() *gin.Engine {
+	app := gin.Default()
+
+	app.Static("/static", "./static")
+	app.Static("/node_modules", "./node_modules")
+	app.LoadHTMLGlob("./static/*.html")
+
 	// Admin routing
-	admin := app.Group("/api/a")
+	admin := app.Group("/api")
 	{
 		problem.InitialiseAdminRoutes(admin)
 		contest.InitialiseAdminRoutes(admin)
 	}
 
+	// Serve admin js
 	app.Use(func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "index.html", nil)
+		ctx.HTML(http.StatusOK, "index.html", []string{
+			"/static/admin.js",
+		})
 	})
 
 	return app

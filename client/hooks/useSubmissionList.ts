@@ -64,7 +64,7 @@ function useSubmissionList({ params, pageSize = 15 }: HookProps): HookResult {
       }
 
       let url = buildURL(
-        "/api/c/submission",
+        "/api/submission",
         params.concat([
           ["page", String(page)],
           ["size", String(pageSize)]

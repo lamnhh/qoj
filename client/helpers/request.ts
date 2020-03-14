@@ -2,7 +2,7 @@ import { getAccessToken, hasToken, setAccessToken } from "./auth";
 import jwtDecode from "jwt-decode";
 
 function refreshToken() {
-  return fetch("/api/c/refresh").then(function(res) {
+  return fetch("/api/refresh").then(function(res) {
     if (res.ok) {
       return res.json().then(function({ accessToken }) {
         return accessToken;

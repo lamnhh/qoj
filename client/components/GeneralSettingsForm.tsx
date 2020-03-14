@@ -27,7 +27,7 @@ function GeneralSettingsForm({ user }: { user: User }) {
       // Update non-file fields
       let fullname: string = form.fullname.value;
       promiseList.push(
-        request("/api/c/user", {
+        request("/api/user", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ fullname })
@@ -49,7 +49,7 @@ function GeneralSettingsForm({ user }: { user: User }) {
         let body = new FormData();
         body.append("file", form.file.files[0]);
         promiseList.push(
-          request("/api/c/user/profile-picture", {
+          request("/api/user/profile-picture", {
             method: "POST",
             body
           })

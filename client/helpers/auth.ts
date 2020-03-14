@@ -17,5 +17,5 @@ export function setAccessToken(tkn: string): void {
 
 export function clearToken(): void {
   accessToken = null;
-  fetch("/api/c/logout");
+  fetch("/api/logout");
 }

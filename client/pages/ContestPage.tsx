@@ -27,7 +27,7 @@ function ContestPage({ tab }: ContestPageProps) {
   let [contest, setContest] = useState<Contest | null>(null);
   useEffect(
     function() {
-      request(`/api/c/contest/${contestId}`).then(setContest);
+      request(`/api/contest/${contestId}`).then(setContest);
     },
     [contestId]
   );
@@ -35,7 +35,7 @@ function ContestPage({ tab }: ContestPageProps) {
   let [problemList, setProblemList] = useState<Array<Problem> | null>(null);
   useEffect(
     function() {
-      request(`/api/c/contest/${contestId}/problem`).then(setProblemList);
+      request(`/api/contest/${contestId}/problem`).then(setProblemList);
     },
     [contestId]
   );

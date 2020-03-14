@@ -12,7 +12,7 @@ function ContestParticipantsPage() {
   let [contest, setContest] = useState<Contest | null>(null);
   useEffect(
     function() {
-      request(`/api/c/contest/${contestId}`).then(setContest);
+      request(`/api/contest/${contestId}`).then(setContest);
     },
     [contestId]
   );
@@ -20,7 +20,7 @@ function ContestParticipantsPage() {
   let [userList, setUserList] = useState<Array<string>>([]);
   useEffect(
     function() {
-      request(`/api/c/contest/${contestId}/participant`).then(setUserList);
+      request(`/api/contest/${contestId}/participant`).then(setUserList);
     },
     [contestId]
   );

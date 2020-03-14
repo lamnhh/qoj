@@ -25,7 +25,7 @@ function ProblemPage({ tab }: ProblemPageProps) {
   let [problem, setProblem] = useState<Problem>(emptyProblem);
   useEffect(
     function() {
-      request("/api/c/problem/" + problemId).then(setProblem);
+      request("/api/problem/" + problemId).then(setProblem);
     },
     [problemId]
   );
