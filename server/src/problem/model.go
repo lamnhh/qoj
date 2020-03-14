@@ -51,7 +51,7 @@ func DeleteProblem(problemId int) error {
 	return nil
 }
 
-func FetchAllProblems(username string, page int, size int) ([]Problem, int, error) {
+func FetchAllProblems(username string, page int, size int) ([]Problem, int, error) 	{
 	rows, err := config.DB.Query("SELECT * FROM get_problem_list($1, $2, $3)", username, page, size)
 	if err != nil {
 		return []Problem{}, 0, err

@@ -10,6 +10,7 @@ import { setAccessToken } from "./helpers/auth";
 import AppContext from "./contexts/AppContext";
 import Logout from "./components/Logout";
 import AdminCreateProblemPage from "./pages/AdminCreateProblemPage";
+import AdminProblemPage from "./pages/AdminProblemPage";
 
 function Admin() {
   let [user, setUser] = useState<User | null>(null);
@@ -70,7 +71,9 @@ function Admin() {
             </AdminLayout>
           </Route>
           <Route path="/problem" exact>
-            <AdminLayout title="Problems">View problems</AdminLayout>
+            <AdminLayout title="Problems">
+              <AdminProblemPage />
+            </AdminLayout>
           </Route>
           <Route path="/contest/new">
             <AdminLayout title="Create Contest">Create contest</AdminLayout>

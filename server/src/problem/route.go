@@ -204,6 +204,7 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 }
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
+	app.GET("/problem", token.RequireAuth(), getProblemAdmin)
 	app.POST("/problem", token.RequireAuth(), postProblem)
 	app.DELETE("/problem/:id", deleteProblemId)
 	app.PATCH("/problem/:id", patchProblemId)
