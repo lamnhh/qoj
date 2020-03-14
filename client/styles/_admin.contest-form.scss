@@ -1,0 +1,61 @@
+.contest-form__title {
+  font-size: 1.6rem;
+  font-weight: normal;
+  text-align: center;
+}
+
+.contest-form {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  grid-gap: 6rem;
+}
+
+.contest-form__metadata label {
+  display: block;
+  margin-bottom: 2rem;
+}
+
+.contest-form__field-name {
+  display: inline-block;
+  font-size: 1.4rem;
+  width: 33%;
+}
+
+.contest-form__field-value {
+  display: inline-block;
+  width: 67%;
+
+  input {
+    width: 100%;
+  }
+}
+
+.contest-form__selected select[name="problemId"] {
+  background: transparent;
+  border: none;
+  padding: 0.4rem 0;
+  width: 100%;
+}
+
+.contest-form__selected option {
+  padding: 0.4rem 0.8rem;
+}
+
+.contest-form__selected__action button {
+  background: transparent;
+  border: none;
+  color: rgb(0, 0, 204);
+  cursor: pointer;
+  margin-right: 1rem;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+}
+
+.contest-form__submit-btn {
+  margin-top: 3rem;
+  text-align: center;
+  button {
+    padding: 0.2rem 1.6rem;
+  }
+}

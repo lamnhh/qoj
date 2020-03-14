@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./styles/admin.scss";
+import "../node_modules/react-datetime/css/react-datetime.css";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import AdminLoginPage from "./pages/AdminLoginPage";
@@ -14,6 +15,7 @@ import AdminProblemPage from "./pages/AdminProblemPage";
 import AdminEditProblemPage from "./pages/AdminEditProblemPage";
 import AdminSearchPage from "./pages/AdminSearchPage";
 import AdminContestPage from "./pages/AdminContestPage";
+import AdminCreateContestPage from "./pages/AdminCreateContestPage";
 
 // Initialise moment-duration
 let moment = require("moment");
@@ -91,7 +93,9 @@ function Admin() {
             </AdminLayout>
           </Route>
           <Route path="/contest/new">
-            <AdminLayout title="Create Contest">Create contest</AdminLayout>
+            <AdminLayout title="Create Contest">
+              <AdminCreateContestPage />
+            </AdminLayout>
           </Route>
           <Route path="/contest" exact>
             <AdminLayout title="Contests">
