@@ -54,6 +54,8 @@ func InitialiseAdminApp() *gin.Engine {
 	// Admin routing
 	admin := app.Group("/api")
 	{
+		auth.InitialiseAdminRoutes(admin)
+		user.InitialiseAdminRoutes(admin)
 		problem.InitialiseAdminRoutes(admin)
 		contest.InitialiseAdminRoutes(admin)
 	}

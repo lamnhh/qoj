@@ -58,7 +58,7 @@ func FindUserByUsername(username string) (User, error) {
 }
 
 func CreateNewUser(user User) error {
-	hashedPassword := hashPassword(user.Password)
+	hashedPassword := HashPassword(user.Password)
 	_, err := config.DB.Exec("SELECT create_user($1, $2, $3)", user.Username, hashedPassword, user.Fullname)
 	return err
 }
@@ -94,7 +94,7 @@ func UpdateUserProfile(username string, modifier map[string]interface{}) (User, 
 }
 
 func updatePassword(username string, newPassword string) error {
-	hashedPassword := hashPassword(newPassword)
+	hashedPassword := HashPassword(newPassword)
 	_, err := config.DB.Exec("UPDATE users SET password = $1 WHERE username = $2", hashedPassword, username)
 	return err
 }

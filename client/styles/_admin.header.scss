@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css?family=Bellota+Text&display=swap");
+
+.header {
+  padding-top: 1.2rem;
+}
+
+.header__logo {
+  color: #1010c0;
+  font-family: "Bellota Text", cursive;
+  font-size: 3.2rem;
+  font-weight: bold;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.header__subtext {
+  font-size: 1.6rem;
+  font-style: italic;
+  margin: 0;
+}
+
+.navigation {
+  align-items: center;
+  background-color: #e5ecf9;
+  border: 0.1rem solid rgb(195, 217, 255);
+  border-radius: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3.2rem;
+  margin-top: 1.6rem;
+  padding: 0.4rem 1.2rem;
+}
+
+.navigation ul {
+  margin: 0;
+  padding: 0;
+  text-align: right;
+}
+
+.navigation li {
+  display: inline-block;
+  list-style: none;
+  margin-left: 1.2rem;
+  a {
+    font-size: 1.4rem;
+  }
+  a.active {
+    font-weight: bold;
+  }
+}
+
+.navigation span {
+  font-size: 1.4rem;
+  margin-left: 1.2rem;
+}
+
+.page-title {
+  flex-grow: 1;
+  font-size: 1.8rem;
+  font-weight: normal;
+  line-height: 1.5;
+  margin: 0;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 1024px) {
+  .align-left-right {
+    padding-left: 8%;
+    padding-right: 8%;
+  }
+}

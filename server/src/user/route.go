@@ -165,3 +165,7 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 	// Update password
 	app.PUT("/user/password", token.RequireAuth(), putUserPassword)
 }
+
+func InitialiseAdminRoutes(app *gin.RouterGroup) {
+	app.GET("/user", token.RequireAuth(), getUser)
+}
