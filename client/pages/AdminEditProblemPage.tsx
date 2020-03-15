@@ -5,6 +5,7 @@ import useSWR from "swr";
 import request from "../helpers/request";
 import Problem from "../models/Problem";
 import AdminProblem from "../models/AdminProblem";
+import Loading from "../components/Loading";
 
 interface AdminEditProblemPageRouterProps {
   id: string;
@@ -12,7 +13,7 @@ interface AdminEditProblemPageRouterProps {
 
 function AdminEditProblemPage() {
   let problemId = parseInt(useParams<AdminEditProblemPageRouterProps>().id);
-  let { data, error } = useSWR("/api/problem/" + problemId, request);
+  let { data } = useSWR("/api/problem/" + problemId, request);
 
   let history = useHistory();
 
@@ -55,11 +56,8 @@ function AdminEditProblemPage() {
     [problemId, history]
   );
 
-  if (error) {
-    return <section className="error-msg">Server error</section>;
-  }
   if (!data) {
-    return <section className="loading-msg">Loading</section>;
+    return <Loading />;
   }
 
   let currentProblem: Problem = {

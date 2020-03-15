@@ -58,7 +58,7 @@ function LoginForm() {
       <div className="auth-form__body">
         <label>
           <span>Username</span>
-          <input type="text" name="username" required />
+          <input type="text" name="username" required autoFocus />
         </label>
         <label>
           <span>Password</span>

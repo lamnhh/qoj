@@ -7,6 +7,7 @@ import useSelectedProblemList from "../hooks/useSelectedProblemList";
 import moment, { Moment } from "moment";
 import Contest from "../models/Contest";
 import AdminContest from "../models/AdminContest";
+import Loading from "./Loading";
 
 interface AdminContestFormProps {
   action: string;
@@ -86,7 +87,7 @@ function AdminContestForm({
   );
 
   if (!data) {
-    return <section className="loading-msg">Loading</section>;
+    return <Loading />;
   }
 
   let problemList: Problem[] = data;
@@ -120,9 +121,7 @@ function AdminContestForm({
             </div>
           </label>
           <label>
-            <span className="contest-form__field-name">
-              Duration (in minutes)
-            </span>
+            <span className="contest-form__field-name">Duration</span>
             <div className="contest-form__field-value">
               <input
                 type="text"
@@ -132,6 +131,7 @@ function AdminContestForm({
                 pattern="[0-9]*"
                 required
               />
+              <p className="contest-form__field-desc">Duration in minutes</p>
             </div>
           </label>
         </form>

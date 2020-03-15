@@ -10,7 +10,7 @@ function AdminProblemPage() {
   let search = qs.parse(useLocation().search.slice(1)).search ?? "";
 
   let { user } = useContext(AppContext);
-  let { data, error } = useSWR(
+  let { data } = useSWR(
     "/api/problem" + (search ? "?search=" + search : ""),
     request
   );
@@ -29,10 +29,6 @@ function AdminProblemPage() {
       });
   }, []);
 
-  if (error) {
-    return <section className="error-msg">Server error</section>;
-  }
-
   return (
     <section className="problem-page">
       <h2 className="problem-page__count">Problems: {problemList.length}</h2>
@@ -48,6 +44,11 @@ function AdminProblemPage() {
           </tr>
         </thead>
         <tbody>
+          {problemList.length === 0 && (
+            <tr>
+              <td colSpan={6}>No item</td>
+            </tr>
+          )}
           {problemList.map(function(problem) {
             return (
               <tr key={problem.id}>

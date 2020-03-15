@@ -50,15 +50,19 @@ function UserPageProblemList({ title, url }: { title: string; url: string }) {
     [url]
   );
 
-  if (problemList.length === 0) {
-    return null;
-  }
   return (
     <div className="user-page__prob-list">
       <div className="user-page__prob-list__title">
         <h1>{title}</h1>
       </div>
-      <div className="user-page__prob-list__content">
+      <div
+        className={
+          "user-page__prob-list__content" +
+          (problemList.length === 0 ? " empty" : "")
+        }>
+        {problemList.length === 0 && (
+          <div className="user-page__prob-list__item">No item</div>
+        )}
         {problemList.map(function(problem: PartialProblem) {
           return <ProblemListItem key={problem.id} problem={problem} />;
         })}

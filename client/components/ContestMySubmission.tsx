@@ -47,13 +47,15 @@ function ContestMySubmission({
   );
   return (
     <div className="my-submission">
-      <SubmissionList
-        title="Late submissions"
-        borderStyle="full-border"
-        socket={socket}
-        submissionList={lateSubmissionList}
-        paginationProps={paginationProps}
-      />
+      {lateSubmissionList.length > 0 && (
+        <SubmissionList
+          title="Late submissions"
+          borderStyle="full-border"
+          socket={socket}
+          submissionList={lateSubmissionList}
+          paginationProps={paginationProps}
+        />
+      )}
       <SubmissionList
         title="My in-contest submissions"
         borderStyle="full-border"

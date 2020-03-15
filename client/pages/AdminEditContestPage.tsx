@@ -5,6 +5,7 @@ import useSWR from "swr";
 import request from "../helpers/request";
 import AdminContest from "../models/AdminContest";
 import Contest from "../models/Contest";
+import Loading from "../components/Loading";
 
 interface AdminEditContestPageRouterProps {
   id: string;
@@ -12,7 +13,7 @@ interface AdminEditContestPageRouterProps {
 
 function AdminEditContestPage() {
   let contestId = parseInt(useParams<AdminEditContestPageRouterProps>().id);
-  let { data, error } = useSWR("/api/contest/" + contestId, request);
+  let { data } = useSWR("/api/contest/" + contestId, request);
 
   let history = useHistory();
 
@@ -30,11 +31,8 @@ function AdminEditContestPage() {
       });
   }
 
-  if (error) {
-    return <section className="error-msg">Server Error</section>;
-  }
   if (!data) {
-    return <section className="loading-msg">Loading</section>;
+    return <Loading />;
   }
 
   let contest = data as Contest;

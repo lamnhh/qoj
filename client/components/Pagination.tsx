@@ -37,6 +37,9 @@ function Pagination({
   onPageChange
 }: PaginationProps) {
   let pageCount = Math.ceil(totalCount / pageSize);
+  if (pageCount === 0) {
+    return null;
+  }
   return (
     <div className="pagination">
       <PaginationButton
