@@ -34,7 +34,10 @@ function ContestItem({
   return (
     <tr>
       <td className="contest-column">
-        <Link to={`/contest/${contest.id}`}>{contest.name}</Link>
+        <Link
+          to={user && contest.isRegistered ? `/contest/${contest.id}` : "#"}>
+          {contest.name}
+        </Link>
       </td>
       <td>{moment(contest.startDate).format("MMM/DD/YYYY, HH:mm")}</td>
       <td>{duration}</td>

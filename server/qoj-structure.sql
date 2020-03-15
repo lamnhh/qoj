@@ -141,6 +141,32 @@ CREATE TRIGGER trigger_submission_in_contest
     FOR EACH ROW
 EXECUTE PROCEDURE insert_submission_in_contest();
 
+CREATE OR REPLACE FUNCTION insert_submission_before_register() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF NOT EXISTS(
+            SELECT *
+            FROM problems
+                     LEFT JOIN contests ON (problems.contest_id = contests.id)
+                     LEFT JOIN contest_registrations ON (contests.id = contest_registrations.contest_id)
+            WHERE NEW.problem_id = problems.id
+              AND (contests.id IS NULL OR contest_registrations.username = NEW.username)
+        ) THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'Must register first',
+            HINT = 'Must register first',
+            ERRCODE = 'QHHOJ';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_submission_before_register
+    BEFORE INSERT
+    ON submissions
+    FOR EACH ROW
+EXECUTE PROCEDURE insert_submission_before_register();
+
 INSERT INTO languages(name, ext, command)
 VALUES ('C', '.c', 'gcc -Wall -lm -static -DEVAL -o %s -O2 %s.c'),
        ('C++', '.cpp', 'g++ -Wall -lm -static -DEVAL -o %s -O2 %s.cpp'),
