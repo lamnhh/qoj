@@ -7,6 +7,7 @@ import useSelectedProblemList from "../hooks/useSelectedProblemList";
 import moment, { Moment } from "moment";
 import Contest from "../models/Contest";
 import AdminContest from "../models/AdminContest";
+import Loading from "./Loading";
 
 interface AdminContestFormProps {
   action: string;
@@ -86,7 +87,7 @@ function AdminContestForm({
   );
 
   if (!data) {
-    return <section className="loading-msg">Loading</section>;
+    return <Loading />;
   }
 
   let problemList: Problem[] = data;

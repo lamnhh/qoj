@@ -10,7 +10,7 @@ function AdminProblemPage() {
   let search = qs.parse(useLocation().search.slice(1)).search ?? "";
 
   let { user } = useContext(AppContext);
-  let { data, error } = useSWR(
+  let { data } = useSWR(
     "/api/problem" + (search ? "?search=" + search : ""),
     request
   );
@@ -28,10 +28,6 @@ function AdminProblemPage() {
         alert(error);
       });
   }, []);
-
-  if (error) {
-    return <section className="error-msg">Server error</section>;
-  }
 
   return (
     <section className="problem-page">

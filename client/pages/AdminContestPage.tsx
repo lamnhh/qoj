@@ -6,7 +6,7 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 
 function AdminContestPage() {
-  let { data, error } = useSWR("/api/contest", request);
+  let { data } = useSWR("/api/contest", request);
 
   function deleteContest(contestId: number) {
     if (!confirm("Are you sure you want to discard this contest?")) {
@@ -20,10 +20,6 @@ function AdminContestPage() {
       .catch(function({ error }) {
         alert(error);
       });
-  }
-
-  if (error) {
-    return <section className="error-msg">Server Error</section>;
   }
 
   let contestList: Contest[] = data ?? [];
