@@ -41,6 +41,11 @@ function AdminContestPage() {
           </tr>
         </thead>
         <tbody>
+          {contestList.length === 0 && (
+            <tr>
+              <td colSpan={5}>No item</td>
+            </tr>
+          )}
           {contestList.map(function(contest) {
             return (
               <tr key={contest.id}>

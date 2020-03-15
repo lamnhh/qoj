@@ -120,9 +120,7 @@ function AdminContestForm({
             </div>
           </label>
           <label>
-            <span className="contest-form__field-name">
-              Duration (in minutes)
-            </span>
+            <span className="contest-form__field-name">Duration</span>
             <div className="contest-form__field-value">
               <input
                 type="text"
@@ -132,6 +130,7 @@ function AdminContestForm({
                 pattern="[0-9]*"
                 required
               />
+              <p className="contest-form__field-desc">Duration in minutes</p>
             </div>
           </label>
         </form>

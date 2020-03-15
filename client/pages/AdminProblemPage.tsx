@@ -48,6 +48,11 @@ function AdminProblemPage() {
           </tr>
         </thead>
         <tbody>
+          {problemList.length === 0 && (
+            <tr>
+              <td colSpan={6}>No item</td>
+            </tr>
+          )}
           {problemList.map(function(problem) {
             return (
               <tr key={problem.id}>
