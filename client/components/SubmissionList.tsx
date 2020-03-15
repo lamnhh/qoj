@@ -37,15 +37,21 @@ function SubmissionList({
           <th>Execution time</th>
           <th>Memory</th>
         </tr>
-        {submissionList.map(submission => {
-          return (
-            <SubmissionListItem
-              key={submission.id}
-              submission={submission}
-              socket={socket}
-            />
-          );
-        })}
+        {submissionList.length === 0 ? (
+          <tr className="my-table__empty-row">
+            <td colSpan={8}>No item</td>
+          </tr>
+        ) : (
+          submissionList.map(submission => {
+            return (
+              <SubmissionListItem
+                key={submission.id}
+                submission={submission}
+                socket={socket}
+              />
+            );
+          })
+        )}
       </table>
       {paginationProps !== null && <Pagination {...paginationProps} />}
     </div>

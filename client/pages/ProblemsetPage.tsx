@@ -44,25 +44,31 @@ function ProblemsetPage() {
               <th>Problem code</th>
               <th>Problem title</th>
             </tr>
-            {problemList.map(function(problem) {
-              return (
-                <tr key={problem.id}>
-                  <td>{problem.id}</td>
-                  <td>
-                    <ScoreBar
-                      maxScore={problem.maxScore}
-                      testCount={problem.testCount}
-                    />
-                  </td>
-                  <td>
-                    <Link to={"/problem/" + problem.id}>{problem.code}</Link>
-                  </td>
-                  <td>
-                    <Link to={"/problem/" + problem.id}>{problem.name}</Link>
-                  </td>
-                </tr>
-              );
-            })}
+            {problemList.length === 0 ? (
+              <tr className="my-table__empty-row">
+                <td colSpan={4}>No item</td>
+              </tr>
+            ) : (
+              problemList.map(function(problem) {
+                return (
+                  <tr key={problem.id}>
+                    <td>{problem.id}</td>
+                    <td>
+                      <ScoreBar
+                        maxScore={problem.maxScore}
+                        testCount={problem.testCount}
+                      />
+                    </td>
+                    <td>
+                      <Link to={"/problem/" + problem.id}>{problem.code}</Link>
+                    </td>
+                    <td>
+                      <Link to={"/problem/" + problem.id}>{problem.name}</Link>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </table>
           <Pagination
             totalCount={problemCount}

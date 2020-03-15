@@ -46,8 +46,10 @@
 .user-page__prob-list__content {
   background-color: #ddd;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-gap: 0.1rem;
+  &:not(.empty) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-gap: 0.1rem;
+  }
 }
 
 .user-page__prob-list__item {

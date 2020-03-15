@@ -74,3 +74,8 @@
   padding-left: 1rem !important;
   text-align: left !important;
 }
+
+.my-table__empty-row td {
+  font-weight: bold;
+  padding-left: 1.2rem;
+}
