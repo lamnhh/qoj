@@ -2,7 +2,9 @@ package submission
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"qoj/server/config"
 	"strings"
 	"time"
@@ -60,6 +62,9 @@ func createSubmission(username string, problemId int, languageId int, code strin
 		code,
 	)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			return Submission{}, errors.New(pqErr.Hint)
+		}
 		return Submission{}, err
 	}
 
@@ -75,15 +80,17 @@ func updateCompilationMessage(submissionId int, msg string) error {
 	return err
 }
 
-func fetchCode(submissionId int) (string, error) {
+func fetchCode(submissionId int, username string) (string, error) {
 	code := ""
-	err := config.DB.QueryRow("SELECT code FROM submissions WHERE id = $1", submissionId).Scan(&code)
+	cmd := "SELECT code FROM get_submission_with_permission($1, $2)"
+	err := config.DB.QueryRow(cmd, submissionId, username).Scan(&code)
 	return code, err
 }
 
-func fetchCompilationMessage(submissionId int) (string, error) {
+func fetchCompilationMessage(submissionId int, username string) (string, error) {
 	msg := ""
-	err := config.DB.QueryRow("SELECT compile_msg FROM submissions WHERE id = $1", submissionId).Scan(&msg)
+	cmd := "SELECT compile_msg FROM get_submission_with_permission($1, $2)"
+	err := config.DB.QueryRow(cmd, submissionId, username).Scan(&msg)
 	return msg, err
 }
 

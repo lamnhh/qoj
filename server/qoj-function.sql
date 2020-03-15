@@ -19,7 +19,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_submission_result(sub_id INT)
+CREATE OR REPLACE FUNCTION get_submission_result(_submission_id INT, _username CHARACTER(16))
     RETURNS TABLE
             (
                 inp_preview    TEXT,
@@ -33,6 +33,22 @@ CREATE OR REPLACE FUNCTION get_submission_result(sub_id INT)
 AS
 $$
 BEGIN
+    IF NOT EXISTS(
+            SELECT *
+            FROM submissions
+                     JOIN problems ON (submissions.problem_id = problems.id)
+                     LEFT JOIN contests ON (problems.contest_id = contests.id)
+            WHERE submissions.id = _submission_id
+              AND (
+                    (contests.id IS NULL) OR
+                    (NOW() AT TIME ZONE 'utc' > contests.start_date + (contests.duration || 'minutes') :: interval)
+                )
+        ) THEN
+        RAISE EXCEPTION USING
+            HINT = 'Contest has not ended yet, cannot view solutions',
+            MESSAGE = 'Contest has not ended yet, cannot view solutions',
+            ERRCODE = 'QHHOJ';
+    END IF;
     RETURN QUERY
         SELECT tests.inp_preview,
                tests.out_preview,
@@ -43,7 +59,7 @@ BEGIN
                submission_results.memory_used
         FROM submission_results
                  JOIN tests ON (submission_results.test_id = tests.id)
-        WHERE submission_id = sub_id
+        WHERE submission_id = _submission_id
         ORDER BY tests.ord ASC;
 END;
 $$ LANGUAGE plpgsql;
@@ -267,5 +283,23 @@ BEGIN
            _contest_id as contest_id
     FROM problems
     WHERE problems.id = ANY (_problem_list);
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_submission_with_permission(_submission_id INT, _username CHARACTER(16))
+    RETURNS SETOF submissions AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT submissions.*
+        FROM submissions
+                 JOIN problems ON (submissions.problem_id = problems.id)
+                 LEFT JOIN contests ON (problems.contest_id = contests.id)
+        WHERE submissions.id = _submission_id
+          AND (
+                (submissions.username = _username) OR
+                (contests.id IS NULL) OR
+                (NOW() AT TIME ZONE 'utc' > contests.start_date + (contests.duration || 'minutes') :: interval)
+            );
 END
 $$ LANGUAGE plpgsql;

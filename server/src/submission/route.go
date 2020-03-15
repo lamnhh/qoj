@@ -157,7 +157,8 @@ func getSubmissionIdResult(ctx *gin.Context) {
 	}
 	submissionId := int(submissionId64)
 
-	resultList, err := result.GetResultsOfSubmission(submissionId)
+	username := ctx.GetString("username")
+	resultList, err := result.GetResultsOfSubmission(submissionId, username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -173,7 +174,8 @@ func getSubmissionIdCode(ctx *gin.Context) {
 	}
 	submissionId := int(submissionId64)
 
-	code, err := fetchCode(submissionId)
+	username := ctx.GetString("username")
+	code, err := fetchCode(submissionId, username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
@@ -189,7 +191,8 @@ func getSubmissionIdCompile(ctx *gin.Context) {
 	}
 	submissionId := int(submissionId64)
 
-	msg, err := fetchCompilationMessage(submissionId)
+	username := ctx.GetString("username")
+	msg, err := fetchCompilationMessage(submissionId, username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
@@ -201,7 +204,7 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 	app.GET("/submission", getSubmission)
 	app.GET("/submission/:id", getSubmissionId)
 	app.POST("/submission", token.RequireAuth(), postSubmission)
-	app.GET("/submission/:id/result", getSubmissionIdResult)
-	app.GET("/submission/:id/code", getSubmissionIdCode)
-	app.GET("/submission/:id/compile", getSubmissionIdCompile)
+	app.GET("/submission/:id/result", token.ParseAuth(), getSubmissionIdResult)
+	app.GET("/submission/:id/code", token.ParseAuth(), getSubmissionIdCode)
+	app.GET("/submission/:id/compile", token.ParseAuth(), getSubmissionIdCompile)
 }

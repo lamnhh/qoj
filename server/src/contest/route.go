@@ -175,9 +175,9 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 }
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
-	app.GET("/contest", token.RequireAuth(), getContest)
-	app.GET("/contest/:id", token.RequireAuth(), getContestIdAdmin)
-	app.POST("/contest", token.RequireAuth(), postContest)
-	app.PATCH("/contest/:id", token.RequireAuth(), patchContestId)
-	app.DELETE("/contest/:id", token.RequireAuth(), deleteContestId)
+	app.GET("/contest", token.RequireAuth(), token.RequireAdmin(), getContest)
+	app.GET("/contest/:id", token.RequireAuth(), token.RequireAdmin(), getContestIdAdmin)
+	app.POST("/contest", token.RequireAuth(), token.RequireAdmin(), postContest)
+	app.PATCH("/contest/:id", token.RequireAuth(), token.RequireAdmin(), patchContestId)
+	app.DELETE("/contest/:id", token.RequireAuth(), token.RequireAdmin(), deleteContestId)
 }
