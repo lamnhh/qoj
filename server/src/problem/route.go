@@ -204,10 +204,10 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 }
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
-	app.GET("/problem", token.RequireAuth(), getProblemAdmin)
-	app.GET("/problem/:id", token.RequireAuth(), getProblemIdAdmin)
-	app.POST("/problem", token.RequireAuth(), postProblem)
-	app.DELETE("/problem/:id", deleteProblemId)
-	app.PATCH("/problem/:id", patchProblemId)
-	app.PUT("/problem/:id/test", putProblemIdTest)
+	app.GET("/problem", token.RequireAuth(), token.RequireAdmin(), getProblemAdmin)
+	app.GET("/problem/:id", token.RequireAuth(), token.RequireAdmin(), getProblemIdAdmin)
+	app.POST("/problem", token.RequireAuth(), token.RequireAdmin(), postProblem)
+	app.DELETE("/problem/:id", token.RequireAuth(), token.RequireAdmin(), deleteProblemId)
+	app.PATCH("/problem/:id", token.RequireAuth(), token.RequireAdmin(), patchProblemId)
+	app.PUT("/problem/:id/test", token.RequireAuth(), token.RequireAdmin(), putProblemIdTest)
 }

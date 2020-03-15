@@ -4,9 +4,10 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"os"
-	"strings"
+	"qoj/server/config"
 	"time"
 )
 
@@ -62,30 +63,15 @@ func DecodeRefreshToken(tokenString string) (string, error) {
 
 func ParseAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// Extract header
-		authHeader := ctx.GetHeader("Authorization")
-		if authHeader == "" {
-			ctx.Next()
-			return
-		}
+		username, err := parseUsernameFromToken(ctx)
 
-		// Split authHeader into 2 parts: "Bearer" and the actual token
-		authHeaderToken := strings.Split(authHeader, " ")
-		if len(authHeaderToken) != 2 {
-			// If there aren't exactly 2 parts, return a 401
-			ctx.Next()
-			return
-		}
-
-		// Extract access token as the 2nd element from authHeaderToken
-		accessToken := authHeaderToken[1]
-		username, err := DecodeAccessToken(accessToken)
+		// If no token exists, or token is valid, ignore it
 		if err != nil {
 			ctx.Next()
 			return
 		}
 
-		// Save `username` into context for later use
+		// Set username if possible
 		ctx.Set("username", username)
 		ctx.Next()
 	}
@@ -93,31 +79,28 @@ func ParseAuth() gin.HandlerFunc {
 
 func RequireAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// Extract header
-		authHeader := ctx.GetHeader("Authorization")
-		if authHeader == "" {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Access token required"})
-			return
-		}
-
-		// Split authHeader into 2 parts: "Bearer" and the actual token
-		authHeaderToken := strings.Split(authHeader, " ")
-		if len(authHeaderToken) != 2 {
-			// If there aren't exactly 2 parts, return a 401
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-			return
-		}
-
-		// Extract access token as the 2nd element from authHeaderToken
-		accessToken := authHeaderToken[1]
-		username, err := DecodeAccessToken(accessToken)
+		username, err := parseUsernameFromToken(ctx)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
-
-		// Save `username` into context for later use
 		ctx.Set("username", username)
+		ctx.Next()
+	}
+}
+
+// RequireAdmin is a middleware that verify if ctx.GetString(username) is an admin or not
+// It is meant to be used AFTER RequireAuth()
+func RequireAdmin() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		username := ctx.GetString("username")
+
+		err := config.DB.QueryRow("SELECT username FROM users WHERE username = $1 AND is_admin = TRUE", username).
+			Scan(&username)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Action requires admin privilege"})
+			return
+		}
 		ctx.Next()
 	}
 }

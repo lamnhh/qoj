@@ -167,5 +167,5 @@ func InitialiseRoutes(app *gin.RouterGroup) {
 }
 
 func InitialiseAdminRoutes(app *gin.RouterGroup) {
-	app.GET("/user", token.RequireAuth(), getUser)
+	app.GET("/user", token.RequireAuth(), token.RequireAdmin(), getUser)
 }
