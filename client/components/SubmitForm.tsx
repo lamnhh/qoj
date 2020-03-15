@@ -57,9 +57,13 @@ function SubmitForm({
           languageId,
           code
         })
-      }).then(function() {
-        history.push(redirectUrl);
-      });
+      })
+        .then(function() {
+          history.push(redirectUrl);
+        })
+        .catch(function({ error }) {
+          alert(error);
+        });
     },
     [redirectUrl, history]
   );

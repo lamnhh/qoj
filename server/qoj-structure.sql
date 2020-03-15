@@ -150,7 +150,8 @@ BEGIN
                      LEFT JOIN contests ON (problems.contest_id = contests.id)
                      LEFT JOIN contest_registrations ON (contests.id = contest_registrations.contest_id)
             WHERE NEW.problem_id = problems.id
-              AND (contests.id IS NULL OR contest_registrations.username = NEW.username)
+              AND (contests.id IS NULL OR contest_registrations.username = NEW.username OR
+                   NOW() AT TIME ZONE 'utc' > contests.start_date + (contests.duration || 'minutes') :: interval)
         ) THEN
         RAISE EXCEPTION USING
             MESSAGE = 'Must register first',
