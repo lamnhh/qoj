@@ -67,10 +67,10 @@ CREATE TABLE submission_results
 
 CREATE TABLE contests
 (
-    id           SERIAL,
-    name         CHARACTER(100),
-    start_date   TIMESTAMP,
-    duration     INT, -- duration in minutes
+    id         SERIAL,
+    name       CHARACTER(100),
+    start_date TIMESTAMP,
+    duration   INT, -- duration in minutes
     primary key (id)
 );
 
@@ -116,6 +116,30 @@ CREATE TRIGGER trigger_problem_insert
     ON problems
     FOR EACH ROW
 EXECUTE PROCEDURE insert_problem_original_id();
+
+CREATE OR REPLACE FUNCTION insert_submission_in_contest() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF NOT EXISTS(
+            SELECT *
+            FROM problems
+                     LEFT JOIN contests ON (problems.contest_id = contests.id)
+            WHERE problems.id = NEW.problem_id
+              AND (contest_id IS NULL OR NEW.created_at >= contests.start_date)) THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'Contest has not begun',
+            HINT = 'Contest has not begun',
+            ERRCODE = 'QHHOJ';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_submission_in_contest
+    BEFORE INSERT
+    ON submissions
+    FOR EACH ROW
+EXECUTE PROCEDURE insert_submission_in_contest();
 
 INSERT INTO languages(name, ext, command)
 VALUES ('C', '.c', 'gcc -Wall -lm -static -DEVAL -o %s -O2 %s.c'),

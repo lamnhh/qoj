@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"os"
 	"qoj/server/config"
@@ -44,7 +43,7 @@ func DecodeAccessToken(tokenString string) (string, error) {
 		return []byte(os.Getenv("JWT_ACCESS_SECRET")), nil
 	})
 	if err != nil || !token.Valid {
-		return "", errors.New("invalid token")
+		return "", errors.New("Invalid token")
 	}
 	return claim.Username, nil
 }
@@ -56,7 +55,7 @@ func DecodeRefreshToken(tokenString string) (string, error) {
 		return []byte(os.Getenv("JWT_REFRESH_SECRET")), nil
 	})
 	if err != nil || !token.Valid {
-		return "", errors.New("invalid token")
+		return "", errors.New("Invalid token")
 	}
 	return claim.Username, nil
 }

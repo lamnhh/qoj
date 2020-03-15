@@ -2,7 +2,9 @@ package submission
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"qoj/server/config"
 	"strings"
 	"time"
@@ -60,6 +62,9 @@ func createSubmission(username string, problemId int, languageId int, code strin
 		code,
 	)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			return Submission{}, errors.New(pqErr.Hint)
+		}
 		return Submission{}, err
 	}
 
