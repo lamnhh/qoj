@@ -84,8 +84,8 @@ func UpdateResult(submissionId int, testId int, result Result) error {
 	return nil
 }
 
-func GetResultsOfSubmission(submissionId int) ([]Result, error) {
-	rows, err := config.DB.Query("SELECT * FROM get_submission_result($1)", submissionId)
+func GetResultsOfSubmission(submissionId int, username string) ([]Result, error) {
+	rows, err := config.DB.Query("SELECT * FROM get_submission_result($1, $2)", submissionId, username)
 	if err != nil {
 		return nil, err
 	}
