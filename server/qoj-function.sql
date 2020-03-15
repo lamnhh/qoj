@@ -40,7 +40,6 @@ BEGIN
                      LEFT JOIN contests ON (problems.contest_id = contests.id)
             WHERE submissions.id = _submission_id
               AND (
-                    (submissions.username = _username) OR
                     (contests.id IS NULL) OR
                     (NOW() AT TIME ZONE 'utc' > contests.start_date + (contests.duration || 'minutes') :: interval)
                 )
