@@ -2,25 +2,42 @@
 
 An online judge that uses problem structure similar to that of Themis
 
+Demo video [here](https://www.youtube.com/watch?v=o2DUFkfa8ms)
+
 # Requirement
 
+- A PostgreSQL server running
 - `go >= 1.11` (any version that support Go Modules)
 - `node`
 - `yarn`
 
 # Usage
 
-- `yarn install`.
-- `yarn build`.
-- `go run main.go`
+## Create a .env file
 
-The server will be hosted at `localhost:3000`
+View `.env-sample` to see what `.env` needs to contain.
 
-For now, uploading problem can only be done using a placeholder page at `/static/test-upload-problem.html`.
+## Build Javascript
+
+```
+$ yarn install.
+$ yarn build.
+```
+
+## Start server
+
+```
+$ go run main.go  // client app, for regular users
+$ go run main-admin.go  // admin app, for managing problems and contests
+```
+
+The client app will be hosted on `localhost:3000` and the admin app on `localhost:3001`.
+
+For now, you have to register on the client app and manually modify admin privilege to be able to access the admin app.
 
 # To-Do
 
-- [ ] Admin dashboard (for managing problems, contests, test data).
+- [x] Admin dashboard (for managing problems, contests, test data).
 - [x] Add responsive CSS.
 - [ ] Improve judger (`./timeout`).
 - [ ] Docker for deployment.
