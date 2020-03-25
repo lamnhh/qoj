@@ -5,6 +5,7 @@ import Submission from "../models/Submission";
 import request from "../helpers/request";
 import CodeMirror, { EditorFromTextArea } from "codemirror";
 import ResultList from "../components/ResultList";
+import "codemirror/mode/clike/clike";
 
 interface SubmissionPageRouterProps {
   submissionId: string;

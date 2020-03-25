@@ -35,8 +35,6 @@ func InitialiseApp() *gin.Engine {
 	// Serve client js
 	app.Use(func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", []string{
-			"/node_modules/codemirror/lib/codemirror.js",
-			"/node_modules/codemirror/mode/clike/clike.js",
 			"/static/index.js",
 		})
 	})

@@ -13,7 +13,7 @@ module.exports = {
   devtool: "source-map",
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: [".ts", ".tsx", ".js"]
+    extensions: [".js", ".ts", ".tsx"]
   },
   module: {
     rules: [
@@ -52,6 +52,7 @@ module.exports = {
   },
   output: {
     filename: "[name].js",
+    publicPath: "/static/",
     path: path.join(__dirname, "static")
   },
 
@@ -61,7 +62,6 @@ module.exports = {
   // dependencies, which allows browsers to cache those libraries between builds.
   externals: {
     react: "React",
-    "react-dom": "ReactDOM",
-    codemirror: "CodeMirror"
+    "react-dom": "ReactDOM"
   }
 };
