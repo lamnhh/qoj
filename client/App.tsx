@@ -1,26 +1,31 @@
 import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
-import StatusPage from "./pages/StatusPage";
-import ProblemsetPage from "./pages/ProblemsetPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import loadable from "@loadable/component";
+
 import request from "./helpers/request";
-import { setAccessToken, clearToken } from "./helpers/auth";
+import { setAccessToken } from "./helpers/auth";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import ProblemPage from "./pages/ProblemPage";
 import User from "./models/User";
 import AppContext from "./contexts/AppContext";
 import "./styles/index.scss";
-import { TransitionGroup, CSSTransition } from "react-transition-group";
-import UserPage from "./pages/UserPage";
-import SettingsPage from "./pages/SettingsPage";
-import SubmissionPage from "./pages/SubmissionPage";
-import ContestListPage from "./pages/ContestListPage";
-import ContestParticipantsPage from "./pages/ContestParticipantsPage";
-import ContestPage from "./pages/ContestPage";
 import Logout from "./components/Logout";
+
+const StatusPage = loadable(() => import("./pages/StatusPage"), {});
+const ProblemsetPage = loadable(() => import("./pages/ProblemsetPage"));
+const LoginPage = loadable(() => import("./pages/LoginPage"));
+const RegisterPage = loadable(() => import("./pages/RegisterPage"));
+const ProblemPage = loadable(() => import("./pages/ProblemPage"));
+const UserPage = loadable(() => import("./pages/UserPage"));
+const SettingsPage = loadable(() => import("./pages/SettingsPage"));
+const SubmissionPage = loadable(() => import("./pages/SubmissionPage"));
+const ContestListPage = loadable(() => import("./pages/ContestListPage"));
+const ContestParticipantsPage = loadable(() =>
+  import("./pages/ContestParticipantsPage")
+);
+const ContestPage = loadable(() => import("./pages/ContestPage"));
 
 // Initialise moment-duration
 let moment = require("moment");

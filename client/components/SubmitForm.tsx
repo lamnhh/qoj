@@ -11,6 +11,7 @@ import request from "../helpers/request";
 import Language from "../models/Language";
 import CodeMirror, { EditorFromTextArea } from "codemirror";
 import Problem from "../models/Problem";
+import "codemirror/mode/clike/clike";
 
 interface FormElements extends HTMLFormElement {
   languageId: HTMLSelectElement;
